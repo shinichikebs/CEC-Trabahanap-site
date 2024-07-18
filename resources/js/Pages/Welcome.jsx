@@ -1,6 +1,6 @@
 import { Link, Head } from "@inertiajs/react";
 import { Navbar } from "@/Components/common";
-import { Button } from "@/Components";
+import { Button, NavLink } from "@/Components"; //single line import 
 
 export default function Welcome({ auth, laravelVersion, phpVersion }) {
     const handleImageError = () => {
@@ -31,11 +31,17 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                         Unlock a World of Career Advancements and Project
                         Collaborations Tailored to Your Expertise and Passion
                     </p>
-                    <Button
-                        className={`bg-[#E8AA42] p-2 rounded-lg w-32 text-white`}
-                    >
-                        Get Started
-                    </Button>
+                        <div className={`flex items-center space-x-5`}>
+                            <NavLink active={false} href={`/register`} className={`bg-[#E8AA42] hover:bg-sky-700 hover:bg-blue-700 rounded-lg w-24 text-center text-white`}>Get Started</NavLink>
+                            <a
+                                href="https://sites.google.com/view/risk-coders/home"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={`border border-black hover:bg-blue-700 rounded-lg h-9 w-24 flex items-center justify-center`}>
+                                Learn More
+                            </a>
+                            {/* <NavLink active={false} href={`https://sites.google.com/view/risk-coders/home`} className={`border border-black rounded-lg w-24 text-center`}>Learn More</NavLink> */}
+                        </div>
                     <p className={`text-gray-500 tracking-wide`}>
                         In collaboration with:
                     </p>
