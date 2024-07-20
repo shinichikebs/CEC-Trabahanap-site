@@ -11,7 +11,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
     return (
         <>
             <Head title="Welcome" />
-                <h1>Sample Route</h1>
+                <h1>Sample Routes</h1>
         </>
     );
 }
