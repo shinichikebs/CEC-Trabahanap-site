@@ -1,3 +1,5 @@
+database:
+
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -13,10 +15,15 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->integer('id_number')->unique();
+            $table->string('firstName');
+            $table->string('lastName');
+            $table->string('middleName')->nullable();
             $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
+            $table->timestamp('email_verified_at');
             $table->string('password');
+            $table->enum('role', ['student', 'employee']);
+            $table->enum('gender', ['male', 'female']);
             $table->rememberToken();
             $table->timestamps();
         });
