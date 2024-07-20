@@ -29,23 +29,47 @@ class RegisteredUserController extends Controller
      * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request): RedirectResponse
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
+{
+    // Log the incoming request data
+    \Log::info('Request data:', $request->all());
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+    // Validate the incoming request
+    $request->validate([
+        'id_number' => 'required|integer|unique:users',
+        'firstName' => 'required|string|max:255',
+        'lastName' => 'required|string|max:255',
+        'middleName' => 'nullable|string|max:255',
+        'gender' => 'required|in:male,female',
+        'role' => 'required|in:student,employee',
+        'email' => 'required|string|email|max:255|unique:users',
+        'password' => ['required', 'confirmed', Rules\Password::defaults()],
+    ]);
 
-        event(new Registered($user));
+    // Log the validated data
+    \Log::info('Validated data:', $request->all());
 
-        Auth::login($user);
+    // Create a new user
+    $user = User::create([
+        'id_number' => $request->id_number,
+        'firstName' => $request->firstName,
+        'lastName' => $request->lastName,
+        'middleName' => $request->middleName,
+        'gender' => $request->gender,
+        'role' => $request->role,
+        'email' => $request->email,
+        'password' => Hash::make($request->password),
+    ]);
 
-        return redirect(route('dashboard', absolute: false));
-    }
+    // Fire the Registered event
+    event(new Registered($user));
+
+    // Log the user creation
+    \Log::info('User created:', $user->toArray());
+
+    // Log the user in
+    Auth::login($user);
+
+    // Redirect to the dashboard
+    return redirect(route('dashboard'));
+}
 }

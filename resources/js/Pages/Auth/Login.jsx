@@ -140,7 +140,7 @@ export default function Login({ status, canResetPassword }) {
                     <form onSubmit={submit}>
                         
                     <div className="mt-4">
-                                <InputLabel htmlFor="id_number" value="ID Number" />
+                                <InputLabel className="text-white" htmlFor="id_number" value="ID Number"/>
 
                                 <TextInput
                                     id="id_number"

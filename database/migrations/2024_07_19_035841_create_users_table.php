@@ -1,5 +1,3 @@
-database:
-
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -20,7 +18,7 @@ return new class extends Migration
             $table->string('lastName');
             $table->string('middleName')->nullable();
             $table->string('email')->unique();
-            $table->timestamp('email_verified_at');
+            $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->enum('role', ['student', 'employee']);
             $table->enum('gender', ['male', 'female']);
