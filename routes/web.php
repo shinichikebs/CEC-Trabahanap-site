@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\GoogleAuthController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -15,9 +16,12 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::group(['middleware' => ['auth', 'verified']], function () {
+    Route::get('/dashboard', function () {
+        return Inertia::render('Dashboard');
+    })->name('dashboard');
+    Route::get('/dashboard-data', [DashboardController::class, 'getData']);
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -25,7 +29,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::get('auth/google', [GoogleAuthController::class, 'redirect'])->name('google-auth');
-Route::get('auth/google/call-back', [GoogleAuthController::class, 'callbackGoogle']);
+Route::group(['prefix' => 'auth/google'], function () {
+    Route::get('/', [GoogleAuthController::class, 'redirect'])->name('google-auth');
+    Route::get('/call-back', [GoogleAuthController::class, 'callbackGoogle']);
+});
 
 require __DIR__.'/auth.php';
