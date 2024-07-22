@@ -18,11 +18,15 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
+    protected $table = 'users';
+
     protected $fillable = [
         'id_number',
         'firstName',
         'lastName',
         'middleName',
+        'google_id',
+        'avatar',
         'gender',
         'role',
         'email',
@@ -47,4 +51,8 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function jobOffers () {
+		return $this->hasMany(JobOffer::class);
+	}
 }

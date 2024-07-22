@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->integer('id_number')->unique()->nullable();
+            $table->string('id_number')->unique()->nullable();
             $table->string('firstName');
             $table->string('lastName');
             $table->string('middleName')->nullable();
@@ -21,6 +21,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
             $table->string('google_id')->nullable();
+            $table->string('avatar')->nullable(); 
             $table->enum('role', ['student', 'employee']);
             $table->enum('gender', ['male', 'female']);
             $table->rememberToken();
