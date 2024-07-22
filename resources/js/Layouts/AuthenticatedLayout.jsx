@@ -1,125 +1,94 @@
-import { useState } from 'react';
-import ApplicationLogo from '@/Components/ApplicationLogo';
-import Dropdown from '@/Components/Dropdown';
-import NavLink from '@/Components/NavLink';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
-import { Link } from '@inertiajs/react';
+import { useState } from "react";
+import { Dropdown, NavLink, TextInput } from "@/Components";
+import { IoSettingsOutline, IoLogOutOutline } from "react-icons/io5";
+import { IoMdNotificationsOutline } from "react-icons/io";
+import { TbMessageShare } from "react-icons/tb";
 
 export default function Authenticated({ user, header, children }) {
-    const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
+    const [showingNavigationDropdown, setShowingNavigationDropdown] =
+        useState(false);
 
     return (
-        <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
-            <nav className="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between h-16">
-                        <div className="flex">
-                            <div className="shrink-0 flex items-center">
-                                <Link href="/">
-                                    <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800 dark:text-gray-200" />
-                                </Link>
-                            </div>
+        <div className="min-h-screen">
+            <nav className="flex justify-between items-center min-w-full px-6 py-4 bg-[#231955] ">
+                <ul
+                    className={`flex items-center space-x-10 text-white text-sm`}
+                >
+                    <NavLink
+                        href={route("dashboard")}
+                        className={`text-lg font-bold text-[#E8AA42] uppercase tracking-tight`}
+                    >
+                        CeC-Trabahanap
+                    </NavLink>
+                    <li>Find Work</li>
+                    <li>Our Jobs</li>
+                    <li>About Us</li>
+                </ul>
+                <div className="flex items-center space-x-6">
+                    <TbMessageShare size={25} className="text-white" />
+                    <IoMdNotificationsOutline
+                        size={25}
+                        className="text-white"
+                    />
+                    <div className="ms-3 relative">
+                        <Dropdown>
+                            <Dropdown.Trigger>
+                                <span className="inline-flex rounded-md">
+                                    <button
+                                        type="button"
+                                        className="transition ease-in-out duration-150"
+                                    >
+                                        <img
+                                            src={
+                                                user.avatar
+                                                    ? user.avatar
+                                                    : "https://www.pngall.com/wp-content/uploads/12/Avatar-Profile-Vector-PNG-Pic.png"
+                                            }
+                                            width={35}
+                                            className="object-cover rounded-full shadow-md"
+                                            draggable="false"
+                                        />
+                                    </button>
+                                </span>
+                            </Dropdown.Trigger>
 
-                            <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink href={route('dashboard')} active={route().current('dashboard')}>
-                                    Dashboard
-                                </NavLink>
-                            </div>
-                        </div>
-
-                        <div className="hidden sm:flex sm:items-center sm:ms-6">
-                            <div className="ms-3 relative">
-                                <Dropdown>
-                                    <Dropdown.Trigger>
-                                        <span className="inline-flex rounded-md">
-                                            <button
-                                                type="button"
-                                                className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150"
-                                            >
-                                                {user.name}
-
-                                                <svg
-                                                    className="ms-2 -me-0.5 h-4 w-4"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 20 20"
-                                                    fill="currentColor"
-                                                >
-                                                    <path
-                                                        fillRule="evenodd"
-                                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                                        clipRule="evenodd"
-                                                    />
-                                                </svg>
-                                            </button>
-                                        </span>
-                                    </Dropdown.Trigger>
-
-                                    <Dropdown.Content>
-                                        <Dropdown.Link href={route('profile.edit')}>Profile</Dropdown.Link>
-                                        <Dropdown.Link href={route('logout')} method="post" as="button">
-                                            Log Out
-                                        </Dropdown.Link>
-                                    </Dropdown.Content>
-                                </Dropdown>
-                            </div>
-                        </div>
-
-                        <div className="-me-2 flex items-center sm:hidden">
-                            <button
-                                onClick={() => setShowingNavigationDropdown((previousState) => !previousState)}
-                                className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-900 focus:text-gray-500 dark:focus:text-gray-400 transition duration-150 ease-in-out"
-                            >
-                                <svg className="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                                    <path
-                                        className={!showingNavigationDropdown ? 'inline-flex' : 'hidden'}
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M4 6h16M4 12h16M4 18h16"
-                                    />
-                                    <path
-                                        className={showingNavigationDropdown ? 'inline-flex' : 'hidden'}
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M6 18L18 6M6 6l12 12"
-                                    />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div className={(showingNavigationDropdown ? 'block' : 'hidden') + ' sm:hidden'}>
-                    <div className="pt-2 pb-3 space-y-1">
-                        <ResponsiveNavLink href={route('dashboard')} active={route().current('dashboard')}>
-                            Dashboard
-                        </ResponsiveNavLink>
-                    </div>
-
-                    <div className="pt-4 pb-1 border-t border-gray-200 dark:border-gray-600">
-                        <div className="px-4">
-                            <div className="font-medium text-base text-gray-800 dark:text-gray-200">{user.name}</div>
-                            <div className="font-medium text-sm text-gray-500">{user.email}</div>
-                        </div>
-
-                        <div className="mt-3 space-y-1">
-                            <ResponsiveNavLink href={route('profile.edit')}>Profile</ResponsiveNavLink>
-                            <ResponsiveNavLink method="post" href={route('logout')} as="button">
-                                Log Out
-                            </ResponsiveNavLink>
-                        </div>
+                            <Dropdown.Content>
+                                <img
+                                    src={
+                                        user.avatar
+                                            ? user.avatar
+                                            : "https://www.pngall.com/wp-content/uploads/12/Avatar-Profile-Vector-PNG-Pic.png"
+                                    }
+                                    width={80}
+                                    className="object-cover rounded-full shadow-md mt-2 border-4 border-green-700"
+                                    draggable="false"
+                                />
+                                <h1 className="text-sm mt-2 font-semibold uppercase">
+                                    {user.firstName} {user.lastName}
+                                </h1>
+                                <p className="text-xs font-sans">{user.role}</p>
+                                <Dropdown.Link
+                                    className="flex items-center mt-4"
+                                    href={route("profile.edit")}
+                                >
+                                    <IoSettingsOutline size={16} />
+                                    &nbsp; Settings
+                                </Dropdown.Link>
+                                <Dropdown.Link
+                                    className="flex items-center"
+                                    href={route("logout")}
+                                    method="post"
+                                    as="button"
+                                >
+                                    <IoLogOutOutline size={16} />
+                                    &nbsp;Log Out
+                                </Dropdown.Link>
+                            </Dropdown.Content>
+                        </Dropdown>
                     </div>
                 </div>
             </nav>
-
-            {header && (
-                <header className="bg-white dark:bg-gray-800 shadow">
-                    <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">{header}</div>
-                </header>
-            )}
-
-            <main>{children}</main>
+            <main className="max-w-[1330px] mx-auto">{children}</main>
         </div>
     );
 }
