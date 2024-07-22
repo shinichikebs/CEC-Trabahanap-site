@@ -1,4 +1,5 @@
 export { default as Button } from "./Button";
 export { default as NavLink } from "./NavLink";
-
-//Diri ibutang nyo mga components na gameton para inig import sa Pages dili dghan ang lines duha ni ka index js para under sa commons ug Components 
+export { default as AnchorLink } from "./AnchorLink";
+export { default as TextInput } from "./TextInput";
+export { default as Dropdown } from "./Dropdown";
