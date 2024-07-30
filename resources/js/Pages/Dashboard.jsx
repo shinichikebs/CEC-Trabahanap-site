@@ -1,11 +1,15 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head } from "@inertiajs/react";
-import { Tab } from "@/Components/common";
+import { IoSettingsOutline, IoLogOutOutline } from "react-icons/io5";
+import { IoMdArrowBack } from "react-icons/io";
+import { ImNewTab } from "react-icons/im";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
 export default function Dashboard({ auth }) {
     const [data, setData] = useState([]);
+    const [click, setClick] = useState(false);
+    const [details, setDetails] = useState([]);
     const [profileData, setProfileData] = useState({});
 
     useEffect(() => {
@@ -17,6 +21,18 @@ export default function Dashboard({ auth }) {
 
         return () => clearInterval(interval);
     }, []);
+
+    useEffect(() => {
+        if (click) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "auto";
+        }
+
+        return () => {
+            document.body.style.overflow = "auto";
+        };
+    }, [click]);
 
     const fetchData = () => {
         axios
@@ -73,8 +89,12 @@ export default function Dashboard({ auth }) {
                 <div className="flex flex-col border-t border-gray-300 w-full">
                     {data.map((item) => (
                         <div
-                            className="flex flex-col space-y-4 border-b border-gray-300 py-2 px-4 hover:bg-gray-100"
+                            className="flex flex-col space-y-4 border-b border-gray-300 py-2 px-4 hover:bg-gray-100 cursor-pointer ease-in duration-150"
                             key={item.id}
+                            onClick={() => {
+                                setDetails(item);
+                                setClick(true);
+                            }}
                         >
                             <div className="mt-4">
                                 <p className="text-gray-500 text-xs">
@@ -131,6 +151,42 @@ export default function Dashboard({ auth }) {
                                         : "100%",
                             }}
                         ></div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="flex">
+                <div
+                    onClick={() => setClick(false)}
+                    className={`fixed top-0 w-full h-screen bg-black opacity-50 ease-in-out duration-500 cursor-pointer ${
+                        click ? "left-0" : "left-[-100%]"
+                    }`}
+                ></div>
+                <div
+                    className={`fixed top-0 w-8/12 h-full shadow-md bg-white text-black ${
+                        click ? "right-0" : "right-[-100%]"
+                    } ease-in-out duration-500 p-4 space-y-4 overflow-auto scroll-hidden`}
+                >
+                    <div className="flex items-center justify-between">
+                        <IoMdArrowBack
+                            size={25}
+                            onClick={() => setClick(false)}
+                            className="cursor-pointer"
+                        />
+                        <ImNewTab size={25} />
+                    </div>
+                    <div className="flex mx-8">
+                        <div className="flex flex-col w-full space-y-8">
+                            <h1 className="font-bold text-3xl italic underline text-gray-800">
+                                {click ? details.job_title : ""}
+                            </h1>
+                            <article className="leading-6">
+                                {click ? details.job_description : ""}
+                            </article>
+                        </div>
+                        <div className="flex flex-col items-center w-1/2">
+                            Open Job
+                        </div>
                     </div>
                 </div>
             </div>
