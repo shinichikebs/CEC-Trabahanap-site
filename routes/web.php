@@ -21,6 +21,12 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         return Inertia::render('Dashboard');
     })->name('dashboard');
     Route::get('/dashboard-data', [DashboardController::class, 'getData']);
+
+    Route::get('/post-project', function () {
+    return Inertia::render('PostProject');
+})->name('post-project');
+
+    
 });
 
 Route::middleware('auth')->group(function () {

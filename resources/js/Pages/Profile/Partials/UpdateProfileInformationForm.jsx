@@ -11,6 +11,7 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status, clas
     const { data, setData, patch, errors, processing, recentlySuccessful } = useForm({
         name: user.name,
         email: user.email,
+        id_number: user.id_number || '', // Ensure the ID number can be added if missing
     });
 
     const submit = (e) => {
@@ -61,6 +62,24 @@ export default function UpdateProfileInformation({ mustVerifyEmail, status, clas
 
                     <InputError className="mt-2" message={errors.email} />
                 </div>
+
+                {/* Conditionally render the ID number field if it is missing */}
+                {!user.id_number && (
+                    <div>
+                        <InputLabel htmlFor="id_number" value="ID Number" />
+
+                        <TextInput
+                            id="id_number"
+                            className="mt-1 block w-full"
+                            value={data.id_number}
+                            onChange={(e) => setData('id_number', e.target.value)}
+                            required
+                            placeholder="Add your ID number"
+                        />
+
+                        <InputError className="mt-2" message={errors.id_number} />
+                    </div>
+                )}
 
                 {mustVerifyEmail && user.email_verified_at === null && (
                     <div>

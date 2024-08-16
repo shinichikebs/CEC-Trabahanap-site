@@ -1,6 +1,5 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head } from "@inertiajs/react";
-import { IoSettingsOutline, IoLogOutOutline } from "react-icons/io5";
+import { Head, Link } from "@inertiajs/react";
 import { IoMdArrowBack } from "react-icons/io";
 import { ImNewTab } from "react-icons/im";
 import { useEffect, useState } from "react";
@@ -40,6 +39,7 @@ export default function Dashboard({ auth }) {
             .then((response) => {
                 setData(response.data.jobOffers);
                 setProfileData(response.data.profileData);
+                console.log("Profile Data:", response.data.profileData); // Debugging step
             })
             .catch((error) => {
                 console.error("Error fetching data:", error);
@@ -75,6 +75,9 @@ export default function Dashboard({ auth }) {
         }
     };
 
+    // Explicitly check for undefined, null, and empty values
+    const isProfileIncomplete = !profileData.id_number || profileData.id_number.trim() === "" || !profileData.password || profileData.password.trim() === "";
+
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -96,7 +99,7 @@ export default function Dashboard({ auth }) {
                                 setClick(true);
                             }}
                         >
-                            <div className="mt-4">
+                            <div className="mt-1">
                                 <p className="text-gray-500 text-xs">
                                     Posted{" "}
                                     {item.elapsedTime ||
@@ -106,13 +109,12 @@ export default function Dashboard({ auth }) {
                                     by {item.user.firstName}{" "}
                                     {item.user.lastName}
                                 </p>
-                                <h1 className="text-2xl font-medium mt-1">
+                                <h1 className="text-2xl font-medium ">
                                     {item.job_title}
                                 </h1>
                             </div>
                             <div>
-                                <article>{item.job_description}</article>
-                                <button className="rounded-full p-2 bg-gray-200 text-gray-500 mt-4 mb-4 text-sm font-medium">
+                                <button className="rounded-full p-2 bg-gray-200 text-gray-500 text-sm font-medium">
                                     {item.category}
                                 </button>
                             </div>
@@ -133,22 +135,30 @@ export default function Dashboard({ auth }) {
                             <p className="text-xl font-semibold">
                                 {profileData.firstName} {profileData.lastName}
                             </p>
-                            {/* <p className="text-xs font-medium leading-none text-center">
-                                {profileData.role}
-                            </p> */}
                         </div>
                     </div>
-                    <a className="underline text-sm text-blue-600">
+
+                    {/* Link to profile.edit */}
+                    <Link
+                        href={route("profile.edit")}
+                        className={`underline text-sm ${
+                            isProfileIncomplete ? "text-red-600" : "text-blue-600"
+                        }`}
+                    >
                         Complete your profile
-                    </a>
+                    </Link>
                     <div className="flex items-center bg-gray-200 rounded-full h-1.5 mb-4 dark:bg-gray-700">
                         <div
-                            className="bg-blue-600 h-1.5 rounded-full dark:bg-blue-500"
+                            className={`h-1.5 rounded-full ${
+                                isProfileIncomplete
+                                    ? "bg-red-600"
+                                    : "bg-blue-600"
+                            }`}
                             style={{
                                 width:
-                                    `${profileData.id_number}` == "05173923"
-                                        ? "50%"
-                                        : "100%",
+                                    !isProfileIncomplete
+                                        ? "100%"
+                                        : "50%", // Adjust based on profile completeness
                             }}
                         ></div>
                     </div>

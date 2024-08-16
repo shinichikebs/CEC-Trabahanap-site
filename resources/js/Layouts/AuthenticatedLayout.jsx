@@ -3,6 +3,7 @@ import { Dropdown, NavLink, TextInput } from "@/Components";
 import { IoSettingsOutline, IoLogOutOutline } from "react-icons/io5";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { TbMessageShare } from "react-icons/tb";
+import { Link } from '@inertiajs/react';
 
 export default function Authenticated({ user, header, children }) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
@@ -10,19 +11,36 @@ export default function Authenticated({ user, header, children }) {
 
     return (
         <div className="min-h-screen">
-            <nav className="flex justify-between items-center min-w-full px-6 py-4 bg-[#231955] ">
-                <ul
-                    className={`flex items-center space-x-10 text-white text-sm`}
-                >
-                    <NavLink
-                        href={route("dashboard")}
-                        className={`text-lg font-bold text-[#E8AA42] uppercase tracking-tight`}
-                    >
-                        CeC-Trabahanap
+            <nav className="flex justify-between items-center min-w-full px-6 bg-[#231955] ">
+                <img src={`cecLogo.png`} width={70} />
+            <ul className="flex items-center justify-between space-x-10 text-white text-sm w-full  mr-16">
+                    
+                    <li>
+                        <Link href={route('dashboard')} className="text-lg font-bold text-[#E8AA42] uppercase tracking-tight">
+                            CeC-Trabahanap
+                        </Link>
+                    </li>
+                    <li>
+                        <Link href={route('post-project')} className="text-white">
+                            Post Project
+                        </Link>
+                    </li> 
+{/* <li>
+                        <NavLink
+                            href={route("dashboard")}
+                            className="text-lg font-bold text-[#E8AA42] uppercase tracking-tight"
+                        >
+                            CeC-Trabahanap
+                        </NavLink>
+                    </li>
+                    <li>
+                    <NavLink to={route('post-project')} className="text-white">
+                        Post Project
                     </NavLink>
-                    <li>Find Work</li>
-                    <li>Our Jobs</li>
-                    <li>About Us</li>
+                    </li> */}
+                    {/* <li>Our Jobs</li>
+                    <li>About Us</li> */}
+                    
                 </ul>
                 <div className="flex items-center space-x-6">
                     <TbMessageShare size={25} className="text-white" />
@@ -69,6 +87,13 @@ export default function Authenticated({ user, header, children }) {
                                 <p className="text-xs font-sans">{user.role}</p>
                                 <Dropdown.Link
                                     className="flex items-center mt-4"
+                                    href={route("profile.edit")}
+                                >
+                                    <IoSettingsOutline size={16} />
+                                    &nbsp; My Project
+                                </Dropdown.Link>
+                                <Dropdown.Link
+                                    className="flex items-center "
                                     href={route("profile.edit")}
                                 >
                                     <IoSettingsOutline size={16} />
