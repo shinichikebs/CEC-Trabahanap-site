@@ -87,7 +87,7 @@ export default function Authenticated({ user, header, children }) {
                                 <p className="text-xs font-sans">{user.role}</p>
                                 <Dropdown.Link
                                     className="flex items-center mt-4"
-                                    href={route("profile.edit")}
+                                    href={route("My-project")}
                                 >
                                     <IoSettingsOutline size={16} />
                                     &nbsp; My Project

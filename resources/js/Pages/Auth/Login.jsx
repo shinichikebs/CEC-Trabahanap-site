@@ -46,31 +46,7 @@ export default function Login({ status, canResetPassword }) {
                         )}
 
                         <form onSubmit={submit}>
-                            <div className="mt-4">
-                                <InputLabel
-                                    className="text-white"
-                                    htmlFor="id_number"
-                                    value="ID Number"
-                                />
-
-                                <TextInput
-                                    id="id_number"
-                                    type="text"
-                                    name="id_number"
-                                    value={data.id_Number}
-                                    className="mt-2 block w-full h-9"
-                                    autoComplete="id-number"
-                                    isFocused={true}
-                                    onChange={(e) =>
-                                        setData("id_number", e.target.value)
-                                    }
-                                />
-
-                                <InputError
-                                    message={errors.id_number}
-                                    className="mt-2"
-                                />
-                            </div>
+                            
                             <div className="mt-4">
                                 <InputLabel htmlFor="email" value="Email" />
 

@@ -26,7 +26,9 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     return Inertia::render('PostProject');
 })->name('post-project');
 
-    
+Route::get('/My-project', function () {
+    return Inertia::render('MyProject');
+})->name('My-project');
 });
 
 Route::middleware('auth')->group(function () {
