@@ -31,14 +31,16 @@ export default function Register() {
     return (
         <>
             <Head title="Register" />
-
+            <div
+                    className={`fixed inset-0 w-full h-screen bg-black opacity-50 z-[1]`}
+                ></div>
             <div
                 className="min-h-screen flex items-center justify-center bg-cover bg-center"
                 style={{
                     backgroundImage: `url('/cec.jpg')`,
                 }}
             >
-                <div className="w-full max-w-md py-8">
+                <div className="w-full max-w-md py-8 z-[10]">
                     <h1 className="text-4xl font-bold text-center text-white mb-6">
                         SIGN UP
                     </h1>
