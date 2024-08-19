@@ -131,7 +131,7 @@ export default function PostProject({ auth }) {
                                         name="work-type"
                                         className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring"
                                     >
-                                        <option>full Time</option>
+                                        <option>Full Time</option>
                                         <option>Part Time</option>
                                         
                                         
