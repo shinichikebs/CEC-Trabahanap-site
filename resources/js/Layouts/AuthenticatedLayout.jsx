@@ -3,7 +3,7 @@ import { Dropdown, NavLink, TextInput } from "@/Components";
 import { IoSettingsOutline, IoLogOutOutline } from "react-icons/io5";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { TbMessageShare } from "react-icons/tb";
-import { Link } from '@inertiajs/react';
+
 
 export default function Authenticated({ user, header, children }) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
@@ -15,7 +15,7 @@ export default function Authenticated({ user, header, children }) {
                 <img src={`cecLogo.png`} width={70} />
             <ul className="flex items-center justify-between space-x-10 text-white text-sm w-full  mr-16">
                     
-                    <li>
+                    {/* <li>
                         <Link href={route('dashboard')} className="text-lg font-bold text-[#E8AA42] uppercase tracking-tight">
                             CeC-Trabahanap
                         </Link>
@@ -24,8 +24,8 @@ export default function Authenticated({ user, header, children }) {
                         <Link href={route('post-project')} className="text-white">
                             Post Project
                         </Link>
-                    </li> 
-{/* <li>
+                    </li>  */}
+<li>
                         <NavLink
                             href={route("dashboard")}
                             className="text-lg font-bold text-[#E8AA42] uppercase tracking-tight"
@@ -34,10 +34,10 @@ export default function Authenticated({ user, header, children }) {
                         </NavLink>
                     </li>
                     <li>
-                    <NavLink to={route('post-project')} className="text-white">
+                    <NavLink href={route('post-project')} className="text-white">
                         Post Project
                     </NavLink>
-                    </li> */}
+                    </li>
                     {/* <li>Our Jobs</li>
                     <li>About Us</li> */}
                     
