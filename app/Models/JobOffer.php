@@ -23,4 +23,8 @@ class JobOffer extends Model
     public function user() {
 		return $this->belongsTo(User::class);
 	}
+
+    public function attachment() {
+        return $this->hasMany(Attachment::class);
+    }
 }

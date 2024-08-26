@@ -55,4 +55,8 @@ class User extends Authenticatable
     public function jobOffers () {
 		return $this->hasMany(JobOffer::class);
 	}
+
+    public function files () {
+        return $this->hasMany(Attachment::class);
+    }
 }

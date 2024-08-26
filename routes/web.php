@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PostProjectController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -22,9 +23,11 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     })->name('dashboard');
     Route::get('/dashboard-data', [DashboardController::class, 'getData']);
 
-    Route::get('/post-project', function () {
+Route::get('/post-project', function () {
     return Inertia::render('PostProject');
 })->name('post-project');
+
+Route::post('/post-project-offer', [PostProjectController::class, 'postProject'])->name('post-offer');
 
 Route::get('/My-project', function () {
     return Inertia::render('MyProject');
