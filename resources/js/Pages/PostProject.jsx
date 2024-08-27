@@ -1,6 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { router } from '@inertiajs/react';
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import { AiOutlineLoading3Quarters, AiFillFile } from 'react-icons/ai'; // Icons for loading and file
 
 export default function PostProject({ auth }) {
     const [formData, setFormData] = useState({
@@ -8,15 +9,22 @@ export default function PostProject({ auth }) {
         category: '',
         subCategory: '',
         description: '',
-        uploads: [], // Handle multiple files
+        uploads: [],
         workType: '',
         budget: '',
         daysPostEnd: '',
         terms: false,
     });
 
+    const [uploadStatus, setUploadStatus] = useState([]); // New state to track upload status
+
     const handleFileChange = (e) => {
-        setFormData({ ...formData, uploads: e.target.files });
+        const files = Array.from(e.target.files);
+        setFormData({ ...formData, uploads: files });
+
+        // Set initial status as 'uploading' for each file
+        const initialStatus = files.map(file => ({ file, status: 'uploading' }));
+        setUploadStatus(initialStatus);
     };
 
     const handleTermsChange = (e) => {
@@ -30,18 +38,30 @@ export default function PostProject({ auth }) {
         Object.keys(formData).forEach(key => {
             if (key === 'uploads') {
                 for (const file of formData.uploads) {
-                    console.log('Appending file:', file);
-                    data.append('uploads[]', file); // Handle multiple files
+                    data.append('uploads[]', file);
                 }
             } else {
                 data.append(key, formData[key]);
             }
         });
 
+        // Handle file upload with progress indication
         router.post('/post-project-offer', data, {
             forceFormData: true,
+            onProgress: (event) => {
+                // Update the status based on the progress
+                const percentCompleted = Math.round((event.loaded * 100) / event.total);
+
+                setUploadStatus((prevStatus) =>
+                    prevStatus.map((status) =>
+                        status.status === 'uploading' && percentCompleted === 100
+                            ? { ...status, status: 'done' }
+                            : status
+                    )
+                );
+            },
             onSuccess: () => {
-                console.error('Success');
+                console.log('Success');
             },
             onError: (errors) => {
                 console.error('Error:', errors);
@@ -122,17 +142,34 @@ export default function PostProject({ auth }) {
                             <div className="mb-6">
                                 <h1 className="flex flex-col text-gray-700 text-sm font-bold mb-2">Upload Samples and Other Helpful Material</h1>
                                 <div>
-                                <label className="block w-full h-24 flex justify-center items-center border-2 border-dashed border-gray-400 rounded-lg items-center cursor-pointer" htmlFor="uploads" >
-                                        Drop files here or Browse to add attachments
-                                </label>
-                                <input
-                                    id="uploads"
-                                    name="uploads[]"
-                                    type="file"
-                                    onChange={handleFileChange}
-                                    multiple
-                                    className="hidden"
-                                />
+                                    <label className="block w-full h-24 flex justify-center items-center border-2 border-dashed border-gray-400 rounded-lg items-center cursor-pointer" htmlFor="uploads">
+                                        {uploadStatus.length > 0 ? (
+                                            <div className="flex flex-col space-y-2">
+                                                {uploadStatus.map((fileStatus, index) => (
+                                                    <div key={index} className="flex items-center space-x-2">
+                                                        {fileStatus.status === 'uploading' ? (
+                                                            <AiOutlineLoading3Quarters className="animate-spin text-blue-500" size={20} />
+                                                        ) : (
+                                                            <AiFillFile className="text-green-500" size={20} />
+                                                        )}
+                                                        <span className="text-gray-700 text-sm">
+                                                            {fileStatus.file.name} - {fileStatus.status === 'uploading' ? 'Uploading...' : 'Done uploading'}
+                                                        </span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <span>Drop files here or Browse to add attachments</span>
+                                        )}
+                                    </label>
+                                    <input
+                                        id="uploads"
+                                        name="uploads[]"
+                                        type="file"
+                                        onChange={handleFileChange}
+                                        multiple
+                                        className="hidden"
+                                    />
                                 </div>
                             </div>
 

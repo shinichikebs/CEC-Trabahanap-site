@@ -3,13 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\JobOffer;
-use App\Models\User;
 use App\Models\Attachment;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-
 
 class PostProjectController extends Controller
 {
@@ -18,46 +16,47 @@ class PostProjectController extends Controller
         return Inertia::render('PostProject');
     }
 
+    // Method to handle project posting along with file uploads
     public function postProject(Request $request)
     {
         $validated = $request->validate([
-                        'title' => 'required|string|max:255',
-                        'category' => 'required|string|max:255',
-                        'description' => 'required|string',
-                        'uploads.*' => 'file|mimes:jpg,png,pdf|max:2048',
-                    ]);
+            'title' => 'required|string|max:255',
+            'category' => 'required|string|max:255',
+            'description' => 'required|string',
+            'uploads.*' => 'file|mimes:jpg,png,pdf,docx|max:2048',
+        ]);
 
         $project = new JobOffer();
         $project->job_title = $validated['title'];
         $project->job_description = $validated['description'];
         $project->category = $validated['category'];
-        $project->user_id = Auth::id(); // logged in na user
+        $project->user_id = Auth::id();
         $project->save();
 
         if ($request->hasFile('uploads')) {
-            Log::info('Uploads field is present.');
-    
             foreach ($request->file('uploads') as $file) {
-                // Log file information
-                Log::info('Processing file: ' . $file->getClientOriginalName());
-    
-                // Store each file and get its path
                 $filePath = $file->store('uploads', 'public');
-    
-                // Save file information in the attachments table
+
                 $attachment = new Attachment();
-                $attachment->job_id = $project->id; // last id of project saved above
+                $attachment->job_id = $project->id;
                 $attachment->user_id = Auth::id();
                 $attachment->attachment_path = $filePath;
                 $attachment->save();
-    
-                Log::info('File stored at: ' . $filePath);
             }
-    
+
             return response()->json(['message' => 'Project posted successfully!']);
         } else {
-            Log::info('No files uploaded.');
             return response()->json(['message' => 'No files were uploaded.']);
         }
-  }
+    }
+
+    // Separate method for handling individual file uploads
+    public function uploadFile(Request $request)
+    {
+        $request->validate(['file' => 'required|file|mimes:jpg,png,pdf,docx|max:2048']);
+    
+        $filePath = $request->file('file')->store('uploads', 'public');
+
+        return response()->json(['filePath' => $filePath]);
+    }
 }

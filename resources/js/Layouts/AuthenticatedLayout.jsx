@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Dropdown, NavLink, TextInput } from "@/Components";
 import { IoSettingsOutline, IoLogOutOutline } from "react-icons/io5";
 import { IoMdNotificationsOutline } from "react-icons/io";
+import { BiFolderOpen } from "react-icons/bi";
 import { TbMessageShare } from "react-icons/tb";
 
 
@@ -89,7 +90,7 @@ export default function Authenticated({ user, header, children }) {
                                     className="flex items-center mt-4"
                                     href={route("My-project")}
                                 >
-                                    <IoSettingsOutline size={16} />
+                                    <BiFolderOpen size={16} />
                                     &nbsp; My Project
                                 </Dropdown.Link>
                                 <Dropdown.Link

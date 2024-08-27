@@ -27,7 +27,11 @@ Route::get('/post-project', function () {
     return Inertia::render('PostProject');
 })->name('post-project');
 
-Route::post('/post-project-offer', [PostProjectController::class, 'postProject'])->name('post-offer');
+Route::post('/post-project-offer', [PostProjectController::class, 'postProject']);
+Route::post('/upload-file-endpoint', [PostProjectController::class, 'uploadFile']);
+// Route::post('/post-project-offer', [PostProjectController::class, 'postProject'])->name('post-offer');
+
+// Route::post('/upload-file-endpoint', [PostProjectController::class, 'uploadFile'])->name('upload-file');
 
 Route::get('/My-project', function () {
     return Inertia::render('MyProject');
@@ -43,6 +47,6 @@ Route::middleware('auth')->group(function () {
 Route::group(['prefix' => 'auth/google'], function () {
     Route::get('/', [GoogleAuthController::class, 'redirect'])->name('google-auth');
     Route::get('/call-back', [GoogleAuthController::class, 'callbackGoogle']);
-});
+}); 
 
 require __DIR__.'/auth.php';

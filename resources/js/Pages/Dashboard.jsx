@@ -7,6 +7,7 @@ import axios from "axios";
 
 export default function Dashboard({ auth }) {
     const [data, setData] = useState([]);
+    const [Attachment, setAttachment] = useState ([]);
     const [click, setClick] = useState(false);
     const [details, setDetails] = useState([]);
     const [profileData, setProfileData] = useState({});
@@ -38,6 +39,7 @@ export default function Dashboard({ auth }) {
             .get("/dashboard-data")
             .then((response) => {
                 setData(response.data.jobOffers);
+                setAttachment(response.data.Attachment)
                 setProfileData(response.data.profileData);
                 console.log("Profile Data:", response.data.profileData); // Debugging step
             })
@@ -193,6 +195,26 @@ export default function Dashboard({ auth }) {
                             <article className="leading-6">
                                 {click ? details.job_description : ""}
                             </article>
+
+                            {/* Display Attachments */}
+                            <div className="flex flex-col space-y-2">
+                                <p className="text-gray-500 text-sm">Attachments:</p>
+                                {click && details.attachments && details.attachments.length > 0 ? (
+                                    details.attachments.map((attachment) => (
+                                        <a
+                                            href={attachment.attachment_path}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            key={attachment.id}
+                                            className="text-blue-500 underline"
+                                        >
+                                            {attachment.attachment_path.split('/').pop()} {/* Display file name */}
+                                        </a>
+                                    ))
+                                ) : (
+                                    <p className="text-gray-500 text-xs">No attachments available</p>
+                                )}
+                            </div>
                         </div>
                         <div className="flex flex-col items-center w-1/2">
                             Open Job
@@ -200,6 +222,7 @@ export default function Dashboard({ auth }) {
                     </div>
                 </div>
             </div>
+
         </AuthenticatedLayout>
     );
 }
