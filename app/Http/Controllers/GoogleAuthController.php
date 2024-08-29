@@ -48,7 +48,9 @@ class GoogleAuthController extends Controller
                 return redirect()->route('dashboard');
         }
         catch (\Throwable $th) {
-            dd('Something went wrong!'. $th->getMessage());
+            \Log::error('Google OAuth Error: ' . $th->getMessage());
+            return redirect()->route('login')->with('error', 'Something went wrong during authentication. Please try again.');
         }
+        
     }
 }

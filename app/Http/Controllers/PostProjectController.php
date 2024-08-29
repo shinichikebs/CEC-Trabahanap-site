@@ -59,4 +59,23 @@ class PostProjectController extends Controller
 
         return response()->json(['filePath' => $filePath]);
     }
+
+    public function edit($id)
+        {
+            // Fetch the job offer by its ID, including related attachments
+            $jobOffer = JobOffer::with('attachments')->findOrFail($id);
+
+            return Inertia::render('PostProject', [
+                'jobOffer' => $jobOffer,
+            ]);
+        }
+    public function destroy($id)
+        {
+            $project = JobOffer::findOrFail($id);
+            $project->delete();
+
+            return response()->json(['success' => 'Project deleted successfully.']);
+        }
+
+
 }
