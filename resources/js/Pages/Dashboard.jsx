@@ -178,7 +178,7 @@ export default function Dashboard({ auth }) {
                     click ? "left-0" : "left-[-100%]"
                 }`}
             ></div>
-
+                        <h1>HEy</h1>
 
                         <div className={`fixed top-14 w-8/12 h-[92vh] shadow-md bg-white text-black ${click ? "right-100" : "right-[-100%]"} ease-in-out duration-500 p-4 space-y-4 overflow-y-auto`}>
                                 <div className="flex items-center justify-between">
