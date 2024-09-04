@@ -19,12 +19,36 @@ export default function PostProject({ auth, jobOffer }) {
     const [uploadStatus, setUploadStatus] = useState([]);
     const [existingFiles, setExistingFiles] = useState(jobOffer?.attachments || []);
 
-    const handleFileChange = (e) => {
+    const handleFileChange = async (e) => {
         const files = Array.from(e.target.files);
         setFormData({ ...formData, uploads: files });
 
         const initialStatus = files.map(file => ({ file, status: 'uploading' }));
         setUploadStatus(initialStatus);
+
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+
+                await fakeUploadFile(formData);
+
+                setUploadStatus((prevStatus) =>
+                    prevStatus.map((status, index) =>
+                        index === i ? { ...status, status: 'done' } : status
+                    )
+                );
+            } catch (error) {
+                console.error('Upload error:', error);
+                setUploadStatus((prevStatus) =>
+                    prevStatus.map((status, index) =>
+                        index === i ? { ...status, status: 'error' } : status
+                    )
+                );
+            }
+        }
     };
 
     const handleTermsChange = (e) => {
@@ -48,17 +72,6 @@ export default function PostProject({ auth, jobOffer }) {
         const routeUrl = jobOffer ? `/post-project/${jobOffer.id}/update` : '/post-project-offer';
         router.post(routeUrl, data, {
             forceFormData: true,
-            onProgress: (event) => {
-                const percentCompleted = Math.round((event.loaded * 100) / event.total);
-
-                setUploadStatus((prevStatus) =>
-                    prevStatus.map((status) =>
-                        status.status === 'uploading' && percentCompleted === 100
-                            ? { ...status, status: 'done' }
-                            : status
-                    )
-                );
-            },
             onSuccess: () => {
                 console.log('Success');
             },
@@ -68,17 +81,24 @@ export default function PostProject({ auth, jobOffer }) {
         });
     };
 
+    // Simulate an upload request
+    const fakeUploadFile = (formData) => {
+        return new Promise((resolve) => {
+            setTimeout(() => resolve("File uploaded successfully"), 2000);
+        });
+    };
+
     return (
-                <AuthenticatedLayout 
-                    user={auth.user} 
-                    header={
-                        <div className="bg-purple-900 text-white py-4 px-6 shadow-lg">
-                            <h2 className="font-semibold text-xl leading-tight">
-                                {jobOffer ? 'Edit Project' : 'Post Project'}
-                            </h2>
-                        </div>
-                    }
-                >
+        <AuthenticatedLayout 
+            user={auth.user} 
+            header={
+                <div className="bg-purple-900 text-white py-4 px-6 shadow-lg">
+                    <h2 className="font-semibold text-xl leading-tight">
+                        {jobOffer ? 'Edit Project' : 'Post Project'}
+                    </h2>
+                </div>
+            }
+        >
             <div className="bg-gray-100 py-10">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="bg-white shadow-md rounded-lg px-8 py-6">
