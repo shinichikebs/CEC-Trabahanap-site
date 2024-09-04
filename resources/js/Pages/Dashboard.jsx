@@ -4,9 +4,12 @@ import { IoMdArrowBack } from "react-icons/io";
 import { ImNewTab } from "react-icons/im";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { FaFileAlt } from "react-icons/fa";
+
 
 export default function Dashboard({ auth }) {
     const [data, setData] = useState([]);
+    const [Attachment, setAttachment] = useState ([]);
     const [click, setClick] = useState(false);
     const [details, setDetails] = useState([]);
     const [profileData, setProfileData] = useState({});
@@ -38,6 +41,7 @@ export default function Dashboard({ auth }) {
             .get("/dashboard-data")
             .then((response) => {
                 setData(response.data.jobOffers);
+                setAttachment(response.data.Attachment)
                 setProfileData(response.data.profileData);
                 console.log("Profile Data:", response.data.profileData); // Debugging step
             })
@@ -88,6 +92,7 @@ export default function Dashboard({ auth }) {
             }
         >
             <Head title="Dashboard" />
+            
             <div className="flex justify-between items-start mt-4 space-x-10">
                 <div className="flex flex-col border-t border-gray-300 w-full">
                     {data.map((item) => (
@@ -121,7 +126,7 @@ export default function Dashboard({ auth }) {
                         </div>
                     ))}
                 </div>
-                <div className="flex flex-col bg-gray-200 w-1/4 rounded-lg p-4 space-y-4 sticky top-[10px]">
+                <div className="flex flex-col bg-gray-200 w-1/4 rounded-lg p-4 space-y-4 sticky top-[70px]">
                     <div className="flex items-start space-x-5">
                         <img
                             src={
@@ -158,7 +163,7 @@ export default function Dashboard({ auth }) {
                                 width:
                                     !isProfileIncomplete
                                         ? "100%"
-                                        : "50%", // Adjust based on profile completeness
+                                        : "50%",
                             }}
                         ></div>
                     </div>
@@ -166,40 +171,71 @@ export default function Dashboard({ auth }) {
             </div>
 
             <div className="flex">
-                <div
-                    onClick={() => setClick(false)}
-                    className={`fixed top-0 w-full h-screen bg-black opacity-50 ease-in-out duration-500 cursor-pointer ${
-                        click ? "left-0" : "left-[-100%]"
-                    }`}
-                ></div>
-                <div
-                    className={`fixed top-0 w-8/12 h-full shadow-md bg-white text-black ${
-                        click ? "right-0" : "right-[-100%]"
-                    } ease-in-out duration-500 p-4 space-y-4 overflow-auto scroll-hidden`}
-                >
-                    <div className="flex items-center justify-between">
-                        <IoMdArrowBack
-                            size={25}
-                            onClick={() => setClick(false)}
-                            className="cursor-pointer"
-                        />
-                        <ImNewTab size={25} />
-                    </div>
-                    <div className="flex mx-8">
-                        <div className="flex flex-col w-full space-y-8">
-                            <h1 className="font-bold text-3xl italic underline text-gray-800">
-                                {click ? details.job_title : ""}
-                            </h1>
-                            <article className="leading-6">
-                                {click ? details.job_description : ""}
-                            </article>
+    {/* Background overlay */}
+            <div
+                onClick={() => setClick(false)}
+                className={`fixed top-0 w-full h-screen bg-black opacity-50 ease-in-out duration-500 cursor-pointer ${
+                    click ? "left-0" : "left-[-100%]"
+                }`}
+            ></div>
+
+
+                        <div className={`fixed top-14 w-8/12 h-[92vh] shadow-md bg-white text-black ${click ? "right-100" : "right-[-100%]"} ease-in-out duration-500 p-4 space-y-4 overflow-y-auto`}>
+                                <div className="flex items-center justify-between">
+                                    <IoMdArrowBack size={25} onClick={() => setClick(false)} className="cursor-pointer" />
+                                    <ImNewTab size={25} />
+                                </div>
+
+                                <div className="flex mx-8 flex-col space-y-8">
+                                    {/* Job Title */}
+                                    <h1 className="font-bold text-3xl italic underline text-gray-800">{click ? details.job_title : ""}</h1>
+
+                                    {/* Job Description */}
+                                    <article className="leading-6">{click ? details.job_description : ""}</article>
+
+                                    {/* Attachments */}
+                                    <div className="flex flex-col space-y-2">
+                                        <p className="text-gray-500 text-sm">Attachments:</p>
+                                        {click && details.attachments && details.attachments.length > 0 ? (
+                                            details.attachments.map((attachment) => (
+                                                <a href={attachment.attachment_path} target="_blank" rel="noopener noreferrer" key={attachment.id} className="text-blue-500">
+                                                    <FaFileAlt className="text-lg" />
+                                                </a>
+                                            ))
+                                        ) : (
+                                            <p className="text-gray-500 text-xs">No attachments available</p>
+                                        )}
+                                    </div>
+
+                                    {/* Proposal Details */}
+                                    <div className="mt-4">
+                                        <label className="block text-sm font-medium text-gray-700">Enter Your Proposal Details</label>
+                                        <textarea
+                                            className="mt-1 block w-full px-3 py-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                            placeholder="Provide general info about your proposal, e.g., what you can deliver and when, why you think you can do the project, etc."
+                                        ></textarea>
+                                    </div>
+
+                                    {/* Attachments */}
+                                    <div className="mt-4">
+                                        <label className="block text-sm font-medium text-gray-700">Attachments</label>
+                                        <input type="file" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                                    </div>
+
+
+
+                                    {/* Submit Button */}
+                                    <div className="mt-4 flex justify-end">
+                                        <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                                            Submit Proposal
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div className="flex flex-col items-center w-1/2">
-                            Open Job
-                        </div>
-                    </div>
-                </div>
-            </div>
+                    
+
+
         </AuthenticatedLayout>
     );
 }

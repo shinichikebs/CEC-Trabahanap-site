@@ -18,20 +18,26 @@ Route::get('/', function () {
 });
 
 Route::group(['middleware' => ['auth', 'verified']], function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    
     Route::get('/dashboard-data', [DashboardController::class, 'getData']);
 
-Route::get('/post-project', function () {
-    return Inertia::render('PostProject');
-})->name('post-project');
+    Route::get('/post-project', function () {
+        return Inertia::render('PostProject');
+    })->name('post-project');
 
-Route::post('/post-project-offer', [PostProjectController::class, 'postProject'])->name('post-offer');
+    Route::post('/post-project-offer', [PostProjectController::class, 'postProject']);
 
-Route::get('/My-project', function () {
-    return Inertia::render('MyProject');
-})->name('My-project');
+    Route::post('/upload-file-endpoint', [PostProjectController::class, 'uploadFile']);
+
+    Route::get('/post-project/{id}/edit', [PostProjectController::class, 'edit'])->name('post-project.edit');
+
+    Route::delete('/post-project/{id}', [PostProjectController::class, 'destroy'])->name('post-project.destroy');
+
+
+    Route::get('/My-project', function () {
+        return Inertia::render('MyProject');
+    })->name('My-project');
 });
 
 Route::middleware('auth')->group(function () {
@@ -43,6 +49,6 @@ Route::middleware('auth')->group(function () {
 Route::group(['prefix' => 'auth/google'], function () {
     Route::get('/', [GoogleAuthController::class, 'redirect'])->name('google-auth');
     Route::get('/call-back', [GoogleAuthController::class, 'callbackGoogle']);
-});
+}); 
 
 require __DIR__.'/auth.php';

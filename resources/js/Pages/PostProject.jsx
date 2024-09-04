@@ -1,22 +1,54 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { router } from '@inertiajs/react';
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import { AiOutlineLoading3Quarters, AiFillFile } from 'react-icons/ai';
 
-export default function PostProject({ auth }) {
+export default function PostProject({ auth, jobOffer }) { 
     const [formData, setFormData] = useState({
-        title: '',
-        category: '',
-        subCategory: '',
-        description: '',
-        uploads: [], // Handle multiple files
-        workType: '',
-        budget: '',
-        daysPostEnd: '',
+        title: jobOffer?.job_title || '',
+        category: jobOffer?.category || '',
+        subCategory: jobOffer?.subCategory || '',
+        description: jobOffer?.job_description || '',
+        uploads: [],
+        workType: jobOffer?.workType || '',
+        budget: jobOffer?.budget || '',
+        daysPostEnd: jobOffer?.daysPostEnd || '',
         terms: false,
     });
 
-    const handleFileChange = (e) => {
-        setFormData({ ...formData, uploads: e.target.files });
+    const [uploadStatus, setUploadStatus] = useState([]);
+    const [existingFiles, setExistingFiles] = useState(jobOffer?.attachments || []);
+
+    const handleFileChange = async (e) => {
+        const files = Array.from(e.target.files);
+        setFormData({ ...formData, uploads: files });
+
+        const initialStatus = files.map(file => ({ file, status: 'uploading' }));
+        setUploadStatus(initialStatus);
+
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+
+                await fakeUploadFile(formData);
+
+                setUploadStatus((prevStatus) =>
+                    prevStatus.map((status, index) =>
+                        index === i ? { ...status, status: 'done' } : status
+                    )
+                );
+            } catch (error) {
+                console.error('Upload error:', error);
+                setUploadStatus((prevStatus) =>
+                    prevStatus.map((status, index) =>
+                        index === i ? { ...status, status: 'error' } : status
+                    )
+                );
+            }
+        }
     };
 
     const handleTermsChange = (e) => {
@@ -30,18 +62,18 @@ export default function PostProject({ auth }) {
         Object.keys(formData).forEach(key => {
             if (key === 'uploads') {
                 for (const file of formData.uploads) {
-                    console.log('Appending file:', file);
-                    data.append('uploads[]', file); // Handle multiple files
+                    data.append('uploads[]', file);
                 }
             } else {
                 data.append(key, formData[key]);
             }
         });
 
-        router.post('/post-project-offer', data, {
+        const routeUrl = jobOffer ? `/post-project/${jobOffer.id}/update` : '/post-project-offer';
+        router.post(routeUrl, data, {
             forceFormData: true,
             onSuccess: () => {
-                console.error('Success');
+                console.log('Success');
             },
             onError: (errors) => {
                 console.error('Error:', errors);
@@ -49,14 +81,29 @@ export default function PostProject({ auth }) {
         });
     };
 
+    // Simulate an upload request
+    const fakeUploadFile = (formData) => {
+        return new Promise((resolve) => {
+            setTimeout(() => resolve("File uploaded successfully"), 2000);
+        });
+    };
+
     return (
-        <AuthenticatedLayout user={auth.user} header={<h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Post Project</h2>}>
+        <AuthenticatedLayout 
+            user={auth.user} 
+            header={
+                <div className="bg-purple-900 text-white py-4 px-6 shadow-lg">
+                    <h2 className="font-semibold text-xl leading-tight">
+                        {jobOffer ? 'Edit Project' : 'Post Project'}
+                    </h2>
+                </div>
+            }
+        >
             <div className="bg-gray-100 py-10">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="bg-white shadow-md rounded-lg px-8 py-6">
                         <form onSubmit={handleSubmit} encType="multipart/form-data">
-                            @csrf
-                            {/* Title Input */}
+                            
                             <div className="mb-6">
                                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="title">What Do You Need To Get Done</label>
                                 <input
@@ -71,7 +118,6 @@ export default function PostProject({ auth }) {
                                 />
                             </div>
 
-                            {/* Category Section */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                 <div>
                                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="category">Pick Category</label>
@@ -86,7 +132,6 @@ export default function PostProject({ auth }) {
                                         <option value="">Select Category</option>
                                         <option value="Video Editing">Video Editing</option>
                                         <option value="Photo Editing">Photo Editing</option>
-                                        {/* Add more options as needed */}
                                     </select>
                                 </div>
                                 <div>
@@ -103,7 +148,6 @@ export default function PostProject({ auth }) {
                                 </div>
                             </div>
 
-                            {/* Description Input */}
                             <div className="mb-6">
                                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="description">Description</label>
                                 <textarea
@@ -118,27 +162,51 @@ export default function PostProject({ auth }) {
                                 ></textarea>
                             </div>
 
-                            {/* File Upload Section */}
                             <div className="mb-6">
                                 <h1 className="flex flex-col text-gray-700 text-sm font-bold mb-2">Upload Samples and Other Helpful Material</h1>
                                 <div>
-                                <label className="block w-full h-24 flex justify-center items-center border-2 border-dashed border-gray-400 rounded-lg items-center cursor-pointer" htmlFor="uploads" >
-                                        Drop files here or Browse to add attachments
-                                </label>
-                                <input
-                                    id="uploads"
-                                    name="uploads[]"
-                                    type="file"
-                                    onChange={handleFileChange}
-                                    multiple
-                                    className="hidden"
-                                />
+                                    <label className="block w-full h-24 flex justify-center items-center border-2 border-dashed border-gray-400 rounded-lg items-center cursor-pointer" htmlFor="uploads">
+                                        {uploadStatus.length > 0 ? (
+                                            <div className="flex flex-col space-y-2">
+                                                {uploadStatus.map((fileStatus, index) => (
+                                                    <div key={index} className="flex items-center space-x-2">
+                                                        {fileStatus.status === 'uploading' ? (
+                                                            <AiOutlineLoading3Quarters className="animate-spin text-blue-500" size={20} />
+                                                        ) : (
+                                                            <AiFillFile className="text-green-500" size={20} />
+                                                        )}
+                                                        <span className="text-gray-700 text-sm">
+                                                            {fileStatus.file.name} - {fileStatus.status === 'uploading' ? 'Uploading...' : 'Done uploading'}
+                                                        </span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <span>Drop files here or Browse to add attachments</span>
+                                        )}
+                                    </label>
+                                    <input
+                                        id="uploads"
+                                        name="uploads[]"
+                                        type="file"
+                                        onChange={handleFileChange}
+                                        multiple
+                                        className="hidden"
+                                    />
                                 </div>
+                                {existingFiles.length > 0 && (
+                                    <div className="mt-4">
+                                        <h2 className="text-sm font-semibold text-gray-700">Existing Attachments:</h2>
+                                        <ul>
+                                            {existingFiles.map((file, index) => (
+                                                <li key={index} className="text-sm text-gray-600">{file.attachment_path}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
                             </div>
 
-                            {/* Additional Fields */}
                             <div className="grid md:grid-cols-4 gap-2 mb-6">
-                                {/* Work Type */}
                                 <div>
                                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="work-type">Work Type</label>
                                     <select
@@ -155,20 +223,18 @@ export default function PostProject({ auth }) {
                                         
 =======
                                         <option value="">Select Work Type</option>
-                                        <option value="full Time">Full Time</option>
+                                        <option value="Full Time">Full Time</option>
                                         <option value="Part Time">Part Time</option>
                                         {/* Add more options as needed */}
 >>>>>>> 8dc0d51300ab1fcf8dcc30126c1bda8e2420b098
                                     </select>
                                 </div>
 
-                                {/* Currency */}
                                 <div>
                                     <label className="block text-gray-700 text-sm font-bold mb-2">Currency</label>
                                     <p className="py-1">PHP*</p>
                                 </div>
 
-                                {/* Budget */}
                                 <div>
                                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="budget">Budget (Optional)</label>
                                     <input
@@ -183,7 +249,6 @@ export default function PostProject({ auth }) {
                                 </div>
                             </div>
 
-                            {/* Days to Post End */}
                             <div className="mb-6">
                                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="days-post-end">Days Post End</label>
                                 <input
@@ -197,7 +262,6 @@ export default function PostProject({ auth }) {
                                 />
                             </div>
 
-                            {/* Terms and Conditions */}
                             <div className="mb-6">
                                 <div className="flex items-center">
                                     <input
@@ -214,14 +278,13 @@ export default function PostProject({ auth }) {
                                 </div>
                             </div>
 
-                            {/* Submit Button */}
                             <div className="flex justify-center">
                                 <button
                                     type="submit"
                                     className={`bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg focus:outline-none focus:ring ${!formData.terms ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     disabled={!formData.terms}
                                 >
-                                    POST PROJECT
+                                    {jobOffer ? 'UPDATE PROJECT' : 'POST PROJECT'}
                                 </button>
                             </div>
                         </form>
