@@ -188,10 +188,11 @@ export default function Dashboard({ auth }) {
 
                                 <div className="flex mx-8 flex-col space-y-8">
                                     {/* Job Title */}
-                                    <h1 className="font-bold text-3xl italic underline text-gray-800">{click ? details.job_title : ""}</h1>
+                                    <h1 className="font-bold  text-3xl italic underline text-gray-800 ">{click ? details.job_title : ""}</h1>
 
                                     {/* Job Description */}
-                                    <article className="leading-6">{click ? details.job_description : ""}</article>
+                                    
+                                    <article className="leading-6"><p className="text-2xl font-medium">Description</p>{click ? details.job_description : ""}</article>
 
                                     {/* Attachments */}
                                     <div className="flex flex-col space-y-2">
@@ -209,17 +210,20 @@ export default function Dashboard({ auth }) {
 
                                     {/* Proposal Details */}
                                     <div className="mt-4">
-                                        <label className="block text-sm font-medium text-gray-700">Enter Your Proposal Details</label>
+                                        <h1 className="text-3xl font-medium">New Proposal</h1>
+                                        <div className="px-5">
+                                        <label className="block text-sm font-medium text-gray-700 mt-2">Enter Your Proposal Details</label>
                                         <textarea
-                                            className="mt-1 block w-full px-3 py-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                            className="mt-2 block w-full px-3 py-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                             placeholder="Provide general info about your proposal, e.g., what you can deliver and when, why you think you can do the project, etc."
                                         ></textarea>
+                                        </div>
                                     </div>
 
                                     {/* Attachments */}
-                                    <div className="mt-4">
+                                    <div className="mt-4 px-5">
                                         <label className="block text-sm font-medium text-gray-700">Attachments</label>
-                                        <input type="file" className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                                        <input type="file" className="mt-1 block  px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
                                     </div>
 
 
