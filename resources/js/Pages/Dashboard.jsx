@@ -191,8 +191,8 @@ export default function Dashboard({ auth }) {
                                     <h1 className="font-bold  text-3xl italic underline text-gray-800 ">{click ? details.job_title : ""}</h1>
 
                                     {/* Job Description */}
-                                    
-                                    <article className="leading-6"><p className="text-2xl font-medium">Description</p>{click ? details.job_description : ""}</article>
+                                    <p className="text-3xl font-medium">Description</p>
+                                    <article className="leading-6 px-5">{click ? details.job_description : ""}</article>
 
                                     {/* Attachments */}
                                     <div className="flex flex-col space-y-2">
@@ -211,7 +211,7 @@ export default function Dashboard({ auth }) {
                                     {/* Proposal Details */}
                                     <div className="mt-4">
                                         <h1 className="text-3xl font-medium">New Proposal</h1>
-                                        <div className="px-5">
+                                        <div className="px-4">
                                         <label className="block text-sm font-medium text-gray-700 mt-2">Enter Your Proposal Details</label>
                                         <textarea
                                             className="mt-2 block w-full px-3 py-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
@@ -223,7 +223,7 @@ export default function Dashboard({ auth }) {
                                     {/* Attachments */}
                                     <div className="mt-4 px-5">
                                         <label className="block text-sm font-medium text-gray-700">Attachments</label>
-                                        <input type="file" className="mt-1 block  px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
+                                        <input type="file" className="mt-1 block px-2 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
                                     </div>
 
 
