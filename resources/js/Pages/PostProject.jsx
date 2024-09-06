@@ -32,7 +32,6 @@ export default function PostProject({ auth, jobOffer }) {
             formData.append('file', file);
 
             try {
-
                 await fakeUploadFile(formData);
 
                 setUploadStatus((prevStatus) =>
@@ -118,7 +117,7 @@ export default function PostProject({ auth, jobOffer }) {
                                 />
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                                 <div>
                                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="category">Pick Category</label>
                                     <select
@@ -206,7 +205,7 @@ export default function PostProject({ auth, jobOffer }) {
                                 )}
                             </div>
 
-                            <div className="grid md:grid-cols-4 gap-2 mb-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                                 <div>
                                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="work-type">Work Type</label>
                                     <select
@@ -216,17 +215,8 @@ export default function PostProject({ auth, jobOffer }) {
                                         onChange={(e) => setFormData({ ...formData, workType: e.target.value })}
                                         className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring"
                                     >
-<<<<<<< HEAD
                                         <option>Full Time</option>
                                         <option>Part Time</option>
-                                        
-                                        
-=======
-                                        <option value="">Select Work Type</option>
-                                        <option value="Full Time">Full Time</option>
-                                        <option value="Part Time">Part Time</option>
-                                        {/* Add more options as needed */}
->>>>>>> 8dc0d51300ab1fcf8dcc30126c1bda8e2420b098
                                     </select>
                                 </div>
 
