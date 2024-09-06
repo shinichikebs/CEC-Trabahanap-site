@@ -215,8 +215,9 @@ export default function PostProject({ auth, jobOffer }) {
                                         onChange={(e) => setFormData({ ...formData, workType: e.target.value })}
                                         className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring"
                                     >
-                                        <option>Full Time</option>
-                                        <option>Part Time</option>
+                                        <option value="">Select Work Type</option>
+                                        <option value="Full Time">Full Time</option>
+                                        <option value="Part Time">Part Time</option>
                                     </select>
                                 </div>
 
