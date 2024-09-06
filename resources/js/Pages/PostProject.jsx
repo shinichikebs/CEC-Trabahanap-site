@@ -32,7 +32,6 @@ export default function PostProject({ auth, jobOffer }) {
             formData.append('file', file);
 
             try {
-
                 await fakeUploadFile(formData);
 
                 setUploadStatus((prevStatus) =>
@@ -118,7 +117,7 @@ export default function PostProject({ auth, jobOffer }) {
                                 />
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                                 <div>
                                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="category">Pick Category</label>
                                     <select
@@ -206,7 +205,7 @@ export default function PostProject({ auth, jobOffer }) {
                                 )}
                             </div>
 
-                            <div className="grid md:grid-cols-4 gap-2 mb-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                                 <div>
                                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="work-type">Work Type</label>
                                     <select
