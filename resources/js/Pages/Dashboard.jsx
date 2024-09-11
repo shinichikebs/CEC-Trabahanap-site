@@ -79,7 +79,6 @@ export default function Dashboard({ auth }) {
         }
     };
 
-    // Explicitly check for undefined, null, and empty values
     const isProfileIncomplete = !profileData.id_number || profileData.id_number.trim() === "" || !profileData.password || profileData.password.trim() === "";
 
     return (

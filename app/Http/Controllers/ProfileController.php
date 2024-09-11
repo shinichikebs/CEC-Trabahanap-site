@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 use Inertia\Response;
 
+
 class ProfileController extends Controller
 {
     /**
@@ -67,4 +68,5 @@ class ProfileController extends Controller
 
         return Redirect::to('/');
     }
+
 }

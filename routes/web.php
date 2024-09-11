@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PostProjectController;
@@ -31,6 +32,9 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::post('/upload-file-endpoint', [PostProjectController::class, 'uploadFile']);
 
     Route::get('/post-project/{id}/edit', [PostProjectController::class, 'edit'])->name('post-project.edit');
+
+    Route::get('/search-user', [UserController::class, 'searchUser']);
+    Route::get('/profile/{id}', [UserController::class, 'show'])->name('profile.show');
 
     Route::delete('/post-project/{id}', [PostProjectController::class, 'destroy'])->name('post-project.destroy');
 

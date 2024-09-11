@@ -4,21 +4,39 @@ import { IoSettingsOutline, IoLogOutOutline } from "react-icons/io5";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { BiFolderOpen } from "react-icons/bi";
 import { TbMessageShare } from "react-icons/tb";
+import axios from 'axios';
 
 export default function Authenticated({ user, header, children, showNavbar = true }) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [searchResults, setSearchResults] = useState([]); // State to hold search results
 
-    const handleSearchSubmit = (e) => {
+    const handleSearchSubmit = async (e) => {
         e.preventDefault();
         if (searchQuery.trim()) {
-            window.location.href = `/search?query=${encodeURIComponent(searchQuery)}`;
+            try {
+                const response = await axios.get(`/search-user`, {
+                    params: { query: searchQuery }
+                });
+
+                if (response.data.users) {
+                    // If users are found, update the searchResults state
+                    setSearchResults(response.data.users);
+                } else {
+                    alert("No users found");
+                    setSearchResults([]);
+                }
+            } catch (error) {
+                console.error("Error searching for users:", error);
+                alert("There was an error processing your search.");
+            }
+        } else {
+            alert("Please enter a valid name");
         }
     };
 
     return (
         <div className="min-h-screen">
-            {/* Conditionally render the navigation bar based on showNavbar prop */}
             {showNavbar && (
                 <header className="sticky top-0 bg-[#231955] z-50 shadow-lg">
                     <nav className="flex justify-between items-center min-w-full px-6 py-3">
@@ -60,6 +78,23 @@ export default function Authenticated({ user, header, children, showNavbar = tru
                                     </svg>
                                 </button>
                             </form>
+
+                            {/* Display search results */}
+                            
+                            {searchResults.length > 0 && (
+                                
+                                    <ul className="absolute mt-20 bg-white w-[22rem] max-h-64 overflow-y-auto border border-gray-300 rounded-lg">
+                                        {searchResults.map((result) => (
+                                            <li key={result.id} className="p-2 border-b hover:bg-gray-100">
+                                                <a href={`/profile/${result.id}`}>
+                                                    {result.firstName} {result.lastName}
+                                                </a>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                                
+
 
                             <NavLink 
                                 href={route('post-project')} 
