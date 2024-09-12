@@ -1,6 +1,6 @@
 import { Link, Head } from "@inertiajs/react";
 import { Navbar } from "@/Components/common";
-import { Button, NavLink } from "@/Components"; //single line import 
+import { Button, NavLink } from "@/Components";
 
 export default function Welcome({ auth, laravelVersion, phpVersion }) {
     const handleImageError = () => {

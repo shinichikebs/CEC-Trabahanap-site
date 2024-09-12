@@ -7,7 +7,6 @@ use App\Models\Attachment;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 
 class PostProjectController extends Controller
 {
@@ -23,7 +22,10 @@ class PostProjectController extends Controller
             'title' => 'required|string|max:255',
             'category' => 'required|string|max:255',
             'description' => 'required|string',
-            'uploads.*' => 'file|mimes:jpg,png,pdf,docx|max:2048',
+            'uploads.*' => 'nullable|file|mimes:jpg,png,pdf,docx|max:2048',
+            'workType' => 'nullable|string',
+            'budget' => 'nullable|numeric',
+            'daysPostEnd' => 'nullable|numeric',
         ]);
 
         $project = new JobOffer();
@@ -43,14 +45,9 @@ class PostProjectController extends Controller
                 $attachment->attachment_path = $filePath;
                 $attachment->save();
             }
-
-            return response()->json(['message' => 'Project posted successfully!']);
-        } else {
-            return response()->json(['message' => 'No files were uploaded.']);
         }
     }
 
-    // Separate method for handling individual file uploads
     public function uploadFile(Request $request)
     {
         $request->validate(['file' => 'required|file|mimes:jpg,png,pdf,docx|max:2048']);
@@ -61,21 +58,16 @@ class PostProjectController extends Controller
     }
 
     public function edit($id)
-        {
-            // Fetch the job offer by its ID, including related attachments
-            $jobOffer = JobOffer::with('attachments')->findOrFail($id);
+    {
+        $jobOffer = JobOffer::with('attachments')->findOrFail($id);
+        return Inertia::render('PostProject', ['jobOffer' => $jobOffer]);
+    }
 
-            return Inertia::render('PostProject', [
-                'jobOffer' => $jobOffer,
-            ]);
-        }
     public function destroy($id)
-        {
-            $project = JobOffer::findOrFail($id);
-            $project->delete();
+    {
+        $project = JobOffer::findOrFail($id);
+        $project->delete();
 
-            return response()->json(['success' => 'Project deleted successfully.']);
-        }
-
-
+        return response()->json(['success' => 'Project deleted successfully.']);
+    }
 }

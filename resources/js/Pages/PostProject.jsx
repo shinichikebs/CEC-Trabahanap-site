@@ -3,6 +3,8 @@ import { router } from '@inertiajs/react';
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { AiOutlineLoading3Quarters, AiFillFile } from 'react-icons/ai';
 
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
 export default function PostProject({ auth, jobOffer }) { 
     const [formData, setFormData] = useState({
         title: jobOffer?.job_title || '',
@@ -18,9 +20,22 @@ export default function PostProject({ auth, jobOffer }) {
 
     const [uploadStatus, setUploadStatus] = useState([]);
     const [existingFiles, setExistingFiles] = useState(jobOffer?.attachments || []);
+    const [termsWarning, setTermsWarning] = useState(false);
+    const [showModal, setShowModal] = useState(false); // Modal state
+    const [fileWarning, setFileWarning] = useState(''); // File size warning
 
     const handleFileChange = async (e) => {
         const files = Array.from(e.target.files);
+
+        // Check file sizes
+        const oversizedFiles = files.filter(file => file.size > MAX_FILE_SIZE);
+        if (oversizedFiles.length > 0) {
+            setFileWarning('Some files are too large to upload. Please choose files smaller than 5MB.');
+            return;
+        } else {
+            setFileWarning('');
+        }
+
         setFormData({ ...formData, uploads: files });
 
         const initialStatus = files.map(file => ({ file, status: 'uploading' }));
@@ -52,12 +67,17 @@ export default function PostProject({ auth, jobOffer }) {
 
     const handleTermsChange = (e) => {
         setFormData({ ...formData, terms: e.target.checked });
+        setTermsWarning(false); // Remove warning when checkbox is checked
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const data = new FormData();
+        if (!formData.terms) {
+            setTermsWarning(true); // Show warning if checkbox isn't checked
+            return;
+        }
 
+        const data = new FormData();
         Object.keys(formData).forEach(key => {
             if (key === 'uploads') {
                 for (const file of formData.uploads) {
@@ -72,7 +92,19 @@ export default function PostProject({ auth, jobOffer }) {
         router.post(routeUrl, data, {
             forceFormData: true,
             onSuccess: () => {
-                console.log('Success');
+                setShowModal(true); // Show modal on success
+                setFormData({
+                    title: '',
+                    category: '',
+                    subCategory: '',
+                    description: '',
+                    uploads: [],
+                    workType: '',
+                    budget: '',
+                    daysPostEnd: '',
+                    terms: false,
+                });
+                setUploadStatus([]);
             },
             onError: (errors) => {
                 console.error('Error:', errors);
@@ -80,7 +112,6 @@ export default function PostProject({ auth, jobOffer }) {
         });
     };
 
-    // Simulate an upload request
     const fakeUploadFile = (formData) => {
         return new Promise((resolve) => {
             setTimeout(() => resolve("File uploaded successfully"), 2000);
@@ -102,7 +133,6 @@ export default function PostProject({ auth, jobOffer }) {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="bg-white shadow-md rounded-lg px-8 py-6">
                         <form onSubmit={handleSubmit} encType="multipart/form-data">
-                            
                             <div className="mb-6">
                                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="title">What Do You Need To Get Done</label>
                                 <input
@@ -161,6 +191,7 @@ export default function PostProject({ auth, jobOffer }) {
                                 ></textarea>
                             </div>
 
+
                             <div className="mb-6">
                                 <h1 className="flex flex-col text-gray-700 text-sm font-bold mb-2">Upload Samples and Other Helpful Material</h1>
                                 <div>
@@ -203,7 +234,12 @@ export default function PostProject({ auth, jobOffer }) {
                                         </ul>
                                     </div>
                                 )}
+                                {fileWarning && (
+                                    <p className="text-red-600 text-sm mt-2">{fileWarning}</p>
+                                )}
                             </div>
+
+
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                                 <div>
@@ -243,7 +279,6 @@ export default function PostProject({ auth, jobOffer }) {
                             <div className="mb-6">
                                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="days-post-end">Days Post End</label>
                                 <input
-                                    required
                                     id="days-post-end"
                                     name="daysPostEnd"
                                     type="number"
@@ -267,8 +302,10 @@ export default function PostProject({ auth, jobOffer }) {
                                         I have read and agree to the <a href="#" className="text-blue-600 underline">Terms of Service</a> and <a href="#" className="text-blue-600 underline">Privacy Policy</a>.
                                     </label>
                                 </div>
+                                {termsWarning && (
+                                    <p className="text-red-600 text-sm">You must agree to the Terms of Service.</p>
+                                )}
                             </div>
-
                             <div className="flex justify-center">
                                 <button
                                     type="submit"
@@ -282,6 +319,22 @@ export default function PostProject({ auth, jobOffer }) {
                     </div>
                 </div>
             </div>
+
+            {/* Modal for success message */}
+            {showModal && (
+                <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+                    <div className="bg-white p-6 rounded shadow-lg max-w-md mx-auto">
+                        <h2 className="text-xl font-semibold mb-4">Success</h2>
+                        <p className="text-gray-700 mb-4">Project uploaded successfully!</p>
+                        <button
+                            onClick={() => setShowModal(false)}
+                            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
         </AuthenticatedLayout>
     );
 }
