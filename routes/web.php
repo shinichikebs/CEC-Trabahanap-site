@@ -5,6 +5,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PostProjectController;
+use App\Http\Controllers\ChatController; // Make sure this is imported
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -28,20 +29,17 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     })->name('post-project');
 
     Route::post('/post-project-offer', [PostProjectController::class, 'postProject']);
-
     Route::post('/upload-file-endpoint', [PostProjectController::class, 'uploadFile']);
-
     Route::get('/post-project/{id}/edit', [PostProjectController::class, 'edit'])->name('post-project.edit');
-
     Route::get('/search-user', [UserController::class, 'searchUser']);
     Route::get('/profile/{id}', [UserController::class, 'show'])->name('profile.show');
-
     Route::delete('/post-project/{id}', [PostProjectController::class, 'destroy'])->name('post-project.destroy');
-
-
     Route::get('/My-project', function () {
         return Inertia::render('MyProject');
     })->name('My-project');
+
+    // Add the chat route here
+    Route::get('/chat/{id}', [ChatController::class, 'show'])->name('chat.show'); // Chat page route
 });
 
 Route::middleware('auth')->group(function () {
@@ -53,6 +51,6 @@ Route::middleware('auth')->group(function () {
 Route::group(['prefix' => 'auth/google'], function () {
     Route::get('/', [GoogleAuthController::class, 'redirect'])->name('google-auth');
     Route::get('/call-back', [GoogleAuthController::class, 'callbackGoogle']);
-}); 
+});
 
 require __DIR__.'/auth.php';
