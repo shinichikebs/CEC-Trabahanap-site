@@ -13,7 +13,7 @@ export default function PostProject({ auth, jobOffer }) {
         description: jobOffer?.job_description || '',
         uploads: [],
         workType: jobOffer?.workType || '',
-        budget: jobOffer?.budget || '',
+        budget: jobOffer?.budget || '', 
         daysPostEnd: jobOffer?.daysPostEnd || '',
         terms: false,
     });
@@ -43,11 +43,11 @@ export default function PostProject({ auth, jobOffer }) {
 
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
-            const formData = new FormData();
-            formData.append('file', file);
+            const fileData = new FormData();
+            fileData.append('file', file);
 
             try {
-                await fakeUploadFile(formData);
+                await fakeUploadFile(fileData);
 
                 setUploadStatus((prevStatus) =>
                     prevStatus.map((status, index) =>
@@ -84,11 +84,13 @@ export default function PostProject({ auth, jobOffer }) {
                     data.append('uploads[]', file);
                 }
             } else {
-                data.append(key, formData[key]);
+                data.append(key, formData[key] || '');
             }
         });
 
+        // Check if the jobOffer exists, then perform update, otherwise create a new one
         const routeUrl = jobOffer ? `/post-project/${jobOffer.id}/update` : '/post-project-offer';
+
         router.post(routeUrl, data, {
             forceFormData: true,
             onSuccess: () => {
@@ -191,7 +193,7 @@ export default function PostProject({ auth, jobOffer }) {
                                 ></textarea>
                             </div>
 
-
+                            {/* File Upload */}
                             <div className="mb-6">
                                 <h1 className="flex flex-col text-gray-700 text-sm font-bold mb-2">Upload Samples and Other Helpful Material</h1>
                                 <div>
@@ -239,8 +241,6 @@ export default function PostProject({ auth, jobOffer }) {
                                 )}
                             </div>
 
-
-
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                                 <div>
                                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="work-type">Work Type</label>
@@ -267,7 +267,7 @@ export default function PostProject({ auth, jobOffer }) {
                                     <input
                                         id="budget"
                                         name="budget"
-                                        type="number"
+                                        type="decimal"
                                         placeholder="₱"
                                         value={formData.budget}
                                         onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
@@ -325,7 +325,7 @@ export default function PostProject({ auth, jobOffer }) {
                 <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
                     <div className="bg-white p-6 rounded shadow-lg max-w-md mx-auto">
                         <h2 className="text-xl font-semibold mb-4">Success</h2>
-                        <p className="text-gray-700 mb-4">Project uploaded successfully!</p>
+                        <p className="text-gray-700 mb-4">{jobOffer ? 'Project successfully updated!' : 'Project uploaded successfully!'}</p>
                         <button
                             onClick={() => setShowModal(false)}
                             className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
