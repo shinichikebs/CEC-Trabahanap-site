@@ -48,6 +48,20 @@ export default function MyProject({ auth }) {
         }
     };
 
+    // Done Project
+    const handleDone = (id) => {
+        if (confirm('Are you sure you want to mark this project as done?')) {
+            axios.post(`/post-project/${id}/done`)
+                .then(() => {
+                    setProjects(projects.filter(project => project.id !== id));
+                })
+                .catch(error => {
+                    console.error('Error moving project to done:', error);
+                });
+        }
+    };
+
+
     // Function to handle form submission success
     const handleFormSuccess = (message) => {
         setSuccessMessage(message); // Show success message
@@ -100,6 +114,16 @@ export default function MyProject({ auth }) {
                                 >
                                     Edit
                                 </button>
+
+                                <button
+                                        className="bg-green-500 text-white px-4 py-2 rounded"
+                                        onClick={() => handleDone(project.id)}
+                                    >
+                                        Done
+                                    </button>
+
+
+
                                 <button
                                     className="bg-red-500 text-white px-4 py-2 rounded"
                                     onClick={() => handleDelete(project.id)} // On delete, remove the project

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\JobOffer;
+use App\Models\JobDone; 
 use App\Models\Attachment;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
@@ -115,5 +116,30 @@ class PostProjectController extends Controller
         $project->delete();
 
         return response()->json(['success' => 'Project deleted successfully.']);
+
+    }
+
+    public function markAsDone($id)
+    {
+        try {
+            // Find the job offer by ID
+            $jobOffer = JobOffer::findOrFail($id);
+
+            // Create a new job done record with the job offer data
+            $jobDone = new JobDone();
+            $jobDone->job_title = $jobOffer->job_title;
+            $jobDone->job_description = $jobOffer->job_description;
+            $jobDone->category = $jobOffer->category;
+            $jobDone->user_id = $jobOffer->user_id;
+            $jobDone->save();
+
+            // Delete the job offer record
+            $jobOffer->delete();
+
+            return response()->json(['success' => 'Project moved to job_done table']);
+        } catch (\Exception $e) {
+            Log::error('Error moving project to job_done: ' . $e->getMessage());
+            return response()->json(['error' => 'An error occurred'], 500);
+        }
     }
 }

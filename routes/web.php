@@ -48,6 +48,10 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     // Route to view a user profile
     Route::get('/profile/{id}', [UserController::class, 'show'])->name('profile.show');
 
+    // Route to done project
+    Route::post('/post-project/{id}/done', [PostProjectController::class, 'markAsDone']);
+
+
     // Route to delete a project
     Route::delete('/post-project/{id}', [PostProjectController::class, 'destroy'])->name('post-project.destroy');
 
