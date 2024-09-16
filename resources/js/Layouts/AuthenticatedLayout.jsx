@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Dropdown, NavLink } from "@/Components";
 import { IoSettingsOutline, IoLogOutOutline } from "react-icons/io5";
-import { IoMdNotificationsOutline } from "react-icons/io";
 import { BiFolderOpen } from "react-icons/bi";
 import { TbMessageShare } from "react-icons/tb";
 import axios from 'axios';
+import NotificationsDropdown from "../Components/NotificationsDropdown"; // Import NotificationsDropdown component
 
 export default function Authenticated({ user, header, children, showNavbar = true }) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
@@ -80,21 +80,17 @@ export default function Authenticated({ user, header, children, showNavbar = tru
                             </form>
 
                             {/* Display search results */}
-                            
                             {searchResults.length > 0 && (
-                                
-                                    <ul className="absolute mt-20 bg-white w-[22rem] max-h-64 overflow-y-auto border border-gray-300 rounded-lg">
-                                        {searchResults.map((result) => (
-                                            <li key={result.id} className="p-2 border-b hover:bg-gray-100">
-                                                <a href={`/profile/${result.id}`}>
-                                                    {result.firstName} {result.lastName}
-                                                </a>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
-                                
-
+                                <ul className="absolute mt-20 bg-white w-[22rem] max-h-64 overflow-y-auto border border-gray-300 rounded-lg">
+                                    {searchResults.map((result) => (
+                                        <li key={result.id} className="p-2 border-b hover:bg-gray-100">
+                                            <a href={`/profile/${result.id}`}>
+                                                {result.firstName} {result.lastName}
+                                            </a>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
 
                             <NavLink 
                                 href={route('post-project')} 
@@ -104,7 +100,10 @@ export default function Authenticated({ user, header, children, showNavbar = tru
                             </NavLink>
 
                             <TbMessageShare size={25} className="text-white" />
-                            <IoMdNotificationsOutline size={25} className="text-white" />
+                            
+                            {/* NotificationsDropdown */}
+                            <NotificationsDropdown /> {/* Replace the IoMdNotificationsOutline icon with this */}
+
                             <div className="ms-3 relative">
                                 <Dropdown>
                                     <Dropdown.Trigger>
