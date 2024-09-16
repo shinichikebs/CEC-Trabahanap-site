@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import { IoMdNotificationsOutline } from 'react-icons/io'; // Notification icon
+import { IoMdNotificationsOutline } from 'react-icons/io'; 
 
 export default function NotificationsDropdown() {
-    const [isOpen, setIsOpen] = useState(false); // To toggle the dropdown
+    const [isOpen, setIsOpen] = useState(false); 
     const [notifications] = useState([
         { id: 1, sender: 'Aljay Sepe', message: 'Sent a proposal...', date: 'July 2024' },
         { id: 2, sender: 'Mark Vincent', message: 'Sent a proposal...', date: 'July 2024' },
@@ -10,12 +10,12 @@ export default function NotificationsDropdown() {
 
     const dropdownRef = useRef(null);
 
-    // Toggle dropdown visibility
+
     const toggleDropdown = () => {
         setIsOpen(!isOpen);
     };
 
-    // Close the dropdown if clicked outside
+
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -31,13 +31,13 @@ export default function NotificationsDropdown() {
 
     return (
         <div className="relative" ref={dropdownRef}>
-            {/* Notification Icon */}
+            {}
             <button onClick={toggleDropdown} className="relative">
                 <IoMdNotificationsOutline size={25} className="text-white" />
-                {/* You can also add a notification badge here */}
+                {}
             </button>
 
-            {/* Notification Dropdown */}
+            {}
             {isOpen && (
                 <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg z-50">
                     <div className="p-4 border-b">

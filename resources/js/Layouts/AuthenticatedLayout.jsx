@@ -4,12 +4,11 @@ import { IoSettingsOutline, IoLogOutOutline } from "react-icons/io5";
 import { BiFolderOpen } from "react-icons/bi";
 import { TbMessageShare } from "react-icons/tb";
 import axios from 'axios';
-import NotificationsDropdown from "../Components/NotificationsDropdown"; // Import NotificationsDropdown component
-
+import NotificationsDropdown from "../Components/NotificationsDropdown"; 
 export default function Authenticated({ user, header, children, showNavbar = true }) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
-    const [searchResults, setSearchResults] = useState([]); // State to hold search results
+    const [searchResults, setSearchResults] = useState([]); 
 
     const handleSearchSubmit = async (e) => {
         e.preventDefault();
@@ -20,7 +19,7 @@ export default function Authenticated({ user, header, children, showNavbar = tru
                 });
 
                 if (response.data.users) {
-                    // If users are found, update the searchResults state
+                  
                     setSearchResults(response.data.users);
                 } else {
                     alert("No users found");
