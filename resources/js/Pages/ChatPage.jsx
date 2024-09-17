@@ -3,8 +3,8 @@ import React, { useState } from "react";
 export default function ChatPage({ contactUser }) {
     const [message, setMessage] = useState("");
     const [messages, setMessages] = useState([
-        { sender: "Jelbert.h", text: "Hi sir, This is Jelbert I sent you a proposal for digital" },
-        { sender: "Aljay.S", text: "Hello, This noted" },
+        { sender: "Jelbert", text: "Hi sir, This is Jelbert I sent you a proposal for digital" },
+        { sender: "Jelbert", text: "Hello, This noted" },
     ]);
 
     const handleSendMessage = () => {
@@ -13,7 +13,7 @@ export default function ChatPage({ contactUser }) {
                 ...prevMessages,
                 { sender: "You", text: message },
             ]);
-            setMessage(""); // Clear input
+            setMessage(""); 
         }
     };
 

@@ -6,13 +6,59 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { FaFileAlt } from "react-icons/fa";
 
+// Modal Component for Success Messages
+function SuccessModal({ showModal, closeModal }) {
+    return (
+        showModal && (
+            <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+                <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
+                    <h2 className="text-xl font-semibold mb-4">Proposal Sent Successfully!</h2>
+                    <p className="text-gray-700 mb-4">Your proposal has been sent successfully.</p>
+                    <button
+                        onClick={closeModal}
+                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                    >
+                        Close
+                    </button>
+                </div>
+            </div>
+        )
+    );
+}
+
+// Modal Component for Error Messages
+function ErrorModal({ showErrorModal, closeErrorModal, errorMessage }) {
+    return (
+        showErrorModal && (
+            <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+                <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
+                    <h2 className="text-xl font-semibold text-red-600 mb-4">Error</h2>
+                    <p className="text-gray-700 mb-4">{errorMessage}</p>
+                    <button
+                        onClick={closeErrorModal}
+                        className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                    >
+                        Close
+                    </button>
+                </div>
+            </div>
+        )
+    );
+}
 
 export default function Dashboard({ auth }) {
     const [data, setData] = useState([]);
-    const [Attachment, setAttachment] = useState ([]);
+    const [Attachment, setAttachment] = useState([]);
     const [click, setClick] = useState(false);
     const [details, setDetails] = useState([]);
     const [profileData, setProfileData] = useState({});
+    const [proposalText, setProposalText] = useState('');
+    const [proposalAttachment, setProposalAttachment] = useState(null);
+    const [showModal, setShowModal] = useState(false); 
+    const [showErrorModal, setShowErrorModal] = useState(false); 
+    const [errorMessage, setErrorMessage] = useState(''); 
+
+    const MAX_FILE_SIZE = 30 * 1024 * 1024; 
 
     useEffect(() => {
         fetchData();
@@ -41,9 +87,8 @@ export default function Dashboard({ auth }) {
             .get("/dashboard-data")
             .then((response) => {
                 setData(response.data.jobOffers);
-                setAttachment(response.data.Attachment)
+                setAttachment(response.data.Attachment);
                 setProfileData(response.data.profileData);
-                console.log("Profile Data:", response.data.profileData); // Debugging step
             })
             .catch((error) => {
                 console.error("Error fetching data:", error);
@@ -80,6 +125,59 @@ export default function Dashboard({ auth }) {
     };
 
     const isProfileIncomplete = !profileData.id_number || profileData.id_number.trim() === "" || !profileData.password || profileData.password.trim() === "";
+
+    
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'image/jpeg', 'image/png'];
+
+        if (file && allowedTypes.includes(file.type)) {
+            if (file.size <= MAX_FILE_SIZE) {
+                setProposalAttachment(file);
+                setErrorMessage(''); 
+            } else {
+                setErrorMessage('The file size exceeds the 30MB limit.');
+                setShowErrorModal(true); 
+                setProposalAttachment(null);
+            }
+        } else {
+            setErrorMessage('Please upload a valid file. Accepted types are: .doc, .docx, .pdf, .jpg, .jpeg, .png');
+            setShowErrorModal(true); 
+            setProposalAttachment(null);
+        }
+    };
+
+    const handleProposalSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!proposalAttachment && proposalText.trim() === "") {
+            setErrorMessage('Proposal text or attachment is required.');
+            setShowErrorModal(true); 
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('proposal_text', proposalText);
+        formData.append('job_offer_id', details.id);
+        if (proposalAttachment) {
+            formData.append('attachment', proposalAttachment);
+        }
+
+        try {
+            await axios.post('/submit-proposal', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            setShowModal(true);  
+            setErrorMessage('');
+            setProposalText('');  
+            setProposalAttachment(null); 
+        } catch (error) {
+            setErrorMessage('Error submitting the proposal.');
+            setShowErrorModal(true);
+        }
+    };
 
     return (
         <AuthenticatedLayout
@@ -142,7 +240,7 @@ export default function Dashboard({ auth }) {
                         </div>
                     </div>
 
-                    {/* Link to profile.edit */}
+                    {}
                     <Link
                         href={route("profile.edit")}
                         className={`underline text-sm ${
@@ -170,75 +268,82 @@ export default function Dashboard({ auth }) {
             </div>
 
             <div className="flex">
-    {/* Background overlay */}
-            <div
-                onClick={() => setClick(false)}
-                className={`fixed top-0 w-full h-screen bg-black opacity-50 ease-in-out duration-500 cursor-pointer ${
-                    click ? "left-0" : "left-[-100%]"
-                }`}
-            ></div>
+                {}
+                <div
+                    onClick={() => setClick(false)}
+                    className={`fixed top-0 w-full h-screen bg-black opacity-50 ease-in-out duration-500 cursor-pointer ${
+                        click ? "left-0" : "left-[-100%]"
+                    }`}
+                ></div>
 
+                <div className={`fixed top-14 w-8/12 h-[92vh] shadow-md bg-white text-black ${click ? "right-100" : "right-[-100%]"} ease-in-out duration-500 p-4 space-y-4 overflow-y-auto`}>
+                    <div className="flex items-center justify-between">
+                        <IoMdArrowBack size={25} onClick={() => setClick(false)} className="cursor-pointer" />
+                        <ImNewTab size={25} />
+                    </div>
 
-                        <div className={`fixed top-14 w-8/12 h-[92vh] shadow-md bg-white text-black ${click ? "right-100" : "right-[-100%]"} ease-in-out duration-500 p-4 space-y-4 overflow-y-auto`}>
-                                <div className="flex items-center justify-between">
-                                    <IoMdArrowBack size={25} onClick={() => setClick(false)} className="cursor-pointer" />
-                                    <ImNewTab size={25} />
-                                </div>
+                    <div className="flex mx-8 flex-col space-y-8">
+                        {}
+                        <h1 className="font-bold  text-3xl italic underline text-gray-800 ">{click ? details.job_title : ""}</h1>
 
-                                <div className="flex mx-8 flex-col space-y-8">
-                                    {/* Job Title */}
-                                    <h1 className="font-bold  text-3xl italic underline text-gray-800 ">{click ? details.job_title : ""}</h1>
+                        {}
+                        <p className="text-3xl font-medium">Description</p>
+                        <article className="leading-6 px-5">{click ? details.job_description : ""}</article>
 
-                                    {/* Job Description */}
-                                    <p className="text-3xl font-medium">Description</p>
-                                    <article className="leading-6 px-5">{click ? details.job_description : ""}</article>
+                        {}
+                        <div className="flex flex-col space-y-2">
+                            <p className="text-gray-500 text-sm">Attachments:</p>
+                            {click && details.attachments && details.attachments.length > 0 ? (
+                                details.attachments.map((attachment) => (
+                                    <a href={attachment.attachment_path} target="_blank" rel="noopener noreferrer" key={attachment.id} className="text-blue-500">
+                                        <FaFileAlt className="text-lg" />
+                                    </a>
+                                ))
+                            ) : (
+                                <p className="text-gray-500 text-xs">No attachments available</p>
+                            )}
+                        </div>
 
-                                    {/* Attachments */}
-                                    <div className="flex flex-col space-y-2">
-                                        <p className="text-gray-500 text-sm">Attachments:</p>
-                                        {click && details.attachments && details.attachments.length > 0 ? (
-                                            details.attachments.map((attachment) => (
-                                                <a href={attachment.attachment_path} target="_blank" rel="noopener noreferrer" key={attachment.id} className="text-blue-500">
-                                                    <FaFileAlt className="text-lg" />
-                                                </a>
-                                            ))
-                                        ) : (
-                                            <p className="text-gray-500 text-xs">No attachments available</p>
-                                        )}
-                                    </div>
-
-                                    {/* Proposal Details */}
-                                    <div className="mt-4">
-                                        <h1 className="text-3xl font-medium">New Proposal</h1>
-                                        <div className="px-4">
-                                        <label className="block text-sm font-medium text-gray-700 mt-2">Enter Your Proposal Details</label>
-                                        <textarea
-                                            className="mt-2 block w-full px-3 py-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                            placeholder="Provide general info about your proposal, e.g., what you can deliver and when, why you think you can do the project, etc."
-                                        ></textarea>
-                                        </div>
-                                    </div>
-
-                                    {/* Attachments */}
-                                    <div className="mt-4 px-5">
-                                        <label className="block text-sm font-medium text-gray-700">Attachments</label>
-                                        <input type="file" className="mt-1 block px-2 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
-                                    </div>
-
-
-
-                                    {/* Submit Button */}
-                                    <div className="mt-4 flex justify-end">
-                                        <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                                            Submit Proposal
-                                        </button>
-                                    </div>
-                                </div>
+                        {}
+                        <div className="mt-4">
+                            <h1 className="text-3xl font-medium">New Proposal</h1>
+                            <div className="px-4">
+                                <label className="block text-sm font-medium text-gray-700 mt-2">Enter Your Proposal Details</label>
+                                <textarea
+                                    className="mt-2 block w-full px-3 py-10 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                    placeholder="Provide general info about your proposal, e.g., what you can deliver and when, why you think you can do the project, etc."
+                                    value={proposalText}
+                                    onChange={(e) => setProposalText(e.target.value)}
+                                ></textarea>
                             </div>
                         </div>
-                    
 
+                        {}
+                        <div className="mt-4 px-5">
+                            <label className="block text-sm font-medium text-gray-700">Attachments</label>
+                            <input
+                                type="file"
+                                className="mt-1 block px-2 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                onChange={handleFileChange}
+                            />
+                        </div>
 
+                        {}
+                        <div className="mt-4 flex justify-end">
+                            <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700" onClick={handleProposalSubmit}>
+                                Submit Proposal
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {}
+            <SuccessModal showModal={showModal} closeModal={() => setShowModal(false)} />
+
+            {}
+            <ErrorModal showErrorModal={showErrorModal} closeErrorModal={() => setShowErrorModal(false)} errorMessage={errorMessage} />
         </AuthenticatedLayout>
     );
 }
