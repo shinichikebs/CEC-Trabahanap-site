@@ -2,7 +2,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link } from "@inertiajs/react";
 import { IoMdArrowBack } from "react-icons/io";
 import { ImNewTab } from "react-icons/im";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";  // Added useRef to handle file input reset
 import axios from "axios";
 import { FaFileAlt } from "react-icons/fa";
 
@@ -54,11 +54,13 @@ export default function Dashboard({ auth }) {
     const [profileData, setProfileData] = useState({});
     const [proposalText, setProposalText] = useState('');
     const [proposalAttachment, setProposalAttachment] = useState(null);
-    const [showModal, setShowModal] = useState(false); 
-    const [showErrorModal, setShowErrorModal] = useState(false); 
-    const [errorMessage, setErrorMessage] = useState(''); 
+    const [showModal, setShowModal] = useState(false); // For success modal control
+    const [showErrorModal, setShowErrorModal] = useState(false); // For error modal control
+    const [errorMessage, setErrorMessage] = useState(''); // Error message state
 
-    const MAX_FILE_SIZE = 30 * 1024 * 1024; 
+    const fileInputRef = useRef(null);  // To reset the file input
+
+    const MAX_FILE_SIZE = 30 * 1024 * 1024; // 30MB in bytes
 
     useEffect(() => {
         fetchData();
@@ -126,7 +128,7 @@ export default function Dashboard({ auth }) {
 
     const isProfileIncomplete = !profileData.id_number || profileData.id_number.trim() === "" || !profileData.password || profileData.password.trim() === "";
 
-    
+  
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'image/jpeg', 'image/png'];
@@ -152,7 +154,7 @@ export default function Dashboard({ auth }) {
 
         if (!proposalAttachment && proposalText.trim() === "") {
             setErrorMessage('Proposal text or attachment is required.');
-            setShowErrorModal(true); 
+            setShowErrorModal(true);
             return;
         }
 
@@ -172,10 +174,13 @@ export default function Dashboard({ auth }) {
             setShowModal(true);  
             setErrorMessage('');
             setProposalText('');  
-            setProposalAttachment(null); 
+            setProposalAttachment(null);  
+            if (fileInputRef.current) {
+                fileInputRef.current.value = ''; 
+            }
         } catch (error) {
             setErrorMessage('Error submitting the proposal.');
-            setShowErrorModal(true);
+            setShowErrorModal(true); 
         }
     };
 
@@ -326,6 +331,7 @@ export default function Dashboard({ auth }) {
                                 className="mt-1 block px-2 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                 accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
                                 onChange={handleFileChange}
+                                ref={fileInputRef}  
                             />
                         </div>
 

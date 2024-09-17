@@ -1,46 +1,74 @@
 import React, { useEffect, useState } from 'react';
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import axios from 'axios';
-import PostProject from './PostProject';  // Import the PostProject component
+import PostProject from './PostProject';  
 import { Inertia } from '@inertiajs/inertia';
 
 
+function ProposalModal({ showProposalModal, closeProposalModal, proposalData }) {
+    return (
+        showProposalModal && (
+            <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+                <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
+                    <h2 className="text-xl font-semibold mb-4">Proposal</h2>
+                    <p className="text-gray-700 mb-4">
+                        <strong>Proposal Text:</strong> {proposalData?.proposal_text}
+                    </p>
+                    {proposalData?.attachment && (
+                        <p className="text-gray-700 mb-4">
+                            <strong>Attachment:</strong> <a href={proposalData.attachment} target="_blank" className="text-blue-600">View Attachment</a>
+                        </p>
+                    )}
+                    <button
+                        onClick={closeProposalModal}
+                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                    >
+                        Close
+                    </button>
+                </div>
+            </div>
+        )
+    );
+}
+
 export default function MyProject({ auth }) {
-    const [projects, setProjects] = useState([]); // Stores all projects of the logged-in user
-    const [editingProject, setEditingProject] = useState(null); // Track the project being edited
-    const [successMessage, setSuccessMessage] = useState(''); // State to show success message
+    const [projects, setProjects] = useState([]); 
+    const [editingProject, setEditingProject] = useState(null); 
+    const [successMessage, setSuccessMessage] = useState(''); 
+    const [showProposalModal, setShowProposalModal] = useState(false); 
+    const [proposalData, setProposalData] = useState(null); 
 
     useEffect(() => {
-        fetchProjects(); // Fetch projects when component mounts
+        fetchProjects(); 
     }, []);
 
-    // Function to fetch projects from the server
+
     const fetchProjects = () => {
         axios.get('/dashboard-data')
             .then(response => {
                 const userProjects = response.data.jobOffers.filter(
                     project => project.user_id === auth.user.id
                 );
-                setProjects(userProjects); // Set the logged-in user's projects
+                setProjects(userProjects); 
             })
             .catch(error => {
                 console.error('Error fetching projects:', error);
             });
     };
 
-    // Function to handle editing a project
+
     const handleEdit = (project) => {
-        setEditingProject(project); // Set the project to be edited
+        setEditingProject(project); 
     };
 
-    // Function to handle deleting a project
+
     const handleDelete = (id) => {
         if (confirm('Are you sure you want to delete this project?')) {
             axios.delete(`/post-project/${id}`)
                 .then(() => {
-                    setProjects(projects.filter(project => project.id !== id)); // Update the project list without the deleted project
+                    setProjects(projects.filter(project => project.id !== id)); 
                     setSuccessMessage('Project deleted successfully!');
-                    setTimeout(() => setSuccessMessage(''), 3000); // Clear success message after 3 seconds
+                    setTimeout(() => setSuccessMessage(''), 3000); 
                 })
                 .catch(error => {
                     console.error('Error deleting project:', error);
@@ -48,7 +76,19 @@ export default function MyProject({ auth }) {
         }
     };
 
-    // Done Project
+
+    const handleShowProposal = (projectId) => {
+        axios.get(`/proposal/${projectId}`)
+            .then((response) => {
+                setProposalData(response.data.proposal); 
+                setShowProposalModal(true); 
+            })
+            .catch(error => {
+                console.error('Error fetching proposal:', error);
+            });
+    };
+
+   
     const handleDone = (id) => {
         if (confirm('Are you sure you want to mark this project as done?')) {
             axios.post(`/post-project/${id}/done`)
@@ -61,13 +101,12 @@ export default function MyProject({ auth }) {
         }
     };
 
-
-    // Function to handle form submission success
+ 
     const handleFormSuccess = (message) => {
-        setSuccessMessage(message); // Show success message
-        fetchProjects(); // Refresh the list of projects
-        setEditingProject(null); // Reset the edit mode
-        setTimeout(() => setSuccessMessage(''), 3000); // Clear success message after 3 seconds
+        setSuccessMessage(message); 
+        fetchProjects(); 
+        setEditingProject(null); 
+        setTimeout(() => setSuccessMessage(''), 3000); 
     };
 
     return (
@@ -80,7 +119,7 @@ export default function MyProject({ auth }) {
                     </h2>
                 </div>
             }
-            showNavbar={!editingProject} // Hide the Navbar when editing
+            showNavbar={!editingProject}
         >
             <div className="space-y-4">
                 {successMessage && (
@@ -90,15 +129,15 @@ export default function MyProject({ auth }) {
                 )}
 
                 {editingProject ? (
-                    // If a project is being edited, show the PostProject form
+                  
                     <PostProject
-                        auth={auth}  // Pass the auth object
-                        jobOffer={editingProject}  // Pass the project being edited as a prop
-                        onCancel={() => setEditingProject(null)}  // Function to cancel editing
-                        onSuccess={(message) => handleFormSuccess(message)} // Handle success and refresh the project list
+                        auth={auth}  
+                        jobOffer={editingProject}  
+                        onCancel={() => setEditingProject(null)}  
+                        onSuccess={(message) => handleFormSuccess(message)} 
                     />
                 ) : (
-                    // Show the list of projects when not in edit mode
+                    
                     projects.map((project) => (
                         <div key={project.id} className="bg-white dark:bg-gray-200 p-4 rounded-lg shadow-sm flex justify-between items-center">
                             <div>
@@ -110,23 +149,28 @@ export default function MyProject({ auth }) {
                             <div className="flex space-x-2">
                                 <button
                                     className="bg-blue-500 text-white px-4 py-2 rounded"
-                                    onClick={() => handleEdit(project)} // On edit, load the project data into the form
+                                    onClick={() => handleEdit(project)} 
                                 >
                                     Edit
                                 </button>
 
                                 <button
-                                        className="bg-green-500 text-white px-4 py-2 rounded"
-                                        onClick={() => handleDone(project.id)}
-                                    >
-                                        Done
-                                    </button>
+                                    className="bg-green-500 text-white px-4 py-2 rounded"
+                                    onClick={() => handleDone(project.id)}
+                                >
+                                    Done
+                                </button>
 
-
+                                <button
+                                    className="bg-yellow-500 text-white px-4 py-2 rounded"
+                                    onClick={() => handleShowProposal(project.id)} 
+                                >
+                                    Proposal
+                                </button>
 
                                 <button
                                     className="bg-red-500 text-white px-4 py-2 rounded"
-                                    onClick={() => handleDelete(project.id)} // On delete, remove the project
+                                    onClick={() => handleDelete(project.id)} 
                                 >
                                     Delete
                                 </button>
@@ -135,6 +179,13 @@ export default function MyProject({ auth }) {
                     ))
                 )}
             </div>
+
+            {}
+            <ProposalModal
+                showProposalModal={showProposalModal}
+                closeProposalModal={() => setShowProposalModal(false)}
+                proposalData={proposalData}
+            />
         </AuthenticatedLayout>
     );
 }
