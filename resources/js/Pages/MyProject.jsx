@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import axios from 'axios';
 import PostProject from './PostProject';  
-import { Inertia } from '@inertiajs/inertia';
-
 
 function ProposalModal({ showProposalModal, closeProposalModal, proposalData }) {
     return (
@@ -14,9 +12,9 @@ function ProposalModal({ showProposalModal, closeProposalModal, proposalData }) 
                     <p className="text-gray-700 mb-4">
                         <strong>Proposal Text:</strong> {proposalData?.proposal_text}
                     </p>
-                    {proposalData?.attachment && (
+                    {proposalData?.attachment_path && (
                         <p className="text-gray-700 mb-4">
-                            <strong>Attachment:</strong> <a href={proposalData.attachment} target="_blank" className="text-blue-600">View Attachment</a>
+                            <strong>Attachment:</strong> <a href={`/storage/${proposalData.attachment_path}`} target="_blank" className="text-blue-600">View Attachment</a>
                         </p>
                     )}
                     <button
@@ -42,7 +40,7 @@ export default function MyProject({ auth }) {
         fetchProjects(); 
     }, []);
 
-
+    
     const fetchProjects = () => {
         axios.get('/dashboard-data')
             .then(response => {
@@ -56,29 +54,29 @@ export default function MyProject({ auth }) {
             });
     };
 
-
+    
     const handleEdit = (project) => {
-        setEditingProject(project); 
+        setEditingProject(project);
     };
 
-
+   
     const handleDelete = (id) => {
-        if (confirm('Are you sure you want to delete this project?')) {
+        if (confirm('Are you sure you want to delete this job offer?')) {
             axios.delete(`/post-project/${id}`)
                 .then(() => {
                     setProjects(projects.filter(project => project.id !== id)); 
-                    setSuccessMessage('Project deleted successfully!');
+                    setSuccessMessage('Job offer deleted successfully!');
                     setTimeout(() => setSuccessMessage(''), 3000); 
                 })
                 .catch(error => {
-                    console.error('Error deleting project:', error);
+                    console.error('Error deleting job offer:', error);
                 });
         }
     };
 
 
-    const handleShowProposal = (projectId) => {
-        axios.get(`/proposal/${projectId}`)
+    const handleShowProposal = (jobOfferId) => {
+        axios.get(`/proposal/${jobOfferId}`)
             .then((response) => {
                 setProposalData(response.data.proposal); 
                 setShowProposalModal(true); 
@@ -88,23 +86,23 @@ export default function MyProject({ auth }) {
             });
     };
 
-   
+    
     const handleDone = (id) => {
-        if (confirm('Are you sure you want to mark this project as done?')) {
+        if (confirm('Are you sure you want to mark this job offer as done?')) {
             axios.post(`/post-project/${id}/done`)
                 .then(() => {
                     setProjects(projects.filter(project => project.id !== id));
                 })
                 .catch(error => {
-                    console.error('Error moving project to done:', error);
+                    console.error('Error moving job offer to done:', error);
                 });
         }
     };
 
- 
+    
     const handleFormSuccess = (message) => {
         setSuccessMessage(message); 
-        fetchProjects(); 
+        fetchProjects();
         setEditingProject(null); 
         setTimeout(() => setSuccessMessage(''), 3000); 
     };
@@ -115,11 +113,11 @@ export default function MyProject({ auth }) {
             header={
                 <div className="bg-blue-900 text-white py-4 px-6 shadow-lg" style={{ minHeight: '80px' }}>
                     <h2 className="font-semibold text-xl leading-tight">
-                        {editingProject ? 'Edit Project' : 'My Projects'}
+                        {editingProject ? 'Edit Job Offer' : 'My Job Offers'}
                     </h2>
                 </div>
             }
-            showNavbar={!editingProject}
+            showNavbar={!editingProject} 
         >
             <div className="space-y-4">
                 {successMessage && (
@@ -129,7 +127,7 @@ export default function MyProject({ auth }) {
                 )}
 
                 {editingProject ? (
-                  
+                    
                     <PostProject
                         auth={auth}  
                         jobOffer={editingProject}  
