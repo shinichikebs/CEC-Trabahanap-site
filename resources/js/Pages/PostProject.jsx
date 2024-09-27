@@ -3,7 +3,7 @@ import { router } from '@inertiajs/react';
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { AiOutlineLoading3Quarters, AiFillFile } from 'react-icons/ai';
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_FILE_SIZE = 2 * 1024 * 1024; // 5MB
 
 export default function PostProject({ auth, jobOffer }) { 
     const [formData, setFormData] = useState({
@@ -30,7 +30,7 @@ export default function PostProject({ auth, jobOffer }) {
         // Check file sizes
         const oversizedFiles = files.filter(file => file.size > MAX_FILE_SIZE);
         if (oversizedFiles.length > 0) {
-            setFileWarning('Some files are too large to upload. Please choose files smaller than 5MB.');
+            setFileWarning('Some files are too large to upload. Please choose files smaller than 2MB.');
             return;
         } else {
             setFileWarning('');
