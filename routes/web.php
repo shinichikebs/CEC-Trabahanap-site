@@ -21,16 +21,6 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/admin/login', [AdminLoginController::class, 'showLoginForm'])->name('admin.login');
-Route::post('/admin/login', [AdminLoginController::class, 'login'])->name('admin.login.submit');
-
-// Grouping admin routes under 'admin' middleware
-Route::group(['middleware' => 'admin'], function () {
-    Route::get('/admin/dashboard', function () {
-        return Inertia::render('Admin/Dashboard'); // Admin Dashboard view
-    })->name('admin.dashboard');
-});
-
 
 // Group routes that require authentication and email verification
 Route::group(['middleware' => ['auth', 'verified']], function () {
