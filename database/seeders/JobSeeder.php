@@ -30,6 +30,7 @@ class JobSeeder extends Seeder
                                 Strong attention to detail and a good eye for design.',
                 'category' => 'Programming',
                 'user_id' => 1,
+                'sub_category' => 'HelloWoorld',
             ],
             [
                 'job_title' => 'Html Website Development',
@@ -38,6 +39,7 @@ class JobSeeder extends Seeder
                                 I have attached the website Design, Thanks',
                 'category' => 'Web Development',
                 'user_id' => 2,
+                'sub_category' => 'Submarine',
             ],
             [
                 'job_title' => 'Find someone to work on a simple image enhancement for coloring book',
@@ -82,6 +84,7 @@ class JobSeeder extends Seeder
                                 Looking forward to working together to create beautiful coloring books!",
                 'category' => 'Graphic Arts',
                 'user_id' => 3,
+                'sub_category' => 'OniChan',
             ],
         ];
 
