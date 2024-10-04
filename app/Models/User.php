@@ -59,4 +59,9 @@ class User extends Authenticatable
     public function files () {
         return $this->hasMany(Attachment::class);
     }
+
+    public function proposals()
+    {
+        return $this->hasMany(Proposal::class);
+    }
 }

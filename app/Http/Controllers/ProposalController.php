@@ -38,7 +38,8 @@ class ProposalController extends Controller
     public function getProposal($projectId)
     {
         // Retrieve the proposal based on the job_offer_id
-        $proposal = Proposal::where('job_offer_id', $projectId)->first();
+        // Modified to get return user details (2024-10-04)
+        $proposal = Proposal::with('user')->where('job_offer_id', $projectId)->get();
 
         if (!$proposal) {
             return response()->json(['error' => 'No proposal found for this project'], 404);
