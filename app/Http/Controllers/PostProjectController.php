@@ -22,17 +22,22 @@ class PostProjectController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'category' => 'required|string|max:255',
+            'subCategory' => 'required|string|max:255',
             'description' => 'required|string',
             'uploads.*' => 'nullable|file|mimes:jpg,png,pdf,docx|max:2048',
-            'workType' => 'nullable|string',
+            'workType' => 'integer',
             'budget' => 'nullable|numeric',
-            'daysPostEnd' => 'nullable|numeric',
+            'daysPostEnd' => 'integer',
         ]);
 
         $project = new JobOffer();
         $project->job_title = $validated['title'];
         $project->job_description = $validated['description'];
         $project->category = $validated['category'];
+        $project->budget = $validated['budget'];
+        $project->sub_category = $validated['subCategory'];
+        $project->work_type = $validated['workType'];
+        $project->days_post_end = $validated['daysPostEnd'];
         $project->user_id = Auth::id();
         $project->save();
 
