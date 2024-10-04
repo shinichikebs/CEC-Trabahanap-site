@@ -92,9 +92,9 @@ Route::post('/admin/login', [AdminLoginController::class, 'login'])->name('admin
 
 
 
-Route::middleware([EnsureFrontendRequestsAreStateful::class, 'web'])->group(function () {
+Route::middleware(['admin.auth'])->group(function () {
     Route::get('/admin/dashboard', function () {
-        return Inertia::render('Admin/Dashboard'); // Admin Dashboard
+        return Inertia::render('Admin/dashboardAdmin'); // Admin Dashboard
     })->name('admin.dashboard');
 });
 

@@ -29,15 +29,16 @@ class AdminLoginController extends Controller
 
         // Attempt to login the admin
         $credentials = $request->only('id_number', 'password');
+
+        $admin = Admin::where('id_number', $credentials['id_number'])->first();
         
-        if (Auth::attempt($credentials)) {
-            // Login successful
+        if ($admin && Hash::check($credentials['password'], $admin->password)) {
+            Auth::login($admin); 
             return response()->json([
                 'message' => 'Login successful',
-                'user' => Auth::user(),
+                'user' => $admin,
             ]);
         } else {
-            // Login failed
             return response()->json([
                 'message' => 'Invalid credentials',
             ], 401);

@@ -31,7 +31,7 @@ export default function LoginPage() {
         console.log("Password:", password);
 
         const data = {
-            idNumber: idNumber,
+            id_number: idNumber,
             password: password,
         };
 
@@ -44,13 +44,15 @@ export default function LoginPage() {
 
             // Step 2: Proceed with login request
             console.log("Attempting login with data:", data);
-            const response = await axios.post("/api/admin/login", data, {
+            const response = await axios.post("/admin/login", data, {
                 headers: {
                     "Content-Type": "application/json",
                 },
             });
 
+
             console.log("Login successful", response.data);
+            
             // Handle the successful login response here
         } catch (error) {
             // Detailed error handling
@@ -111,7 +113,7 @@ export default function LoginPage() {
                         <div className="mb-4">
                             <input
                                 type="text"
-                                id="id-number"
+                                id="id_number"
                                 value={idNumber}
                                 onChange={(e) => setIdNumber(e.target.value)}
                                 placeholder="ID Number"
