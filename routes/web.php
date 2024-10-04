@@ -11,7 +11,8 @@ use App\Http\Controllers\ProposalController; // Ensure ProposalController is imp
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-
+use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
+    
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -83,6 +84,22 @@ Route::middleware('auth')->group(function () {
 Route::group(['prefix' => 'auth/google'], function () {
     Route::get('/', [GoogleAuthController::class, 'redirect'])->name('google-auth');
     Route::get('/call-back', [GoogleAuthController::class, 'callbackGoogle']);
+});
+
+Route::get('/admin/login', [AdminLoginController::class, 'showLoginForm'])->name('admin.login');
+Route::post('/admin/login', [AdminLoginController::class, 'login'])->name('admin.login.submit');
+
+
+
+
+Route::middleware([EnsureFrontendRequestsAreStateful::class, 'web'])->group(function () {
+    Route::get('/admin/dashboard', function () {
+        return Inertia::render('Admin/Dashboard'); // Admin Dashboard
+    })->name('admin.dashboard');
+});
+
+Route::get('/test', function () {
+    return response()->json(['message' => 'Laravel is working!']);
 });
 
 require __DIR__.'/auth.php';
