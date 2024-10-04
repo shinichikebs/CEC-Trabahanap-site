@@ -8,4 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class Proposal extends Model
 {
     use HasFactory;
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function jobOffer()
+    {
+        return $this->belongsTo(JobOffer::class);
+    }
 }

@@ -9,13 +9,24 @@ function ProposalModal({ showProposalModal, closeProposalModal, proposalData }) 
             <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
                 <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
                     <h2 className="text-xl font-semibold mb-4">Proposal</h2>
-                    <p className="text-gray-700 mb-4">
-                        <strong>Proposal Text:</strong> {proposalData?.proposal_text}
-                    </p>
-                    {proposalData?.attachment_path && (
-                        <p className="text-gray-700 mb-4">
-                            <strong>Attachment:</strong> <a href={`/storage/${proposalData.attachment_path}`} target="_blank" className="text-blue-600">View Attachment</a>
-                        </p>
+                    {proposalData && proposalData.length > 0 ? (
+                        proposalData.map((proposal, index) => (
+                            <div key={index} className="mb-4">
+                                <p className="text-gray-700">
+                                    <strong>Name:</strong> {proposal.user.firstName + " " + proposal.user.lastName}    {/* To get user details refer to columns in users table (Note: when FK there are relationship methods look up lng sa models)*/}
+                                </p>
+                                <p className="text-gray-700">
+                                    <strong>Proposal Text:</strong> {proposal.proposal_text}
+                                </p>
+                                {proposal.attachment_path && (
+                                    <p className="text-gray-700">
+                                        <strong>Attachment:</strong> <a href={`/storage/${proposal.attachment_path}`} target="_blank" className="text-blue-600">View Attachment</a>
+                                    </p>
+                                )}
+                            </div>
+                        ))
+                    ) : (
+                        <p>No proposals available.</p>
                     )}
                     <button
                         onClick={closeProposalModal}

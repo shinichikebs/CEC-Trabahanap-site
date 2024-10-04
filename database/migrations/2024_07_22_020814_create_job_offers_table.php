@@ -13,11 +13,14 @@ return new class extends Migration
     {
         Schema::create('job_offers', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id');
             $table->string('job_title');
             $table->text('job_description');
             $table->string('category');
             $table->decimal('budget', 10, 2)->nullable();
-            $table->unsignedBigInteger('user_id');
+            $table->string('sub_category');
+            $table->integer('work_type')->default(0);
+            $table->integer('days_post_end')->default(0);
             $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
@@ -31,3 +34,6 @@ return new class extends Migration
         Schema::dropIfExists('job_offers');
     }
 };
+Schema::table('users', function (Blueprint $table) {
+    $table->dropForeign(['job_offer_id']); 
+});
