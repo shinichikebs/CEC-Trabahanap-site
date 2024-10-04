@@ -31,6 +31,7 @@ class JobSeeder extends Seeder
                 'category' => 'Programming',
                 'user_id' => 1,
                 'sub_category' => 'HelloWoorld',
+                'Working_type' => 'Full Time',
             ],
             [
                 'job_title' => 'Html Website Development',
@@ -40,6 +41,7 @@ class JobSeeder extends Seeder
                 'category' => 'Web Development',
                 'user_id' => 2,
                 'sub_category' => 'Submarine',
+                'Working_type' => 'Part Time',
             ],
             [
                 'job_title' => 'Find someone to work on a simple image enhancement for coloring book',
@@ -85,6 +87,7 @@ class JobSeeder extends Seeder
                 'category' => 'Graphic Arts',
                 'user_id' => 3,
                 'sub_category' => 'OniChan',
+                'Working_type' => 'Full Time',
             ],
         ];
 
