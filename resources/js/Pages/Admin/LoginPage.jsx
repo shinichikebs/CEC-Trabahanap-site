@@ -1,86 +1,18 @@
 import React, { useState, useEffect } from "react";
+import { Head, Link, useForm } from "@inertiajs/react";
 import axios from "axios"; // To send the login request
 
 export default function LoginPage() {
-    const [idNumber, setIdNumber] = useState("");
-    const [password, setPassword] = useState("");
-    const [errors, setErrors] = useState({});
+    const { data, setData, post, processing, errors, reset } = useForm({
+        id_number: "",
+        password: "",
+        remember: false,
+    });
 
-    // Handle form submission
-    const handleSubmit = async (e) => {
+    const submit = (e) => {
         e.preventDefault();
 
-        // Validate the form inputs
-        const formErrors = {};
-        if (!idNumber) {
-            formErrors.id_number = "ID Number is required";
-        }
-        if (!password) {
-            formErrors.password = "Password is required";
-        }
-
-        // If errors exist, set them and stop form submission
-        if (Object.keys(formErrors).length > 0) {
-            setErrors(formErrors);
-            return;
-        } else {
-            setErrors({}); // Clear any existing errors if inputs are valid
-        }
-
-        console.log("ID Number:", idNumber);
-        console.log("Password:", password);
-
-        const data = {
-            id_number: idNumber,
-            password: password,
-        };
-
-        try {
-            console.log("Attempting to fetch CSRF token...");
-
-            // Step 1: Fetch the CSRF cookie
-            const csrfResponse = await axios.get("/sanctum/csrf-cookie");
-            console.log("CSRF Token fetched:", csrfResponse.status);
-
-            // Step 2: Proceed with login request
-            console.log("Attempting login with data:", data);
-            const response = await axios.post("/admin/login", data, {
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
-
-
-            console.log("Login successful", response.data);
-            
-            // Handle the successful login response here
-        } catch (error) {
-            // Detailed error handling
-            if (error.response) {
-                // Server responded with a status outside the 2xx range
-                console.error("Error Response Data:", error.response.data);
-                console.error("Error Response Status:", error.response.status);
-                setErrors({
-                    general: `Login failed: ${
-                        error.response.data.message ||
-                        "Please check your credentials."
-                    }`,
-                });
-            } else if (error.request) {
-                // No response received from the server
-                console.error("No response received:", error.request);
-                setErrors({
-                    general:
-                        "Network error: Failed to reach the server. Check if the backend is running.",
-                });
-            } else {
-                // Error occurred while setting up the request
-                console.error("Error in setting up request:", error.message);
-                setErrors({
-                    general: `Unexpected error: ${error.message}`,
-                });
-            }
-        }
+        post(route("admin.login.submit"));
     };
 
     return (
@@ -108,14 +40,17 @@ export default function LoginPage() {
                     <h2 className="text-white text-2xl font-light mb-6">
                         LOG IN
                     </h2>
-                    <form onSubmit={handleSubmit}>
+                    <form onSubmit={submit}>
                         {/* ID Number Field */}
                         <div className="mb-4">
                             <input
                                 type="text"
                                 id="id_number"
-                                value={idNumber}
-                                onChange={(e) => setIdNumber(e.target.value)}
+                                name="id_number"
+                                value={data.id_number}
+                                onChange={(e) =>
+                                    setData("id_number", e.target.value)
+                                }
                                 placeholder="ID Number"
                                 className={`w-full px-4 py-2 border ${
                                     errors.id_number
@@ -135,8 +70,11 @@ export default function LoginPage() {
                             <input
                                 type="password"
                                 id="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                name="id_number"
+                                value={data.password}
+                                onChange={(e) =>
+                                    setData("password", e.target.value)
+                                }
                                 placeholder="Password"
                                 className={`w-full px-4 py-2 border ${
                                     errors.password
