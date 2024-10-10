@@ -26,23 +26,23 @@ class AdminLoginController extends Controller
             'id_number' => 'required|string',
             'password' => 'required|string',
         ]);
-
+    
         // Attempt to login the admin
         $credentials = $request->only('id_number', 'password');
-
+    
         $admin = Admin::where('id_number', $credentials['id_number'])->first();
         
         if ($admin && Hash::check($credentials['password'], $admin->password)) {
-            Auth::login($admin); 
-            return response()->json([
-                'message' => 'Login successful',
-                'user' => $admin,
-            ]);
+            // Use the custom admin guard
+            Auth::guard('admin')->login($admin); 
+    
+            return redirect()->intended(route('admin.dashboard'));
         } else {
             return response()->json([
                 'message' => 'Invalid credentials',
             ], 401);
         }
+    
         // Log::info('Login attempt for ID: ' . $request->id_number);
 
         // $request->validate([

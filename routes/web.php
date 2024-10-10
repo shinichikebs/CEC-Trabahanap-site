@@ -92,7 +92,7 @@ Route::post('/admin/login', [AdminLoginController::class, 'login'])->name('admin
 
 
 
-Route::middleware(['admin.auth'])->group(function () {
+Route::group(['middleware' => ['is_admin']], function () {
     Route::get('/admin/dashboard', function () {
         return Inertia::render('Admin/dashboardAdmin'); // Admin Dashboard
     })->name('admin.dashboard');
