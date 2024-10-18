@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Models\User;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
@@ -31,9 +32,19 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
 
-        $request->session()->regenerate();
+        $user = User::where('email', $request->email)->first();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        if ($user && $user->is_approved == 1) {
+
+            $request->session()->regenerate();
+
+            return redirect()->intended(route('dashboard', absolute: false));
+
+        }
+    
+        Auth::logout();
+
+        return redirect()->back()->withErrors(['email' => 'Your account is not approved.']);
     }
 
     /**
