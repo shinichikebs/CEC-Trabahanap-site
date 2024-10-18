@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AdminLoginController;
+use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\GoogleAuthController;
@@ -99,7 +100,7 @@ Route::group(['middleware' => ['is_admin']], function () {
     })->name('admin.dashboard');
 });
 
-
+Route::get('/admin-dashboard-data', [AdminDashboardController::class, 'getHeaderDetails']);
 Route::post('/admin/logout', function () {
     Auth::guard('admin')->logout(); // Logs out the admin
     return redirect()->route('admin.login'); // Redirect to the login page

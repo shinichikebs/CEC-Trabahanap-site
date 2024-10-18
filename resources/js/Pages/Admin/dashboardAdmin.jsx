@@ -1,11 +1,29 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { Inertia } from "@inertiajs/inertia"; // Import Inertia to handle navigation
 
-export default function Dashboard({ totalUsers, totalPosts }) {
+export default function Dashboard() {
     const [activeTab, setActiveTab] = useState("dashboard"); // State to track the active content
+    const [totalUsers, setTotalUsers] = useState(0);
+    const [totalPosts, setTotalPosts] = useState(0);
 
     // Log props to check if data is being passed correctly
     console.log("Props received:", { totalUsers, totalPosts });
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    const fetchData = () => {
+        axios
+            .get("/admin-dashboard-data")
+            .then((response) => {
+                setTotalUsers(response.data.totalUsers);
+                setTotalPosts(response.data.totalPosts);
+            })
+            .catch((error) => {
+                console.error("Error fetching data:", error);
+            });
+    };
 
     useEffect(() => {
         console.log("Total Users:", totalUsers);

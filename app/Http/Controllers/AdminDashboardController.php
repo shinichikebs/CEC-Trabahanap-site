@@ -26,4 +26,23 @@ class AdminDashboardController extends Controller
         'totalPosts' => $totalJobOffers,
     ]);
 }
+    public function getHeaderDetails() {
+
+        try {
+
+        $totalUsers = User::count();
+            $totalPosts = JobOffer::count();
+            
+            return response()->json([
+                'totalUsers' => $totalUsers,
+                'totalPosts' => $totalPosts,  
+            ]);
+        } catch (\Exception $e) {
+      
+            \Log::error('Error fetching dashboard data: ' . $e->getMessage());
+            return response()->json(['error' => 'Internal Server Error'], 500);
+        }
+        
+    }
+
 }
