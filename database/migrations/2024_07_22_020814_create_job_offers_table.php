@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('sub_category');
             $table->integer('work_type')->default(0);
             $table->integer('days_post_end')->default(0);
+            $table->boolean('is_approved')->default(false);
             $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });

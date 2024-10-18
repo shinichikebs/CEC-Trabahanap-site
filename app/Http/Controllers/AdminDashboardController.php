@@ -28,7 +28,7 @@ class AdminDashboardController extends Controller
     {
         try {
             $totalUsers = User::where('is_approved', 1)->count();
-            $totalPosts = JobOffer::count();
+            $totalPosts = JobOffer::where('is_approved', 1)->count();
 
             return response()->json([
                 'totalUsers' => $totalUsers,
@@ -55,6 +55,22 @@ class AdminDashboardController extends Controller
         }
     }
 
+    
+    public function getPendingApprovalPosts()
+    {
+        try {
+            $pendingPosts = JobOffer::where('is_approved', 0)->get(); // Fetch posts that are not approved yet
+    
+            return response()->json([
+                'pendingPosts' => $pendingPosts,
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error fetching pending posts: ' . $e->getMessage());
+            return response()->json(['error' => 'Internal Server Error'], 500);
+        }
+    }
+
+
     // Method to approve user (set is_approved to 1)
     public function approveUser($id)
     {
@@ -69,4 +85,18 @@ class AdminDashboardController extends Controller
             return response()->json(['error' => 'Internal Server Error'], 500);
         }
     }
+
+        public function approvePost($id)
+        {
+            try {
+                $post = JobOffer::findOrFail($id);
+                $post->is_approved = 1; // Mark the post as approved
+                $post->save();
+
+                return response()->json(['message' => 'Post approved successfully']);
+            } catch (\Exception $e) {
+                \Log::error('Error approving post: ' . $e->getMessage());
+                return response()->json(['error' => 'Internal Server Error'], 500);
+            }
+        }
 }
