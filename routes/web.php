@@ -88,6 +88,7 @@ Route::group(['prefix' => 'auth/google'], function () {
 
 Route::get('/admin/login', [AdminLoginController::class, 'showLoginForm'])->name('admin.login');
 Route::post('/admin/login', [AdminLoginController::class, 'login'])->name('admin.login.submit');
+Route::post('/admin/logout', [AdminLoginController::class, 'logout'])->name('admin.logout');
 
 
 
@@ -97,6 +98,16 @@ Route::group(['middleware' => ['is_admin']], function () {
         return Inertia::render('Admin/dashboardAdmin'); // Admin Dashboard
     })->name('admin.dashboard');
 });
+
+
+Route::post('/admin/logout', function () {
+    Auth::guard('admin')->logout(); // Logs out the admin
+    return redirect()->route('admin.login'); // Redirect to the login page
+})->name('admin.logout');
+
+
+
+
 
 Route::get('/test', function () {
     return response()->json(['message' => 'Laravel is working!']);

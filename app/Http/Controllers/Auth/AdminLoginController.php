@@ -43,6 +43,7 @@ class AdminLoginController extends Controller
             ], 401);
         }
     
+
         // Log::info('Login attempt for ID: ' . $request->id_number);
 
         // $request->validate([
@@ -67,6 +68,12 @@ class AdminLoginController extends Controller
         //     Log::warning('Admin not found with ID number: ' . $request->id_number);
         //     return response()->json(['errors' => ['id_number' => 'Invalid ID number.']], 422);
         // }
+    }
+    
+    public function logout(Request $request)
+    {
+        Auth::guard('admin')->logout();
+        return redirect()->route('admin.login');
     }
 
 
