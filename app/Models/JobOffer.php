@@ -17,6 +17,10 @@ class JobOffer extends Model
         'job_title',
         'job_description',
         'category',
+        'budget',
+        'sub_category',
+        'working_type',
+        'ays_post_end',
         'user_id',
     ];
 
