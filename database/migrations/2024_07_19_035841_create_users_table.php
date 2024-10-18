@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('avatar')->nullable(); 
             $table->enum('role', ['student', 'employee']);
             $table->enum('gender', ['male', 'female']);
+            $table->boolean('is_approved')->default(false);
             $table->rememberToken();
             $table->timestamps();
         });

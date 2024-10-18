@@ -92,7 +92,7 @@ export default function Dashboard() {
                                     {pendingUsers.map((user) => (
                                         <div key={user.id} className="flex justify-between items-center bg-gray-100 p-4 rounded-lg shadow">
                                             <div>
-                                                <p className="font-semibold">{user.first_name} {user.last_name}</p>
+                                                <p className="font-semibold">{user.firstName} {user.lastName}</p>
                                                 <p className="text-sm text-gray-500">{user.email}</p>
                                             </div>
                                             <button
