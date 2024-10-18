@@ -12,7 +12,10 @@ class AdminDashboardController extends Controller
     public function index()
 {
     // Count users using the query builder
-    $totalUsers = DB::table('users')->count();
+    $totalUsers = DB::table('users')->count(); 
+
+
+
 
     // Count job offers using the query builder
     $totalJobOffers = DB::table('job_offers')->count();
@@ -30,7 +33,7 @@ class AdminDashboardController extends Controller
 
         try {
 
-        $totalUsers = User::count();
+        $totalUsers = User::where('is_approved', 1)->count();
             $totalPosts = JobOffer::count();
             
             return response()->json([
