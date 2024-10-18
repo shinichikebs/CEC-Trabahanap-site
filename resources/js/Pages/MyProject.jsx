@@ -151,10 +151,15 @@ export default function MyProject({ auth }) {
                         <div key={project.id} className="bg-white dark:bg-gray-200 p-4 rounded-lg shadow-sm flex justify-between items-center">
                             <div>
                                 <h3 className="text-lg font-bold text-black-900 dark:text-black">{project.job_title}</h3>
-                                <p className="text-sm text-black-600 dark:text-black-400">{project.job_description}</p>
-                                <p className="text-sm text-black-600 dark:text-black-400">{project.budget}</p>
+                                <p className="text-sm text-black-600 dark:text-black-400">Description: {project.job_description}</p>
+                                <p className="text-sm text-black-600 dark:text-black-400">Category: {project.category}</p>
+                                <p className="text-sm text-black-600 dark:text-black-400">Sub Category: {project.sub_category}</p>
+                                <p className="text-sm text-black-600 dark:text-black-400">Days Post End: {project.days_post_end}</p>
+                                <p className="text-sm text-black-600 dark:text-black-400">Budget: {project.budget}</p>
                                 <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">{project.created_at}</p>
+                            
                             </div>
+                            
                             <div className="flex space-x-2">
                                 <button
                                     className="bg-blue-500 text-white px-4 py-2 rounded"
