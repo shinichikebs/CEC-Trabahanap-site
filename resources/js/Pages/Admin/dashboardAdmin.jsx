@@ -6,12 +6,15 @@ export default function Dashboard() {
     const [activeTab, setActiveTab] = useState("dashboard"); // State to track the active content
     const [totalUsers, setTotalUsers] = useState(0);
     const [totalPosts, setTotalPosts] = useState(0);
+    const [pendingUsers, setPendingUsers] = useState([]); // State to hold pending users
 
-    // Log props to check if data is being passed correctly
-    console.log("Props received:", { totalUsers, totalPosts });
+    // Fetch data on component load
     useEffect(() => {
         fetchData();
-    }, []);
+        if (activeTab === "users") {
+            fetchPendingUsers(); // Fetch pending users when the "Users" tab is active
+        }
+    }, [activeTab]);
 
     const fetchData = () => {
         axios
@@ -25,21 +28,38 @@ export default function Dashboard() {
             });
     };
 
-    useEffect(() => {
-        console.log("Total Users:", totalUsers);
-        console.log("Total Job Offers:", totalPosts);
-    }, [totalUsers, totalPosts]);
+    const fetchPendingUsers = () => {
+        axios
+            .get("/admin/pending-approval-users") // Assuming this endpoint fetches pending users
+            .then((response) => {
+                setPendingUsers(response.data.pendingUsers);
+            })
+            .catch((error) => {
+                console.error("Error fetching pending users:", error);
+            });
+    };
+
+    const handleApproveUser = (userId) => {
+        axios
+            .post(`/admin/approve-user/${userId}`)
+            .then((response) => {
+                alert("User approved successfully!");
+                setPendingUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId)); // Remove the approved user from the list
+            })
+            .catch((error) => {
+                console.error("Error approving user:", error);
+                alert("Failed to approve user.");
+            });
+    };
 
     const handleLogout = () => {
-        // Make an Inertia POST request to the logout route
         Inertia.post("/admin/logout", {}, {
             onSuccess: () => {
-                // Redirect to the login page after a successful logout
                 Inertia.visit("/admin/login");
             }
         });
     };
-    // Content to display based on the selected tab
+
     const renderContent = () => {
         switch (activeTab) {
             case "dashboard":
@@ -49,13 +69,11 @@ export default function Dashboard() {
                             <div className="bg-white p-4 rounded-lg shadow">
                                 <h3 className="text-lg font-semibold mb-2">Total Users</h3>
                                 <p className="text-4xl font-bold">{totalUsers}</p>
-                                
                             </div>
                             <div className="bg-white p-4 rounded-lg shadow">
                                 <h3 className="text-lg font-semibold mb-2">Total Job Offers</h3>
-                                <p className="text-4xl font-bold">{totalPosts}</p>  {/* Update to totalJobOffers if changed */}
+                                <p className="text-4xl font-bold">{totalPosts}</p>
                             </div>
-
                             <div className="bg-white p-4 rounded-lg shadow">
                                 <h3 className="text-lg font-semibold mb-2">New Messages</h3>
                                 <p className="text-4xl font-bold">5</p>
@@ -67,10 +85,28 @@ export default function Dashboard() {
                 return (
                     <div>
                         <h2 className="text-xl font-bold mb-4">User Management</h2>
-                        <p>Here you can manage all users. Add, edit, delete, or view details of users.</p>
                         <div className="bg-white p-4 rounded-lg shadow mt-4">
-                            <h3 className="text-lg font-semibold mb-2">List of Users</h3>
-                            {/* You can add user management content here */}
+                            <h3 className="text-lg font-semibold mb-2">List of Users Pending Approval</h3>
+                            {pendingUsers.length > 0 ? (
+                                <div className="space-y-4">
+                                    {pendingUsers.map((user) => (
+                                        <div key={user.id} className="flex justify-between items-center bg-gray-100 p-4 rounded-lg shadow">
+                                            <div>
+                                                <p className="font-semibold">{user.first_name} {user.last_name}</p>
+                                                <p className="text-sm text-gray-500">{user.email}</p>
+                                            </div>
+                                            <button
+                                                onClick={() => handleApproveUser(user.id)}
+                                                className="ml-4 py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                                            >
+                                                Approve
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-gray-500">No users pending approval.</p>
+                            )}
                         </div>
                     </div>
                 );
@@ -81,7 +117,6 @@ export default function Dashboard() {
                         <p>Manage ongoing and completed projects here. Assign users to projects, update statuses, etc.</p>
                         <div className="bg-white p-4 rounded-lg shadow mt-4">
                             <h3 className="text-lg font-semibold mb-2">Current Projects</h3>
-                            {/* You can add project management content here */}
                         </div>
                     </div>
                 );
@@ -92,7 +127,6 @@ export default function Dashboard() {
                         <p>View and respond to messages. You can manage all incoming and outgoing communications.</p>
                         <div className="bg-white p-4 rounded-lg shadow mt-4">
                             <h3 className="text-lg font-semibold mb-2">Inbox</h3>
-                            {/* You can add message management content here */}
                         </div>
                     </div>
                 );
@@ -103,7 +137,6 @@ export default function Dashboard() {
                         <p>Configure system settings. Update your preferences, change passwords, and customize the admin panel here.</p>
                         <div className="bg-white p-4 rounded-lg shadow mt-4">
                             <h3 className="text-lg font-semibold mb-2">System Preferences</h3>
-                            {/* You can add settings management content here */}
                         </div>
                     </div>
                 );
@@ -114,14 +147,13 @@ export default function Dashboard() {
 
     return (
         <div className="min-h-screen flex flex-col">
-            {/* Header */}
             <header className="bg-blue-500 text-white py-4 px-6">
                 <div className="flex justify-between items-center">
                     <h1 className="text-2xl font-semibold">Admin Dashboard</h1>
                     <div className="flex items-center space-x-4">
                         <button
                             className="bg-blue-600 py-2 px-4 rounded-lg"
-                            onClick={handleLogout} // Call the logout handler
+                            onClick={handleLogout}
                         >
                             Logout
                         </button>
@@ -129,9 +161,7 @@ export default function Dashboard() {
                 </div>
             </header>
 
-            {/* Main layout with sidebar and content */}
             <div className="flex flex-1">
-                {/* Sidebar */}
                 <aside className="w-64 bg-gray-800 text-gray-100">
                     <nav className="p-6">
                         <ul className="space-y-4">
@@ -179,9 +209,8 @@ export default function Dashboard() {
                     </nav>
                 </aside>
 
-                {/* Main content */}
                 <main className="flex-1 p-6 bg-gray-100">
-                    {renderContent()} {/* This will display the content based on the selected tab */}
+                    {renderContent()}
                 </main>
             </div>
         </div>

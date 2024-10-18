@@ -98,6 +98,9 @@ Route::group(['middleware' => ['is_admin']], function () {
     Route::get('/admin/dashboard', function () {
         return Inertia::render('Admin/dashboardAdmin'); // Admin Dashboard
     })->name('admin.dashboard');
+
+    Route::get('/admin/pending-approval-users', [AdminDashboardController::class, 'getPendingApprovalUsers']);
+    Route::post('/admin/approve-user/{id}', [AdminDashboardController::class, 'approveUser']);
 });
 
 Route::get('/admin-dashboard-data', [AdminDashboardController::class, 'getHeaderDetails']);
