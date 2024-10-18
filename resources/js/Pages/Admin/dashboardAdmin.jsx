@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Swal from 'sweetalert2';
 import { Inertia } from "@inertiajs/inertia";
 
 export default function Dashboard() {
@@ -56,12 +57,16 @@ export default function Dashboard() {
         axios
             .post(`/admin/approve-post/${postId}`)
             .then((response) => {
-                alert("Post approved successfully!");
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Post approved successfully!',
+                    icon: 'success',
+                    confirmButtonText: 'Okay',
+                });
                 setPendingPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId)); // Remove approved post from list
             })
             .catch((error) => {
                 console.error("Error approving post:", error);
-                alert("Failed to approve post.");
             });
     };
 
@@ -69,12 +74,16 @@ export default function Dashboard() {
         axios
             .post(`/admin/approve-user/${userId}`)
             .then((response) => {
-                alert("User approved successfully!");
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Post approved successfully!',
+                    icon: 'success',
+                    confirmButtonText: 'Okay',
+                });
                 setPendingUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId)); // Remove the approved user from the list
             })
             .catch((error) => {
                 console.error("Error approving user:", error);
-                alert("Failed to approve user.");
             });
     };
 
