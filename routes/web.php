@@ -35,6 +35,10 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         return Inertia::render('PostProject');
     })->name('post-project');
 
+    Route::get('/pending-approval', function () {
+        return Inertia::render('Auth/PendingApproval');
+    })->name('pending-approval');
+    
     // Route to create a new project
     Route::post('/post-project-offer', [PostProjectController::class, 'postProject']);
 
