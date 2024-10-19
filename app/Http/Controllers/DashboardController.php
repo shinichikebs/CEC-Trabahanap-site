@@ -21,7 +21,7 @@ class DashboardController extends Controller
 
             $user = auth()->user();
 
-            $data = JobOffer::with(['user', 'attachments'])->get();
+            $data = JobOffer::with(['user', 'attachments'])->where('is_approved', 1)->get();
             
             $profile = [
                 'firstName' => $user->firstName,

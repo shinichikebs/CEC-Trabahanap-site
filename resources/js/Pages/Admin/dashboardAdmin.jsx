@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Inertia } from "@inertiajs/inertia"; // Import Inertia to handle navigation
+import Swal from 'sweetalert2';
+import { Inertia } from "@inertiajs/inertia";
 
 export default function Dashboard() {
-    const [activeTab, setActiveTab] = useState("dashboard"); // State to track the active content
+    const [activeTab, setActiveTab] = useState("dashboard");
     const [totalUsers, setTotalUsers] = useState(0);
     const [totalPosts, setTotalPosts] = useState(0);
-    const [pendingUsers, setPendingUsers] = useState([]); // State to hold pending users
+    const [pendingUsers, setPendingUsers] = useState([]);
+    const [pendingPosts, setPendingPosts] = useState([]); // Added state for pending posts
 
-    // Fetch data on component load
     useEffect(() => {
         fetchData();
         if (activeTab === "users") {
             fetchPendingUsers(); // Fetch pending users when the "Users" tab is active
+        } else if (activeTab === "projects") {
+            fetchPendingPosts(); // Fetch pending posts when "Posts" tab is active
         }
     }, [activeTab]);
 
@@ -30,7 +33,7 @@ export default function Dashboard() {
 
     const fetchPendingUsers = () => {
         axios
-            .get("/admin/pending-approval-users") // Assuming this endpoint fetches pending users
+            .get("/admin/pending-approval-users")
             .then((response) => {
                 setPendingUsers(response.data.pendingUsers);
             })
@@ -39,48 +42,88 @@ export default function Dashboard() {
             });
     };
 
+    const fetchPendingPosts = () => { // Fetch pending posts
+        axios
+            .get("/admin/pending-approval-posts")
+            .then((response) => {
+                setPendingPosts(response.data.pendingPosts);
+            })
+            .catch((error) => {
+                console.error("Error fetching pending posts:", error);
+            });
+    };
+
+    const handleApprovePost = (postId) => {
+        axios
+            .post(`/admin/approve-post/${postId}`)
+            .then((response) => {
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Post approved successfully!',
+                    icon: 'success',
+                    confirmButtonText: 'Okay',
+                });
+                setPendingPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId)); // Remove approved post from list
+            })
+            .catch((error) => {
+                console.error("Error approving post:", error);
+            });
+    };
+
     const handleApproveUser = (userId) => {
         axios
             .post(`/admin/approve-user/${userId}`)
             .then((response) => {
-                alert("User approved successfully!");
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'Post approved successfully!',
+                    icon: 'success',
+                    confirmButtonText: 'Okay',
+                });
                 setPendingUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId)); // Remove the approved user from the list
             })
             .catch((error) => {
                 console.error("Error approving user:", error);
-                alert("Failed to approve user.");
             });
     };
 
     const handleLogout = () => {
-        Inertia.post("/admin/logout", {}, {
-            onSuccess: () => {
-                Inertia.visit("/admin/login");
-            }
-        });
+        Inertia.post("/admin/logout");  // Assuming Inertia.js is being used for logout
     };
 
     const renderContent = () => {
         switch (activeTab) {
             case "dashboard":
-                return (
-                    <div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <div className="bg-white p-4 rounded-lg shadow">
-                                <h3 className="text-lg font-semibold mb-2">Total Users</h3>
-                                <p className="text-4xl font-bold">{totalUsers}</p>
-                            </div>
-                            <div className="bg-white p-4 rounded-lg shadow">
-                                <h3 className="text-lg font-semibold mb-2">Total Job Offers</h3>
-                                <p className="text-4xl font-bold">{totalPosts}</p>
-                            </div>
-                            <div className="bg-white p-4 rounded-lg shadow">
-                                <h3 className="text-lg font-semibold mb-2">New Messages</h3>
-                                <p className="text-4xl font-bold">5</p>
-                            </div>
+            return (
+                <div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+                        <div className="bg-white p-4 rounded-lg shadow">
+                            <h3 className="text-lg font-semibold mb-2">Total Users</h3>
+                            <p className="text-4xl font-bold">{totalUsers}</p>
                         </div>
+                        <div className="bg-white p-4 rounded-lg shadow">
+                            <h3 className="text-lg font-semibold mb-2">Total Job Offers</h3>
+                            <p className="text-4xl font-bold">{totalPosts}</p>
+                        </div>
+                    
+
+                    {/* Pending Users Count */}
+                    <div className="bg-white p-4 rounded-lg shadow">
+                        <h3 className="text-lg font-semibold mb-2">Pending Users</h3>
+                        <p className="text-2xl font-bold">
+                            {pendingUsers.length > 0 ? pendingUsers.length : "0"}
+                        </p>
                     </div>
-                );
+
+                    {/* Pending Posts Count */}
+                    <div className="bg-white p-4 rounded-lg shadow">
+                        <h3 className="text-lg font-semibold mb-2">Pending Job Offers</h3>
+                        <p className="text-2xl font-bold">
+                            {pendingPosts.length > 0 ? pendingPosts.length : "0"} 
+                        </p>
+                    </div>
+                </div></div>
+            );
             case "users":
                 return (
                     <div>
@@ -110,17 +153,36 @@ export default function Dashboard() {
                         </div>
                     </div>
                 );
-            case "projects":
+            case "projects": // Updated to show pending posts
                 return (
                     <div>
-                        <h2 className="text-xl font-bold mb-4">Project Management</h2>
-                        <p>Manage ongoing and completed projects here. Assign users to projects, update statuses, etc.</p>
+                        <h2 className="text-xl font-bold mb-4">Job Offers Pending Approval</h2>
                         <div className="bg-white p-4 rounded-lg shadow mt-4">
-                            <h3 className="text-lg font-semibold mb-2">Current Projects</h3>
+                            <h3 className="text-lg font-semibold mb-2">List of Job Offers Pending Approval</h3>
+                            {pendingPosts.length > 0 ? (
+                                <div className="space-y-4">
+                                    {pendingPosts.map((post) => (
+                                        <div key={post.id} className="flex justify-between items-center bg-gray-100 p-4 rounded-lg shadow">
+                                            <div>
+                                                <p className="font-semibold">{post.job_title}</p>
+                                                <p className="text-sm text-gray-500">{post.job_description}</p>
+                                            </div>
+                                            <button
+                                                onClick={() => handleApprovePost(post.id)}
+                                                className="ml-4 py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                                            >
+                                                Approve
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-gray-500">No job offers pending approval.</p>
+                            )}
                         </div>
                     </div>
                 );
-            case "messages":
+                case "messages":
                 return (
                     <div>
                         <h2 className="text-xl font-bold mb-4">Messages</h2>
@@ -186,10 +248,11 @@ export default function Dashboard() {
                                     className={`block w-full text-left py-2 px-4 hover:bg-gray-700 rounded-lg ${activeTab === "projects" ? "bg-gray-700" : ""}`}
                                     onClick={() => setActiveTab("projects")}
                                 >
-                                    Projects
+                                    Job Offers
                                 </button>
                             </li>
-                            <li>
+
+                        <li>
                                 <button
                                     className={`block w-full text-left py-2 px-4 hover:bg-gray-700 rounded-lg ${activeTab === "messages" ? "bg-gray-700" : ""}`}
                                     onClick={() => setActiveTab("messages")}
@@ -209,7 +272,7 @@ export default function Dashboard() {
                     </nav>
                 </aside>
 
-                <main className="flex-1 p-6 bg-gray-100">
+                <main className="flex-1 p-6">
                     {renderContent()}
                 </main>
             </div>

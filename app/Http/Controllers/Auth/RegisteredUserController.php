@@ -69,7 +69,8 @@ class RegisteredUserController extends Controller
     // Log the user in
     Auth::login($user);
 
-    // Redirect to the dashboard
-    return redirect(route('dashboard'));
+    // Redirect to pending approval page
+    return redirect()->route('pending-approval');
 }
+
 }

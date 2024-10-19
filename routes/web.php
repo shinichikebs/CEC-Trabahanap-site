@@ -35,6 +35,10 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         return Inertia::render('PostProject');
     })->name('post-project');
 
+    Route::get('/pending-approval', function () {
+        return Inertia::render('Auth/PendingApproval');
+    })->name('pending-approval');
+    
     // Route to create a new project
     Route::post('/post-project-offer', [PostProjectController::class, 'postProject']);
 
@@ -101,6 +105,9 @@ Route::group(['middleware' => ['is_admin']], function () {
 
     Route::get('/admin/pending-approval-users', [AdminDashboardController::class, 'getPendingApprovalUsers']);
     Route::post('/admin/approve-user/{id}', [AdminDashboardController::class, 'approveUser']);
+
+    Route::get('/admin/pending-approval-posts', [AdminDashboardController::class, 'getPendingApprovalPosts']);
+    Route::post('/admin/approve-post/{id}', [AdminDashboardController::class, 'approvePost']);
 });
 
 Route::get('/admin-dashboard-data', [AdminDashboardController::class, 'getHeaderDetails']);
