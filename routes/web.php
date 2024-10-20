@@ -13,7 +13,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
-    
+
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -22,7 +22,6 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
-
 
 // Group routes that require authentication and email verification
 Route::group(['middleware' => ['auth', 'verified']], function () {
@@ -78,10 +77,18 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::get('/proposal/{projectId}', [ProposalController::class, 'getProposal'])->name('proposal.get'); // <-- New Route for fetching proposals
 });
 
-// Group routes that require authentication
+// Group routes that require authentication for profile handling
 Route::middleware('auth')->group(function () {
+    // Route to edit profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+
+    // Route to update profile (PATCH for partial updates)
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+
+    // Route to handle the POST request for updating skills and bio
+    Route::post('/profile/update', [ProfileController::class, 'updateSkillsAndBio'])->name('profile.update.skills');
+
+    // Route to delete profile
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
@@ -95,9 +102,7 @@ Route::get('/admin/login', [AdminLoginController::class, 'showLoginForm'])->name
 Route::post('/admin/login', [AdminLoginController::class, 'login'])->name('admin.login.submit');
 Route::post('/admin/logout', [AdminLoginController::class, 'logout'])->name('admin.logout');
 
-
-
-
+// Admin-specific routes
 Route::group(['middleware' => ['is_admin']], function () {
     Route::get('/admin/dashboard', function () {
         return Inertia::render('Admin/dashboardAdmin'); // Admin Dashboard
@@ -115,10 +120,6 @@ Route::post('/admin/logout', function () {
     Auth::guard('admin')->logout(); // Logs out the admin
     return redirect()->route('admin.login'); // Redirect to the login page
 })->name('admin.logout');
-
-
-
-
 
 Route::get('/test', function () {
     return response()->json(['message' => 'Laravel is working!']);

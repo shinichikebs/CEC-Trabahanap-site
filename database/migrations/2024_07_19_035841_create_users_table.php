@@ -25,6 +25,11 @@ return new class extends Migration
             $table->enum('role', ['student', 'employee']);
             $table->enum('gender', ['male', 'female']);
             $table->boolean('is_approved')->default(false);
+
+            // New columns for skills and bio
+            $table->string('skills')->nullable(); // Adding 'skills' as a string, nullable
+            $table->text('bio')->nullable();      // Adding 'bio' as text, nullable
+
             $table->rememberToken();
             $table->timestamps();
         });

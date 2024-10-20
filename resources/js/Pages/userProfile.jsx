@@ -55,12 +55,12 @@ export default function UserProfile({ user }) {
             <Head title={`${user.firstName} ${user.lastName} Profile`} />
 
             <div className="flex flex-col lg:flex-row justify-between items-start mt-8 px-6 lg:px-20 space-y-6 lg:space-y-0">
-                {}
+                {/* User Info Section */}
                 <div className="bg-gray-200 w-full lg:w-1/4 rounded-lg p-6">
                     <div className="flex flex-col items-center">
                         <img
                             src={user.avatar || "/path-to-avatar.png"}
-                            alt={`${user.firstName} ${user.lastName}`}
+                            alt={`${user.firstName} {user.lastName}`}
                             className="rounded-full w-24 h-24 mb-4"
                             loading="lazy" 
                         />
@@ -68,7 +68,7 @@ export default function UserProfile({ user }) {
                             {user.firstName} {user.lastName}
                         </p>
 
-                        {}
+                        {/* User Rating */}
                         {user.rating ? (
                             <div className="flex items-center space-x-1 text-yellow-500 mt-2">
                                 <span>⭐</span>
@@ -78,7 +78,7 @@ export default function UserProfile({ user }) {
                             <p className="text-gray-500 mt-2">No ratings yet</p>
                         )}
 
-                        {}
+                        {/* Contact Button */}
                         <Link
                             href={route('chat.show', { id: user.id })} 
                             className="mt-4 bg-blue-600 text-white px-4 py-2 rounded"
@@ -86,6 +86,7 @@ export default function UserProfile({ user }) {
                             Contact
                         </Link>
 
+                        {/* Report Profile Button */}
                         <button
                             onClick={handleReportClick}
                             className="text-red-500 text-sm mt-2"
@@ -95,18 +96,19 @@ export default function UserProfile({ user }) {
                     </div>
                 </div>
 
-                {}
+                {/* Profile Details Section */}
                 <div className="w-full lg:w-3/4 bg-white shadow-md rounded-lg p-6">
                     <h3 className="text-lg font-semibold text-gray-800 mb-4">About {user.firstName}</h3>
                     <p className="text-gray-600 mb-4">{user.bio || "This user has not added a bio."}</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div>
-                            <h4 className="font-semibold text-gray-800">Location</h4>
-                            <p className="text-gray-600">{user.location || "Location not provided"}</p>
-                        </div>
+                    
                         <div>
                             <h4 className="font-semibold text-gray-800">Skills</h4>
-                            <p className="text-gray-600">{user.skills?.join(', ') || "No skills listed"}</p>
+                            <p className="text-gray-600">
+                                {Array.isArray(user.skills) 
+                                    ? user.skills.join(', ') // If skills is an array, join it into a string
+                                    : user.skills || "No skills listed"} {/* If it's a string or null, display it directly */}
+                            </p>
                         </div>
                         <div>
                             <h4 className="font-semibold text-gray-800">Email</h4>
@@ -116,7 +118,7 @@ export default function UserProfile({ user }) {
                 </div>
             </div>
 
-            {}
+            {/* Report Modal */}
             {showReportModal && (
                 <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
                     <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
@@ -139,7 +141,7 @@ export default function UserProfile({ user }) {
                 </div>
             )}
 
-            {}
+            {/* Violations Dropdown */}
             {showViolationsDropdown && (
                 <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
                     <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
@@ -166,7 +168,7 @@ export default function UserProfile({ user }) {
                 </div>
             )}
 
-            {}
+            {/* Reported Confirmation Modal */}
             {showReportedModal && (
                 <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
                     <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">

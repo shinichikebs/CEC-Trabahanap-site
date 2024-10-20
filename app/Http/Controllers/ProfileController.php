@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 use Inertia\Response;
 
-
 class ProfileController extends Controller
 {
     /**
@@ -43,6 +42,28 @@ class ProfileController extends Controller
         }
 
         // Save the user with updated information
+        $user->save();
+
+        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+    }
+
+    /**
+     * Update the user's skills and bio.
+     */
+    public function updateSkillsAndBio(Request $request): RedirectResponse
+    {
+        // Validate the request data
+        $request->validate([
+            'skills' => 'nullable|string|max:255',  // Allow optional, max length of 255 characters
+            'bio' => 'nullable|string|max:1000',    // Allow optional, max length of 1000 characters
+        ]);
+
+        // Update the user's profile with the new skills and bio
+        $user = $request->user();
+        $user->skills = $request->input('skills');
+        $user->bio = $request->input('bio');
+
+        // Save the updated profile
         $user->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');

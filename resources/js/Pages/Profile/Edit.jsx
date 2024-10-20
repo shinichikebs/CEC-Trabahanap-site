@@ -4,18 +4,27 @@ import UpdatePasswordForm from './Partials/UpdatePasswordForm';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
 import { Head } from '@inertiajs/react';
 import { useState } from 'react';
+import { Inertia } from '@inertiajs/inertia'; // Import Inertia for form submission
 
 export default function Edit({ auth, mustVerifyEmail, status, hasPassword }) {
     // State for managing skills and bio input
-    const [skills, setSkills] = useState('');
-    const [bio, setBio] = useState('');
+    const [skills, setSkills] = useState(auth.user.skills || ''); // Initialize with current user data
+    const [bio, setBio] = useState(auth.user.bio || ''); // Initialize with current user bio
 
+    // Handle form submission
     const handleSave = (e) => {
         e.preventDefault();
 
-        // Handle the save action here, e.g., send the skills and bio data to the server via an API call
-        console.log('Skills:', skills);
-        console.log('Bio:', bio);
+        // Send the updated skills and bio to the server
+        Inertia.post('/profile/update', { skills, bio }, {
+            onSuccess: () => {
+                alert('Profile updated successfully!');
+            },
+            onError: (errors) => {
+                console.log(errors);
+                alert('There was an error updating your profile.');
+            }
+        });
     };
 
     return (
