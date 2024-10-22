@@ -30,10 +30,7 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
 {
-    // Log the incoming request data
-    \Log::info('Request data:', $request->all());
 
-    // Validate the incoming request
     $request->validate([
         'id_number' => 'required|integer|unique:users',
         'firstName' => 'required|string|max:255',
@@ -45,31 +42,28 @@ class RegisteredUserController extends Controller
         'password' => ['required', 'confirmed', Rules\Password::defaults()],
     ]);
 
-    // Log the validated data
-    \Log::info('Validated data:', $request->all());
-
-    // Create a new user
     $user = User::create([
         'id_number' => $request->id_number,
         'firstName' => $request->firstName,
         'lastName' => $request->lastName,
         'middleName' => $request->middleName,
+        'is_approved' => 0,
         'gender' => $request->gender,
         'role' => $request->role,
         'email' => $request->email,
         'password' => Hash::make($request->password),
     ]);
 
-    // Fire the Registered event
     event(new Registered($user));
 
-    // Log the user creation
-    \Log::info('User created:', $user->toArray());
-
     // Log the user in
-    Auth::login($user);
+    if($user->is_approved == 1) {
 
-    // Redirect to pending approval page
+        Auth::login($user);
+        
+        return redirect()->intended(route('dashboard'));
+    }
+
     return redirect()->route('pending-approval');
 }
 

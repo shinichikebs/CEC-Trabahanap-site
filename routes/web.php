@@ -33,10 +33,6 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::get('/post-project', function () {
         return Inertia::render('PostProject');
     })->name('post-project');
-
-    Route::get('/pending-approval', function () {
-        return Inertia::render('Auth/PendingApproval');
-    })->name('pending-approval');
     
     // Route to create a new project
     Route::post('/post-project-offer', [PostProjectController::class, 'postProject']);
@@ -76,6 +72,10 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     // Route to get a proposal for a specific project
     Route::get('/proposal/{projectId}', [ProposalController::class, 'getProposal'])->name('proposal.get'); // <-- New Route for fetching proposals
 });
+
+Route::get('/pending-approval', function () {
+    return Inertia::render('Auth/PendingApproval');
+})->name('pending-approval');
 
 // Group routes that require authentication for profile handling
 Route::middleware('auth')->group(function () {
