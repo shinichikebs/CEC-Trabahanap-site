@@ -103,6 +103,7 @@ Route::post('/admin/login', [AdminLoginController::class, 'login'])->name('admin
 Route::post('/admin/logout', [AdminLoginController::class, 'logout'])->name('admin.logout');
 
 // Admin-specific routes
+
 Route::group(['middleware' => ['is_admin']], function () {
     Route::get('/admin/dashboard', function () {
         return Inertia::render('Admin/dashboardAdmin'); // Admin Dashboard
@@ -113,7 +114,18 @@ Route::group(['middleware' => ['is_admin']], function () {
 
     Route::get('/admin/pending-approval-posts', [AdminDashboardController::class, 'getPendingApprovalPosts']);
     Route::post('/admin/approve-post/{id}', [AdminDashboardController::class, 'approvePost']);
+
+
+    Route::get('/admin/approved-users', [AdminDashboardController::class, 'getApprovedUsers']);
+    Route::get('/admin/approved-posts', [AdminDashboardController::class, 'getApprovedPosts']);
+    Route::get('/admin/job-done', [AdminDashboardController::class, 'getJobDone']);
+    Route::get('/report/all', [AdminDashboardController::class, 'reportall'])->name('report.all');
+    Route::get('/report/user', [AdminDashboardController::class, 'reportUser'])->name('report.user');
+    Route::get('/report/post', [AdminDashboardController::class, 'reportPost'])->name('report.post');
+    Route::get('/admin-dashboard-data', [AdminDashboardController::class, 'getHeaderDetails']);
+
 });
+
 
 Route::get('/admin-dashboard-data', [AdminDashboardController::class, 'getHeaderDetails']);
 Route::post('/admin/logout', function () {
