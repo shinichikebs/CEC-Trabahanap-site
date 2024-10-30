@@ -1,4 +1,3 @@
-// components/AddUserModal.js
 import React, { useState } from "react";
 import InputError from "@/Components/InputError";
 import PrimaryButton from "@/Components/PrimaryButton";
