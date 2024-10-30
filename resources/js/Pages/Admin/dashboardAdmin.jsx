@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { Inertia } from "@inertiajs/inertia";
+import AddUserModal from "@/components/AddUserModal";
+import AddStaffModal from "@/components/AddStaffModal";
 
 export default function Dashboard() {
     const [activeTab, setActiveTab] = useState("dashboard");
@@ -10,8 +12,15 @@ export default function Dashboard() {
     const [totalJobsDone, settotalJobsDone] = useState(0);
     const [pendingUsers, setPendingUsers] = useState([]);
     const [pendingPosts, setPendingPosts] = useState([]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
+        const [isAddStaffModalOpen, setIsAddStaffModalOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState(""); // <-- Define searchQuery here
+    const [searchResults, setSearchResults] = useState([]); 
+    const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false); // Add isModalOpen
     const [selectedPost, setSelectedPost] = useState(null);
+
+    
 
     useEffect(() => {
         fetchData();
@@ -100,27 +109,8 @@ export default function Dashboard() {
                 console.error("Error approving user:", error);
             });
     };
-
-    const openModal = (post) => {
-        setSelectedPost(post);
-        setIsModalOpen(true);
-    };
-
-    const closeModal = () => {
-        setSelectedPost(null);
-        setIsModalOpen(false);
-    };
-
     const handleLogout = () => {
         Inertia.post("/admin/logout"); // Assuming Inertia.js is being used for logout
-    };
-
-    const renderDescription = (description) => {
-        const words = description.split(" ");
-        if (words.length > 15) {
-            return words.slice(0, 15).join(" ") + "...";
-        }
-        return description;
     };
 
     const Modal = ({ post, onClose }) => {
@@ -155,6 +145,72 @@ export default function Dashboard() {
             </div>
         );
     };
+
+    const renderDescription = (description) => {
+        const words = description.split(" ");
+        if (words.length > 15) {
+            return words.slice(0, 15).join(" ") + "...";
+        }
+        return description;
+    };
+
+
+    const openModal = (post) => {
+        setSelectedPost(post);
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setSelectedPost(null);
+        setIsModalOpen(false);
+    };
+
+
+    // Search functionality handlers
+const handleSearchChange = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query); // Update the search query
+    
+    if (query) {
+        setIsDropdownVisible(true); // Show dropdown if there’s a query
+        fetchApprovedUsers(query);
+    } else {
+        setIsDropdownVisible(false); // Hide dropdown if query is empty
+        setSearchResults([]);
+    }
+};
+
+// Fetch approved users based on the search query
+const fetchApprovedUsers = (searchQuery) => {
+    axios.get(`/admin/search-approved-users?query=${encodeURIComponent(searchQuery)}`)
+        .then(response => {
+            setSearchResults(response.data.users);
+        })
+        .catch(error => {
+            console.error("Error fetching approved users:", error);
+        });
+};
+
+// To hide dropdown when clicking outside
+useEffect(() => {
+    const handleClickOutside = (event) => {
+        if (!event.target.closest("#search-container")) {
+            setIsDropdownVisible(false);
+        }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+}, []);
+
+// Add User modal handlers
+const openAddUserModal = () => setIsAddUserModalOpen(true);
+const closeAddUserModal = () => setIsAddUserModalOpen(false);
+
+const openAddStaffModal = () => setIsAddStaffModalOpen(true);
+const closeAddStaffModal = () => setIsAddStaffModalOpen(false);
+
+
+
 
 
     
@@ -253,6 +309,9 @@ export default function Dashboard() {
                             <h3 className="text-lg font-semibold mb-2">
                                 List of Users Pending Approval
                             </h3>
+                            {/* button to add a user */}
+                            <button onClick={openAddUserModal} className="bg-green-500 text-white px-4 py-2 rounded">Add User</button>
+                            <button onClick={openAddStaffModal} className="bg-green-500 text-white mb-5 ml-5 px-4 py-2 rounded">Add Staff</button>
                             {pendingUsers.length > 0 ? (
                                 <div className="space-y-4">
                                     {pendingUsers.map((user) => (
@@ -394,18 +453,43 @@ export default function Dashboard() {
     };
 
     return (
-        <div className="min-h-screen flex flex-col">
+         <div className="min-h-screen flex flex-col">
             <header className="bg-blue-500 text-white py-4 px-6">
                 <div className="flex justify-between items-center">
                     <h1 className="text-2xl font-semibold">Admin Dashboard</h1>
-                    <div className="flex items-center space-x-4">
-                        <button
-                            className="bg-blue-600 py-2 px-4 rounded-lg"
-                            onClick={handleLogout}
-                        >
-                            Logout
-                        </button>
+                    <div id="search-container" className="relative">
+                        <input
+                            type="text"
+                            placeholder="Search..."
+                            value={searchQuery}
+                            onChange={handleSearchChange}
+                            className="py-2 px-4 rounded-lg text-black"
+                        />
+                        {isDropdownVisible && searchResults.length > 0 && (
+                            <div className="absolute left-0 right-0 mt-1 bg-white border rounded-lg shadow-lg z-50">
+                                {searchResults.map((user) => (
+                                    <div
+                                        key={user.id}
+                                        className="p-2 hover:bg-gray-100 cursor-pointer"
+                                        onClick={() => {
+                                            Inertia.visit(`/admin/user/${user.id}`);
+                                            setIsDropdownVisible(false); // Close dropdown after selection
+                                        }}
+                                    >
+                                        <p>{user.firstName} {user.lastName}</p>
+                                        <p className="text-sm text-gray-500">{user.email}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
                     </div>
+                    <button
+                        className="bg-blue-600 py-2 px-4 rounded-lg ml-4"
+                        onClick={() => Inertia.post("/admin/logout")}
+                    >
+                        Logout
+                    </button>
                 </div>
             </header>
 
@@ -490,7 +574,11 @@ export default function Dashboard() {
                     </nav>
                 </aside>
 
-                <main className="flex-1 p-6">{renderContent()}</main>
+                <main className="flex-1 p-6">
+                    {renderContent()}
+                    <AddUserModal isOpen={isAddUserModalOpen} onClose={closeAddUserModal} />
+                    <AddStaffModal isOpen={isAddStaffModalOpen} onClose={closeAddStaffModal} />
+                </main>
             </div>
         </div>
     );

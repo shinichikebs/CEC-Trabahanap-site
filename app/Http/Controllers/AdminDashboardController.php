@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Admin;
 use App\Models\User;
 use App\Models\JobOffer;
 use App\Models\JobDone;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Inertia\Inertia;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rules;
+use Inertia\Inertia;
 
 class AdminDashboardController extends Controller
 {
@@ -161,5 +165,74 @@ class AdminDashboardController extends Controller
             }
 
 
+            public function searchApprovedUsers(Request $request)
+            {
+                return response()->json(['message' => 'Endpoint is working']);
+            }
+            
+            
+            public function addUser(Request $request)
+    {
+        $request->validate([
+            'id_number' => 'required|integer|unique:users',
+            'firstName' => 'required|string|max:255',
+            'lastName' => 'required|string|max:255',
+            'middleName' => 'nullable|string|max:255',
+            'gender' => 'required|in:male,female',
+            'role' => 'required|in:student,employee',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ]);
+
+        try {
+            $user = User::create([
+                'id_number' => $request->id_number,
+                'firstName' => $request->firstName,
+                'lastName' => $request->lastName,
+                'middleName' => $request->middleName,
+                'is_approved' => 1,
+                'gender' => $request->gender,
+                'role' => $request->role,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
+
+            return response()->json(['message' => 'User added successfully', 'user' => $user], 200);
+        } catch (\Exception $e) {
+            Log::error('Error adding user: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to add user'], 500);
+        }
+        
+    }
+            
+            
+    public function addStaff(Request $request)
+    {
+        // Validate request input
+        $request->validate([
+            'id_number' => 'required|integer|unique:admins,id_number',
+            'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
+        ]);
+    
+        try {
+            // Create a new staff entry in the admins table
+            $staff = Admin::create([
+                'id_number' => $request->id_number,
+                'password' => Hash::make($request->password),
+                'role' => 'staff',
+            ]);
+    
+            return response()->json(['message' => 'Staff added successfully', 'staff' => $staff], 200);
+        } catch (\Exception $e) {
+            Log::error('Error adding staff: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to add staff'], 500);
+        }
+    }
 
 }
+            
+
+
+
+
+
