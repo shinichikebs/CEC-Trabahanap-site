@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { Inertia } from "@inertiajs/inertia";
-import AddUserModal from "@/components/AddUserModal";
-import AddStaffModal from "@/components/AddStaffModal";
-import SearchUserModal from "@/components/SearchUserModal";
-import UserProfile from "@/components/UserProfile";
+import AddUserModal from "@/Components/AddUserModal";
+import AddStaffModal from "@/Components/AddStaffModal";
+import SearchUserModal from "@/Components/SearchUserModal";
+import UserProfile from "@/Components/UserProfile";
 
 export default function Dashboard() {
     const [activeTab, setActiveTab] = useState("dashboard");

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link } from "@inertiajs/react";
+import axios from 'axios'; // Import Axios for making HTTP requests
 
 export default function UserProfile({ user }) {
     const [showReportModal, setShowReportModal] = useState(false);
@@ -32,10 +33,21 @@ export default function UserProfile({ user }) {
         setSelectedViolation(e.target.value);
     };
 
-    const handleSubmitViolation = () => {
+    const handleSubmitViolation = async () => {
         if (selectedViolation) {
-            setShowViolationsDropdown(false); 
-            setShowReportedModal(true); 
+            try {
+                // Send POST request to the backend with the violation data
+                await axios.post(route('reportted.user', { id: user.id }), {
+                    violation: selectedViolation,
+                });
+
+                // Close the violations dropdown and show the confirmation modal
+                setShowViolationsDropdown(false);
+                setShowReportedModal(true);
+            } catch (error) {
+                console.error('Error reporting user:', error);
+                // Optional: Show an error message to the user
+            }
         }
     };
 
