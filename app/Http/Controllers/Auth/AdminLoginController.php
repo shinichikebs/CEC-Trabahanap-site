@@ -36,7 +36,7 @@ class AdminLoginController extends Controller
             // Use the custom admin guard
             Auth::guard('admin')->login($admin); 
     
-            return redirect()->intended(route('admin.dashboard'));
+            return redirect()->intended(route('admin.dashboardAdmin'));
         } else {
             return response()->json([
                 'message' => 'Invalid credentials',

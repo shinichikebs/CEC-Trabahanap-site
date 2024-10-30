@@ -13,6 +13,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
+use App\Http\Controllers\Auth\RegisteredUserController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -107,7 +108,7 @@ Route::post('/admin/logout', [AdminLoginController::class, 'logout'])->name('adm
 Route::group(['middleware' => ['is_admin']], function () {
     Route::get('/admin/dashboard', function () {
         return Inertia::render('Admin/dashboardAdmin'); // Admin Dashboard
-    })->name('admin.dashboard');
+    })->name('admin.dashboardAdmin');
 
     Route::get('/admin/pending-approval-users', [AdminDashboardController::class, 'getPendingApprovalUsers']);
     Route::post('/admin/approve-user/{id}', [AdminDashboardController::class, 'approveUser']);
@@ -123,6 +124,9 @@ Route::group(['middleware' => ['is_admin']], function () {
     Route::get('/report/user', [AdminDashboardController::class, 'reportUser'])->name('report.user');
     Route::get('/report/post', [AdminDashboardController::class, 'reportPost'])->name('report.post');
     Route::get('/admin-dashboard-data', [AdminDashboardController::class, 'getHeaderDetails']);
+    Route::get('/admin/search-approved-users', [AdminDashboardController::class, 'searchApprovedUsers']);
+    Route::post('/admin/add-user', [AdminDashboardController::class, 'addUser'])->name('admin.add-user');
+    Route::post('/admin/add-staff', [AdminDashboardController::class, 'addStaff'])->name('admin.add-staff');
 
 });
 
