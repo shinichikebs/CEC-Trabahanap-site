@@ -8,7 +8,8 @@ use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PostProjectController;
 use App\Http\Controllers\ChatController;
-use App\Http\Controllers\ProposalController; // Ensure ProposalController is imported
+use App\Http\Controllers\ProposalController;
+use App\Http\Controllers\ReportController; // Import ReportController
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -68,10 +69,13 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::get('/chat/{id}', [ChatController::class, 'show'])->name('chat.show');
 
     // Route to submit a proposal
-    Route::post('/submit-proposal', [ProposalController::class, 'store'])->name('submit-proposal'); // <-- New Route for submitting proposals
+    Route::post('/submit-proposal', [ProposalController::class, 'store'])->name('submit-proposal');
 
     // Route to get a proposal for a specific project
-    Route::get('/proposal/{projectId}', [ProposalController::class, 'getProposal'])->name('proposal.get'); // <-- New Route for fetching proposals
+    Route::get('/proposal/{projectId}', [ProposalController::class, 'getProposal'])->name('proposal.get');
+
+    // **New Route to Submit a Report**
+    Route::post('/report/user/{id}', [ReportController::class, 'store'])->name('reportted.user'); // <-- Add this line
 });
 
 Route::get('/pending-approval', function () {
@@ -130,10 +134,7 @@ Route::group(['middleware' => ['auth:admin']], function () {
     Route::post('/admin/add-staff', [AdminDashboardController::class, 'addStaff'])->name('admin.add-staff');
     Route::delete('/admin/delete-user/{id}', [AdminDashboardController::class, 'deleteUser']);
     Route::post('/admin/restrict-user/{id}', [AdminDashboardController::class, 'restrictUser']);
-
-
 });
-
 
 Route::get('/admin-dashboard-data', [AdminDashboardController::class, 'getHeaderDetails']);
 Route::post('/admin/logout', function () {
