@@ -13,7 +13,12 @@ class Report extends Model
     protected $table = 'reports';
 
     // Define fillable fields for mass assignment
-    protected $fillable = ['user_id', 'violation'];
+    protected $fillable = [
+        'user_id', 
+        'violation', 
+        'reported_user_name', 
+        'reporting_user_name'
+    ];
 
     /**
      * Relationship to the User model.

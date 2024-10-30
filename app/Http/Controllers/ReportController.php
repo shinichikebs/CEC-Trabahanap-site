@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Report;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ReportController extends Controller
 {
@@ -23,12 +24,17 @@ class ReportController extends Controller
         ]);
 
         // Find the user being reported by their ID
-        $user = User::findOrFail($id);
+        $reportedUser = User::findOrFail($id);
 
-        // Create a new report for the user with the specified violation
+        // Get the reporting user (the authenticated user)
+        $reportingUser = Auth::user();
+
+        // Create a new report with the violation and both user names
         Report::create([
-            'user_id' => $user->id,
+            'user_id' => $reportedUser->id,
             'violation' => $request->input('violation'),
+            'reported_user_name' => $reportedUser->firstName . ' ' . $reportedUser->lastName,
+            'reporting_user_name' => $reportingUser->firstName . ' ' . $reportingUser->lastName,
         ]);
 
         // Return a JSON response indicating successful report submission
