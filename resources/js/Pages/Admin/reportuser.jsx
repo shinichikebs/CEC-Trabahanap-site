@@ -3,9 +3,8 @@ import axios from 'axios';
 
 const NewReport = () => {
     const [approvedUsers, setApprovedUsers] = useState([]);
-    const [approvedPosts, setApprovedPosts] = useState([]);
     const [pendingUsers, setPendingUsers] = useState([]);
-    const [pendingPosts, setPendingPosts] = useState([]);
+    const [restrictUsers, setRestrictUsers] = useState([]);
     const [totalUsers, setTotalUsers] = useState(0);
     const [totalPosts, setTotalPosts] = useState(0);
     const [totalJobsDone, setTotalJobsDone] = useState(0);
@@ -22,13 +21,10 @@ const NewReport = () => {
                 setTotalPosts(response.data.totalPosts);
                 setTotalJobsDone(response.data.totalJobsDone);
                 fetchPendingUsers();
-
                 fetchApprovedUsers();
-
+                fetchRestrictUsers();
             })
-            .catch((error) => {
-                console.error("Error fetching data:", error);
-            });
+            .catch((error) => console.error("Error fetching data:", error));
     };
 
     const fetchApprovedUsers = () => {
@@ -37,8 +33,6 @@ const NewReport = () => {
             .catch((error) => console.error("Error fetching approved users:", error));
     };
 
-
-
     const fetchPendingUsers = () => {
         axios
             .get("/admin/pending-approval-users")
@@ -46,26 +40,28 @@ const NewReport = () => {
             .catch((error) => console.error("Error fetching pending users:", error));
     };
 
-
+    const fetchRestrictUsers = () => {
+        axios
+            .get("/admin/restricted-users")
+            .then((response) => setRestrictUsers(response.data.restrictUsers)) // Corrected response data key
+            .catch((error) => console.error("Error fetching restricted users:", error));
+    };
 
     return (
         <div className="container mx-auto p-4">
             <h1 className="text-2xl font-bold">User Account Report</h1>
-
             <div className="mt-8">
                 <table className="min-w-full border border-gray-300">
                     <thead>
                         <tr className="bg-gray-200">
                             <th className="border border-gray-300 p-2">Approved Users</th>
-
                             <th className="border border-gray-300 p-2">Pending Users</th>
-
+                            <th className="border border-gray-300 p-2">Restricted Users</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {Array.from({ length: Math.max(approvedUsers.length, approvedPosts.length, pendingUsers.length, pendingPosts.length) }).map((_, index) => (
+                        {Array.from({ length: Math.max(approvedUsers.length, pendingUsers.length, restrictUsers.length) }).map((_, index) => (
                             <tr key={index}>
-                                {/* Approved Users */}
                                 <td className="border border-gray-300 p-2">
                                     {approvedUsers[index] ? (
                                         <div>
@@ -74,10 +70,6 @@ const NewReport = () => {
                                         </div>
                                     ) : "—"}
                                 </td>
-
-
-
-                                {/* Pending Users */}
                                 <td className="border border-gray-300 p-2">
                                     {pendingUsers[index] ? (
                                         <div>
@@ -86,7 +78,14 @@ const NewReport = () => {
                                         </div>
                                     ) : "—"}
                                 </td>
-
+                                <td className="border border-gray-300 p-2">
+                                    {restrictUsers[index] ? (
+                                        <div>
+                                            {restrictUsers[index].firstName} {restrictUsers[index].lastName} <br />
+                                            <span className="text-sm text-gray-600">{restrictUsers[index].email}</span>
+                                        </div>
+                                    ) : "—"}
+                                </td>
                             </tr>
                         ))}
                     </tbody>

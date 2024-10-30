@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DeletedUser;
 use App\Models\Admin;
 use App\Models\User;
 use App\Models\JobOffer;
@@ -136,6 +137,22 @@ class AdminDashboardController extends Controller
             }
         }
 
+
+        public function getRestrictUsers()
+        {
+            try {
+                $restrictUsers = User::where('is_approved', 3)->get(); // Fetch restricted users
+        
+                return response()->json([
+                    'restrictUsers' => $restrictUsers, // Corrected response key
+                ]);
+            } catch (\Exception $e) {
+                \Log::error('Error fetching restricted users: ' . $e->getMessage());
+                return response()->json(['error' => 'Internal Server Error'], 500);
+            }
+        }
+        
+
         public function getApprovedPosts()
         {
             try {
@@ -149,6 +166,7 @@ class AdminDashboardController extends Controller
                 return response()->json(['error' => 'Internal Server Error'], 500);
             }
         }
+        
 
         public function getJobDone()
             {
@@ -167,67 +185,138 @@ class AdminDashboardController extends Controller
 
             public function searchApprovedUsers(Request $request)
             {
-                return response()->json(['message' => 'Endpoint is working']);
+                try {
+                    $query = $request->query('query'); // Retrieve the 'query' parameter from request
+            
+                    // Search users whose first names start with the search query
+                    $users = User::where('is_approved', 1)
+                        ->where('firstName', 'LIKE', $query . '%')
+                        ->get();
+            
+                    return response()->json([
+                        'users' => $users,
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error('Error fetching search results: ' . $e->getMessage());
+                    return response()->json(['error' => 'Internal Server Error'], 500);
+                }
             }
             
             
             public function addUser(Request $request)
-    {
-        $request->validate([
-            'id_number' => 'required|integer|unique:users',
-            'firstName' => 'required|string|max:255',
-            'lastName' => 'required|string|max:255',
-            'middleName' => 'nullable|string|max:255',
-            'gender' => 'required|in:male,female',
-            'role' => 'required|in:student,employee',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ]);
+                {
+                    $request->validate([
+                        'id_number' => 'required|integer|unique:users',
+                        'firstName' => 'required|string|max:255',
+                        'lastName' => 'required|string|max:255',
+                        'middleName' => 'nullable|string|max:255',
+                        'gender' => 'required|in:male,female',
+                        'role' => 'required|in:student,employee',
+                        'email' => 'required|string|email|max:255|unique:users',
+                        'password' => ['required', 'confirmed', Rules\Password::defaults()],
+                    ]);
 
-        try {
-            $user = User::create([
-                'id_number' => $request->id_number,
-                'firstName' => $request->firstName,
-                'lastName' => $request->lastName,
-                'middleName' => $request->middleName,
-                'is_approved' => 1,
-                'gender' => $request->gender,
-                'role' => $request->role,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-            ]);
+                    try {
+                        $user = User::create([
+                            'id_number' => $request->id_number,
+                            'firstName' => $request->firstName,
+                            'lastName' => $request->lastName,
+                            'middleName' => $request->middleName,
+                            'is_approved' => 1,
+                            'gender' => $request->gender,
+                            'role' => $request->role,
+                            'email' => $request->email,
+                            'password' => Hash::make($request->password),
+                        ]);
 
-            return response()->json(['message' => 'User added successfully', 'user' => $user], 200);
-        } catch (\Exception $e) {
-            Log::error('Error adding user: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to add user'], 500);
-        }
+                        return response()->json(['message' => 'User added successfully', 'user' => $user], 200);
+                    } catch (\Exception $e) {
+                        Log::error('Error adding user: ' . $e->getMessage());
+                        return response()->json(['error' => 'Failed to add user'], 500);
+                    }
+                    
+                }
+                        
+                        
+                public function addStaff(Request $request)
+                {
+                    // Validate request input
+                    $request->validate([
+                        'id_number' => 'required|integer|unique:admins,id_number',
+                        'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
+                    ]);
+                
+                    try {
+                        // Create a new staff entry in the admins table
+                        $staff = Admin::create([
+                            'id_number' => $request->id_number,
+                            'password' => Hash::make($request->password),
+                            'role' => 'staff',
+                        ]);
+                
+                        return response()->json(['message' => 'Staff added successfully', 'staff' => $staff], 200);
+                    } catch (\Exception $e) {
+                        Log::error('Error adding staff: ' . $e->getMessage());
+                        return response()->json(['error' => 'Failed to add staff'], 500);
+                    }
+                }
+
+
+                public function deleteUser($id)
+            {
+                try {
+                    // Find the user by ID
+                    $user = User::findOrFail($id);
+
+                    // Move user data to deleted_users table
+                    DeletedUser::create([
+                        'id_number' => $user->id_number,
+                        'firstName' => $user->firstName,
+                        'lastName' => $user->lastName,
+                        'email' => $user->email,
+                        'role' => $user->role,
+                        'deleted_at' => now(),
+                    ]);
+
+                    // Delete user from users table
+                    $user->delete();
+
+                    return response()->json(['message' => 'User deleted and moved to Deleted Users successfully'], 200);
+                } catch (\Exception $e) {
+                    Log::error('Error deleting user: ' . $e->getMessage());
+                    return response()->json(['error' => 'Failed to delete user'], 500);
+                }
+            }
+
+            public function restrictUser($id)
+            {
+                try {
+                    $user = User::findOrFail($id);
+                    $user->is_approved = 3;
+                    $user->save();
         
-    }
-            
-            
-    public function addStaff(Request $request)
-    {
-        // Validate request input
-        $request->validate([
-            'id_number' => 'required|integer|unique:admins,id_number',
-            'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
-        ]);
-    
-        try {
-            // Create a new staff entry in the admins table
-            $staff = Admin::create([
-                'id_number' => $request->id_number,
-                'password' => Hash::make($request->password),
-                'role' => 'staff',
-            ]);
-    
-            return response()->json(['message' => 'Staff added successfully', 'staff' => $staff], 200);
-        } catch (\Exception $e) {
-            Log::error('Error adding staff: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to add staff'], 500);
-        }
-    }
+                    return response()->json(['message' => 'User restricted successfully']);
+                } catch (\Exception $e) {
+                    \Log::error('Error approving user: ' . $e->getMessage());
+                    return response()->json(['error' => 'Internal Server Error'], 500);
+                }
+            }
+            // public function restrictUser($id)
+            // {
+            //     try {
+            //         // Find the user by ID
+            //         $user = User::findOrFail($id);
+
+            //         // Update the is_approved status to 3 (restricted)
+            //         $user->is_approved = 3;
+            //         $user->save();
+
+            //         return response()->json(['message' => 'User restricted successfully'], 200);
+            //     } catch (\Exception $e) {
+            //         Log::error('Error restricting user: ' . $e->getMessage());
+            //         return response()->json(['error' => 'Failed to restrict user'], 500);
+            //     }
+            // }
 
 }
             

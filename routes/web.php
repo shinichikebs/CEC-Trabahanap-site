@@ -105,9 +105,9 @@ Route::post('/admin/logout', [AdminLoginController::class, 'logout'])->name('adm
 
 // Admin-specific routes
 
-Route::group(['middleware' => ['is_admin']], function () {
+Route::group(['middleware' => ['auth:admin']], function () {
     Route::get('/admin/dashboard', function () {
-        return Inertia::render('Admin/dashboardAdmin'); // Admin Dashboard
+        return Inertia::render('Admin/dashboardAdmin');
     })->name('admin.dashboardAdmin');
 
     Route::get('/admin/pending-approval-users', [AdminDashboardController::class, 'getPendingApprovalUsers']);
@@ -118,6 +118,7 @@ Route::group(['middleware' => ['is_admin']], function () {
 
 
     Route::get('/admin/approved-users', [AdminDashboardController::class, 'getApprovedUsers']);
+    Route::get('/admin/restricted-users', [AdminDashboardController::class, 'getRestrictUsers']);
     Route::get('/admin/approved-posts', [AdminDashboardController::class, 'getApprovedPosts']);
     Route::get('/admin/job-done', [AdminDashboardController::class, 'getJobDone']);
     Route::get('/report/all', [AdminDashboardController::class, 'reportall'])->name('report.all');
@@ -127,6 +128,9 @@ Route::group(['middleware' => ['is_admin']], function () {
     Route::get('/admin/search-approved-users', [AdminDashboardController::class, 'searchApprovedUsers']);
     Route::post('/admin/add-user', [AdminDashboardController::class, 'addUser'])->name('admin.add-user');
     Route::post('/admin/add-staff', [AdminDashboardController::class, 'addStaff'])->name('admin.add-staff');
+    Route::delete('/admin/delete-user/{id}', [AdminDashboardController::class, 'deleteUser']);
+    Route::post('/admin/restrict-user/{id}', [AdminDashboardController::class, 'restrictUser']);
+
 
 });
 

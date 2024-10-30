@@ -4,6 +4,8 @@ import Swal from "sweetalert2";
 import { Inertia } from "@inertiajs/inertia";
 import AddUserModal from "@/components/AddUserModal";
 import AddStaffModal from "@/components/AddStaffModal";
+import SearchUserModal from "@/components/SearchUserModal";
+import UserProfile from "@/components/UserProfile";
 
 export default function Dashboard() {
     const [activeTab, setActiveTab] = useState("dashboard");
@@ -13,12 +15,16 @@ export default function Dashboard() {
     const [pendingUsers, setPendingUsers] = useState([]);
     const [pendingPosts, setPendingPosts] = useState([]);
     const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
-        const [isAddStaffModalOpen, setIsAddStaffModalOpen] = useState(false);
-    const [searchQuery, setSearchQuery] = useState(""); // <-- Define searchQuery here
-    const [searchResults, setSearchResults] = useState([]); 
+    const [isAddStaffModalOpen, setIsAddStaffModalOpen] = useState(false);
+
+    const [searchQuery, setSearchQuery] = useState("");
+    const [searchResults, setSearchResults] = useState([]);
+    const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
     const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+
     const [isModalOpen, setIsModalOpen] = useState(false); // Add isModalOpen
     const [selectedPost, setSelectedPost] = useState(null);
+    const [selectedUser, setSelectedUser] = useState(null);
 
     
 
@@ -60,6 +66,7 @@ export default function Dashboard() {
                 console.error("Error fetching pending users:", error);
             });
     };
+
 
     const fetchPendingPosts = () => {
         axios
@@ -167,40 +174,43 @@ export default function Dashboard() {
 
 
     // Search functionality handlers
-const handleSearchChange = (e) => {
-    const query = e.target.value;
-    setSearchQuery(query); // Update the search query
-    
-    if (query) {
-        setIsDropdownVisible(true); // Show dropdown if there’s a query
-        fetchApprovedUsers(query);
-    } else {
-        setIsDropdownVisible(false); // Hide dropdown if query is empty
-        setSearchResults([]);
-    }
-};
-
-// Fetch approved users based on the search query
-const fetchApprovedUsers = (searchQuery) => {
-    axios.get(`/admin/search-approved-users?query=${encodeURIComponent(searchQuery)}`)
-        .then(response => {
-            setSearchResults(response.data.users);
-        })
-        .catch(error => {
-            console.error("Error fetching approved users:", error);
-        });
-};
-
-// To hide dropdown when clicking outside
-useEffect(() => {
-    const handleClickOutside = (event) => {
-        if (!event.target.closest("#search-container")) {
-            setIsDropdownVisible(false);
+    const handleSearchChange = (e) => {
+        const query = e.target.value;
+        setSearchQuery(query);
+        
+        if (query) {
+            fetchSearchResults(query);
+            setIsSearchModalOpen(true);
+        } else {
+            setIsSearchModalOpen(false);
         }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-}, []);
+
+    const fetchSearchResults = (query) => {
+        axios.get(`/admin/search-approved-users?query=${encodeURIComponent(query)}`)
+            .then(response => {
+                setSearchResults(response.data.users);
+            })
+            .catch(error => {
+                console.error("Error fetching search results:", error);
+            });
+    };
+
+    const handleUserSelect = (user) => {
+        setSelectedUser(user); // Set the selected user to display their profile
+        setIsSearchModalOpen(false);
+    };
+
+    const closeUserProfile = () => {
+        setSelectedUser(null); // Reset selected user to hide profile
+    };
+
+    
+// To hide dropdown when clicking outside
+        const closeSearchModal = () => {
+            setIsSearchModalOpen(false);
+            setSearchQuery("");
+        };
 
 // Add User modal handlers
 const openAddUserModal = () => setIsAddUserModalOpen(true);
@@ -215,7 +225,11 @@ const closeAddStaffModal = () => setIsAddStaffModalOpen(false);
 
     
 
-    const renderContent = () => {
+const renderContent = () => {
+    // Check if a user profile is selected
+    if (selectedUser) {
+        return <UserProfile user={selectedUser} onClose={closeUserProfile} />;
+    }
         switch (activeTab) {
             case "dashboard":
                 return (
@@ -451,39 +465,21 @@ const closeAddStaffModal = () => setIsAddStaffModalOpen(false);
                 );
         }
     };
-
+//  Main content
     return (
          <div className="min-h-screen flex flex-col">
             <header className="bg-blue-500 text-white py-4 px-6">
                 <div className="flex justify-between items-center">
                     <h1 className="text-2xl font-semibold">Admin Dashboard</h1>
-                    <div id="search-container" className="relative">
-                        <input
+                    <div className="relative mt-4">
+                    <input
                             type="text"
-                            placeholder="Search..."
+                            placeholder="Search for users..."
                             value={searchQuery}
                             onChange={handleSearchChange}
-                            className="py-2 px-4 rounded-lg text-black"
+                            className="py-2 px-4 rounded-lg text-black w-full"
                         />
-                        {isDropdownVisible && searchResults.length > 0 && (
-                            <div className="absolute left-0 right-0 mt-1 bg-white border rounded-lg shadow-lg z-50">
-                                {searchResults.map((user) => (
-                                    <div
-                                        key={user.id}
-                                        className="p-2 hover:bg-gray-100 cursor-pointer"
-                                        onClick={() => {
-                                            Inertia.visit(`/admin/user/${user.id}`);
-                                            setIsDropdownVisible(false); // Close dropdown after selection
-                                        }}
-                                    >
-                                        <p>{user.firstName} {user.lastName}</p>
-                                        <p className="text-sm text-gray-500">{user.email}</p>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-
-                    </div>
+                </div>
                     <button
                         className="bg-blue-600 py-2 px-4 rounded-lg ml-4"
                         onClick={() => Inertia.post("/admin/logout")}
@@ -578,6 +574,13 @@ const closeAddStaffModal = () => setIsAddStaffModalOpen(false);
                     {renderContent()}
                     <AddUserModal isOpen={isAddUserModalOpen} onClose={closeAddUserModal} />
                     <AddStaffModal isOpen={isAddStaffModalOpen} onClose={closeAddStaffModal} />
+                    <SearchUserModal 
+                        isOpen={isSearchModalOpen} 
+                        searchResults={searchResults} 
+                        onSelect={handleUserSelect}
+                        onClose={() => setIsSearchModalOpen(false)} // Closes modal
+                    />
+
                 </main>
             </div>
         </div>

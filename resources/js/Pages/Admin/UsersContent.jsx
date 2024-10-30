@@ -19,16 +19,24 @@ export default function UsersContent() {
         fetchPendingUsers();
     }, []);
 
+
     const handleApproveUser = (userId) => {
-        Inertia.post(`/admin/approve-user/${userId}`, {}, {
-            onSuccess: () => {
-                alert("User approved successfully!");
-                setPendingUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId)); // Remove approved user from list
-            },
-            onError: () => {
-                alert("Failed to approve the user.");
-            }
-        });
+        axios
+            .post(`/admin/approve-user/${userId}`)
+            .then((response) => {
+                Swal.fire({
+                    title: "Success!",
+                    text: "Post approved successfully!",
+                    icon: "success",
+                    confirmButtonText: "Okay",
+                });
+                setPendingUsers((prevUsers) =>
+                    prevUsers.filter((user) => user.id !== userId)
+                ); // Remove the approved user from the list
+            })
+            .catch((error) => {
+                console.error("Error approving user:", error);
+            });
     };
 
     return (
