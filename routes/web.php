@@ -134,6 +134,10 @@ Route::group(['middleware' => ['auth:admin']], function () {
     Route::post('/admin/add-staff', [AdminDashboardController::class, 'addStaff'])->name('admin.add-staff');
     Route::delete('/admin/delete-user/{id}', [AdminDashboardController::class, 'deleteUser']);
     Route::post('/admin/restrict-user/{id}', [AdminDashboardController::class, 'restrictUser']);
+    Route::get('/admin/reports', [AdminDashboardController::class, 'reportUsers']);
+    Route::get('/admin/user/{id}', [AdminDashboardController::class, 'getUserById']);
+
+
 });
 
 Route::get('/admin-dashboard-data', [AdminDashboardController::class, 'getHeaderDetails']);
