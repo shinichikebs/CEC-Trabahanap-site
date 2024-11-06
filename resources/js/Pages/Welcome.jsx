@@ -29,7 +29,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                     </h1>
                     <p className={`text-[gray] text-2xl font-medium text-center`}>
                         Unlock a World of Career Advancements and Project
-                        Collaborations Tailored to Your Expertise and Passion
+                        Collaborations Tailored to Your Expertise and Passion.
                     </p>
                     <div className={`flex items-center space-x-11 justify-center`}>
                         <NavLink active={false} href={`/register`} className={`bg-[#E8AA42] hover:bg-sky-700 hover:bg-blue-700 rounded-lg w-24 text-center text-white`}>Get Started</NavLink>
@@ -45,12 +45,27 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                         <br></br> In collaboration with: 
                     </p>
                     <div className={`flex items-start space-x-6 justify-center`}>
-                        <img src={`cec.png`} width={50} />
-                        <img src={`csd.png`} width={50} />
+                        <img src={`cec.png`} width={60} alt="CEC Logo" />
+                        <img src={`csd.png`} width={60} alt="CSD Logo" />
                     </div>
                 </div>
-                <img className={`scale-x-[-1]`} src={`programer.gif`} />
+                
+                <img 
+                    id="job-gif" 
+                    className={`scale-x-[-1]`} 
+                    src={`job.gif`} 
+                    width={600}  
+                    height={600} 
+                    onError={handleImageError} 
+                    alt="Job illustration"
+                    style={{ width: "700px", height: "700px", objectFit: "cover" }}
+                />
             </div>
+
+            {/* Footer Section */}
+            <footer className="bg-[#231955] text-white py-4 text-center mt-8">
+                <p className="text-sm">© 2024 CeCNIAN. All rights reserved.</p>
+            </footer>
         </>
     );
 }

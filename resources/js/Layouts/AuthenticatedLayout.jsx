@@ -169,3 +169,4 @@ export default function Authenticated({ user, header, children, showNavbar = tru
         </div>
     );
 }
+0

@@ -51,7 +51,7 @@ export default function Register() {
                                 id="id_number"
                                 name="id_number"
                                 value={data.id_number}
-                                className="w-full bg-transparent text-white border-b border-white placeholder-white focus:ring-0 focus:border-white"
+                                className="w-full bg-white text-black !text-black border-b border-black placeholder-black focus:ring-0 focus:border-black"
                                 placeholder="ID Number"
                                 onChange={(e) => setData('id_number', e.target.value)}
                                 required
@@ -63,7 +63,7 @@ export default function Register() {
                                     id="lastName"
                                     name="lastName"
                                     value={data.lastName}
-                                    className="w-full bg-transparent text-white border-b border-white placeholder-white focus:ring-0 focus:border-white"
+                                    className="w-full bg-white text-black !text-black border-b border-black placeholder-black focus:ring-0 focus:border-black"
                                     placeholder="Last Name"
                                     onChange={(e) => setData('lastName', e.target.value)}
                                     required
@@ -72,7 +72,7 @@ export default function Register() {
                                     id="firstName"
                                     name="firstName"
                                     value={data.firstName}
-                                    className="w-full bg-transparent text-white border-b border-white placeholder-white focus:ring-0 focus:border-white"
+                                    className="w-full bg-white text-black !text-black border-b border-black placeholder-black focus:ring-0 focus:border-black"
                                     placeholder="First Name"
                                     onChange={(e) => setData('firstName', e.target.value)}
                                     required
@@ -81,7 +81,7 @@ export default function Register() {
                                     id="middleName"
                                     name="middleName"
                                     value={data.middleName}
-                                    className="w-full bg-transparent text-white border-b border-white placeholder-white focus:ring-0 focus:border-white"
+                                    className="w-full bg-white text-black !text-black border-b border-black placeholder-black focus:ring-0 focus:border-black"
                                     placeholder="Middle Name"
                                     onChange={(e) => setData('middleName', e.target.value)}
                                 />
@@ -93,7 +93,7 @@ export default function Register() {
                                     id="gender"
                                     name="gender"
                                     value={data.gender}
-                                    className="w-full bg-transparent text-white border-b border-white placeholder-white focus:ring-0 focus:border-white"
+                                    className="w-full bg-white text-black !text-black border-b border-black placeholder-black focus:ring-0 focus:border-black"
                                     onChange={(e) => setData('gender', e.target.value)}
                                     required
                                 >
@@ -106,7 +106,7 @@ export default function Register() {
                                     id="role"
                                     name="role"
                                     value={data.role}
-                                    className="w-full bg-transparent text-white border-b border-white placeholder-white focus:ring-0 focus:border-white"
+                                    className="w-full bg-white text-black !text-black border-b border-black placeholder-black focus:ring-0 focus:border-black"
                                     onChange={(e) => setData('role', e.target.value)}
                                     required
                                 >
@@ -122,7 +122,7 @@ export default function Register() {
                                 type="email"
                                 name="email"
                                 value={data.email}
-                                className="w-full bg-transparent text-white border-b border-white placeholder-white focus:ring-0 focus:border-white"
+                                className="w-full bg-white text-black !text-black border-b border-black placeholder-black focus:ring-0 focus:border-black"
                                 placeholder="Email"
                                 onChange={(e) => setData('email', e.target.value)}
                                 required
@@ -134,7 +134,7 @@ export default function Register() {
                                 type="password"
                                 name="password"
                                 value={data.password}
-                                className="w-full bg-transparent text-white border-b border-white placeholder-white focus:ring-0 focus:border-white"
+                                className="w-full bg-white text-black !text-black border-b border-black placeholder-black focus:ring-0 focus:border-black"
                                 placeholder="Password"
                                 onChange={(e) => setData('password', e.target.value)}
                                 required
@@ -146,7 +146,7 @@ export default function Register() {
                                 type="password"
                                 name="password_confirmation"
                                 value={data.password_confirmation}
-                                className="w-full bg-transparent text-white border-b border-white placeholder-white focus:ring-0 focus:border-white"
+                                className="w-full bg-white text-black !text-black border-b border-black placeholder-black focus:ring-0 focus:border-black"
                                 placeholder="Confirm Password"
                                 onChange={(e) => setData('password_confirmation', e.target.value)}
                                 required

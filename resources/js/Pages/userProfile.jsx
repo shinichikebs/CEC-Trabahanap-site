@@ -1,13 +1,11 @@
-import React, { useState } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import React, { useState } from "react";
 import { Head, Link } from "@inertiajs/react";
-import axios from 'axios'; // Import Axios for making HTTP requests
+import Swal from 'sweetalert2';
+import axios from 'axios';
 
 export default function UserProfile({ user }) {
-    const [showReportModal, setShowReportModal] = useState(false);
-    const [showViolationsDropdown, setShowViolationsDropdown] = useState(false);
     const [selectedViolation, setSelectedViolation] = useState('');
-    const [showReportedModal, setShowReportedModal] = useState(false);
 
     const violations = [
         "Spam or fake profile",
@@ -17,42 +15,65 @@ export default function UserProfile({ user }) {
     ];
 
     const handleReportClick = () => {
-        setShowReportModal(true); 
-    };
-
-    const handleYesClick = () => {
-        setShowReportModal(false); 
-        setShowViolationsDropdown(true); 
-    };
-
-    const handleNoClick = () => {
-        setShowReportModal(false); 
-    };
-
-    const handleViolationChange = (e) => {
-        setSelectedViolation(e.target.value);
-    };
-
-    const handleSubmitViolation = async () => {
-        if (selectedViolation) {
-            try {
-                // Send POST request to the backend with the violation data
-                await axios.post(route('reportted.user', { id: user.id }), {
-                    violation: selectedViolation,
-                });
-
-                // Close the violations dropdown and show the confirmation modal
-                setShowViolationsDropdown(false);
-                setShowReportedModal(true);
-            } catch (error) {
-                console.error('Error reporting user:', error);
-                // Optional: Show an error message to the user
+        Swal.fire({
+            title: 'Are you sure you want to report this user?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                handleViolationSelection();
             }
-        }
+        });
     };
 
-    const handleCloseReportedModal = () => {
-        setShowReportedModal(false); 
+    const handleViolationSelection = () => {
+        Swal.fire({
+            title: 'Select the reason for reporting:',
+            input: 'select',
+            inputOptions: violations.reduce((options, violation, index) => {
+                options[violation] = violation;
+                return options;
+            }, {}),
+            inputPlaceholder: 'Select a violation',
+            showCancelButton: true,
+            confirmButtonText: 'Submit',
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            preConfirm: (selectedViolation) => {
+                setSelectedViolation(selectedViolation);
+                return selectedViolation || Swal.showValidationMessage('Please select a violation');
+            },
+        }).then((result) => {
+            if (result.isConfirmed) {
+                handleSubmitViolation(result.value);
+            }
+        });
+    };
+
+    const handleSubmitViolation = async (violation) => {
+        try {
+            await axios.post(route('reportted.user', { id: user.id }), {
+                violation: violation,
+            });
+            Swal.fire({
+                title: 'User Reported',
+                text: 'Thank you for reporting this user.',
+                icon: 'success',
+                confirmButtonColor: '#3085d6',
+            });
+        } catch (error) {
+            console.error('Error reporting user:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'There was an error processing your report.',
+                icon: 'error',
+                confirmButtonColor: '#d33',
+            });
+        }
     };
 
     return (
@@ -71,7 +92,7 @@ export default function UserProfile({ user }) {
                 <div className="bg-gray-200 w-full lg:w-1/4 rounded-lg p-6">
                     <div className="flex flex-col items-center">
                         <img
-                            src={user.avatar || "/path-to-avatar.png"}
+                            src={user.avatar || "https://www.pngall.com/wp-content/uploads/12/Avatar-Profile-Vector-PNG-Pic.png"}
                             alt={`${user.firstName} {user.lastName}`}
                             className="rounded-full w-24 h-24 mb-4"
                             loading="lazy" 
@@ -80,17 +101,6 @@ export default function UserProfile({ user }) {
                             {user.firstName} {user.lastName}
                         </p>
 
-                        {/* User Rating */}
-                        {user.rating ? (
-                            <div className="flex items-center space-x-1 text-yellow-500 mt-2">
-                                <span>⭐</span>
-                                <span>{user.rating}</span>
-                            </div>
-                        ) : (
-                            <p className="text-gray-500 mt-2">No ratings yet</p>
-                        )}
-
-                        {/* Contact Button */}
                         <Link
                             href={route('chat.show', { id: user.id })} 
                             className="mt-4 bg-blue-600 text-white px-4 py-2 rounded"
@@ -98,7 +108,6 @@ export default function UserProfile({ user }) {
                             Contact
                         </Link>
 
-                        {/* Report Profile Button */}
                         <button
                             onClick={handleReportClick}
                             className="text-red-500 text-sm mt-2"
@@ -118,8 +127,8 @@ export default function UserProfile({ user }) {
                             <h4 className="font-semibold text-gray-800">Skills</h4>
                             <p className="text-gray-600">
                                 {Array.isArray(user.skills) 
-                                    ? user.skills.join(', ') // If skills is an array, join it into a string
-                                    : user.skills || "No skills listed"} {/* If it's a string or null, display it directly */}
+                                    ? user.skills.join(', ')
+                                    : user.skills || "No skills listed"}
                             </p>
                         </div>
                         <div>
@@ -129,71 +138,6 @@ export default function UserProfile({ user }) {
                     </div>
                 </div>
             </div>
-
-            {/* Report Modal */}
-            {showReportModal && (
-                <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-                        <h2 className="text-lg font-semibold mb-4">Are you sure you want to report this user?</h2>
-                        <div className="flex justify-between">
-                            <button
-                                onClick={handleYesClick}
-                                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-                            >
-                                Yes
-                            </button>
-                            <button
-                                onClick={handleNoClick}
-                                className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
-                            >
-                                No
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Violations Dropdown */}
-            {showViolationsDropdown && (
-                <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-                        <h2 className="text-lg font-semibold mb-4">Select the reason for reporting:</h2>
-                        <select
-                            value={selectedViolation}
-                            onChange={handleViolationChange}
-                            className="block w-full p-2 border border-gray-300 rounded mb-4"
-                        >
-                            <option value="">Select a violation</option>
-                            {violations.map((violation, index) => (
-                                <option key={index} value={violation}>
-                                    {violation}
-                                </option>
-                            ))}
-                        </select>
-                        <button
-                            onClick={handleSubmitViolation}
-                            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                        >
-                            Submit
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            {/* Reported Confirmation Modal */}
-            {showReportedModal && (
-                <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-                    <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-                        <h2 className="text-lg font-semibold mb-4">User is Reported</h2>
-                        <button
-                            onClick={handleCloseReportedModal}
-                            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                        >
-                            Close
-                        </button>
-                    </div>
-                </div>
-            )}
         </AuthenticatedLayout>
     );
 }
