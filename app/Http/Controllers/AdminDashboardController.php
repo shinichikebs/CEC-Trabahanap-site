@@ -340,6 +340,42 @@ class AdminDashboardController extends Controller
 
 
                 
+                public function getUserApprovedPosts($userId)
+                {
+                    try {
+                        $approvedPosts = JobOffer::where('user_id', $userId)
+                            ->where('is_approved', 1) // Only fetch approved posts
+                            ->get();
+                
+                        return response()->json([
+                            'approvedPosts' => $approvedPosts,
+                        ]);
+                    } catch (\Exception $e) {
+                        \Log::error('Error fetching approved posts: ' . $e->getMessage());
+                        return response()->json(['error' => 'Internal Server Error'], 500);
+                    }
+                }
+                
+                
+
+                // Backend in AdminDashboardController.php
+                public function getDoneJobs($userId)
+                {
+                    try {
+                        // Make sure the database query is fetching the correct data
+                        $doneJobs = JobDone::where('user_id', $userId)->get();
+
+                        return response()->json([
+                            'doneJobs' => $doneJobs
+                        ]);
+                    } catch (\Exception $e) {
+                        Log::error('Error fetching done jobs: ' . $e->getMessage());
+                        return response()->json(['error' => 'Internal Server Error'], 500);
+                    }
+                }
+
+                
+
 
             // public function restrictUser($id)
             // {

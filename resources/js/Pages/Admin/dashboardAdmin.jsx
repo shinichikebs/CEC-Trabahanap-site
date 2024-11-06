@@ -463,9 +463,11 @@ const renderContent = () => {
 //  Main content
     return (
          <div className="min-h-screen flex flex-col">
-            <header className="bg-blue-500 text-white py-4 px-6">
+            <header className="bg-[#231955] text-white py-4 px-6">
                 <div className="flex justify-between items-center">
-                    <h1 className="text-2xl font-semibold">Admin Dashboard</h1>
+                <img src="/cecLogo.png" width="70" />
+
+
                     <div className="relative mt-4">
                     <input
                             type="text"
