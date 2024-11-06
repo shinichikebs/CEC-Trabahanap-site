@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Report;
 use App\Models\DeletedUser;
 use App\Models\Admin;
 use App\Models\User;
@@ -301,6 +302,45 @@ class AdminDashboardController extends Controller
                     return response()->json(['error' => 'Internal Server Error'], 500);
                 }
             }
+
+            public function reportUsers()
+            {
+                try {
+                    // Fetch reports with necessary fields including `user_id`
+                    $reports = Report::select('user_id', 'reporting_user_name', 'reported_user_name', 'violation')->get();
+            
+                    return response()->json([
+                        'status' => 'success',
+                        'data' => $reports,
+                    ]);
+                } catch (\Exception $e) {
+                    Log::error('Error fetching reports: ' . $e->getMessage());
+            
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Failed to fetch reports',
+                    ], 500);
+                }
+            }
+            
+            
+
+
+            
+            public function getUserById($id)
+                {
+                    try {
+                        $user = User::findOrFail($id);
+                        return response()->json($user);
+                    } catch (\Exception $e) {
+                        \Log::error('Error fetching user data: ' . $e->getMessage());
+                        return response()->json(['error' => 'User not found'], 404);
+                    }
+                }
+
+
+                
+
             // public function restrictUser($id)
             // {
             //     try {

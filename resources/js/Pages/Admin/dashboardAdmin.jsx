@@ -6,6 +6,7 @@ import AddUserModal from "@/Components/AddUserModal";
 import AddStaffModal from "@/Components/AddStaffModal";
 import SearchUserModal from "@/Components/SearchUserModal";
 import UserProfile from "@/Components/UserProfile";
+import ReportList from "@/Components/ReportList";
 
 export default function Dashboard() {
     const [activeTab, setActiveTab] = useState("dashboard");
@@ -16,13 +17,11 @@ export default function Dashboard() {
     const [pendingPosts, setPendingPosts] = useState([]);
     const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
     const [isAddStaffModalOpen, setIsAddStaffModalOpen] = useState(false);
-
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState([]);
     const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
     const [isDropdownVisible, setIsDropdownVisible] = useState(false);
-
-    const [isModalOpen, setIsModalOpen] = useState(false); // Add isModalOpen
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedPost, setSelectedPost] = useState(null);
     const [selectedUser, setSelectedUser] = useState(null);
 
@@ -218,7 +217,6 @@ const closeAddUserModal = () => setIsAddUserModalOpen(false);
 
 const openAddStaffModal = () => setIsAddStaffModalOpen(true);
 const closeAddStaffModal = () => setIsAddStaffModalOpen(false);
-
 
 
 
@@ -429,18 +427,15 @@ const renderContent = () => {
                         </div>
                     </div>
                 );
-            case "Report":
-                return (
-                    <div>
-                        <h2 className="text-xl font-bold mb-4">Report</h2>
-                        <p>Report</p>
-                        <div className="bg-white p-4 rounded-lg shadow mt-4">
-                            <h3 className="text-lg font-semibold mb-2">
-                                Inbox
-                            </h3>
+
+                // report case
+                case "Report":
+                    return (
+                        <div>
+                            <h2 className="text-xl font-bold mb-4">Report</h2>
+                            <ReportList /> {/* Render the ReportList component */}
                         </div>
-                    </div>
-                );
+                    );
             case "settings":
                 return (
                     <div>
