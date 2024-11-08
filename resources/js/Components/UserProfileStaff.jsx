@@ -45,36 +45,9 @@ const UserProfile = ({ user, onClose }) => {
         }
     }, [user]);
 
-    const handleDelete = async () => {
-        try {
-            const response = await axios.delete(`/admin/delete-user/${user.id}`);
-            if (response.status === 200) {
-                Swal.fire("Deleted", "User has been moved to Deleted Users", "success");
-                onClose();
-            }
-        } catch (error) {
-            Swal.fire("Error", "Failed to delete user", "error");
-            console.error("Error deleting user:", error);
-        }
-    };
 
-    const handleRestrictUser = (userId) => {
-        axios
-            .post(`/admin/restrict-user/${userId}`)
-            .then(() => {
-                Swal.fire({
-                    title: "Success!",
-                    text: "User restricted successfully!",
-                    icon: "success",
-                    confirmButtonText: "Okay",
-                });
-                onClose();
-            })
-            .catch((error) => {
-                Swal.fire("Error", "Failed to restrict user", "error");
-                console.error("Error restricting user:", error);
-            });
-    };
+
+
 
     const handlePostClick = (post) => {
         setSelectedPost(post);
@@ -109,20 +82,7 @@ const UserProfile = ({ user, onClose }) => {
                         {user.firstName} {user.lastName}
                     </h2>
 
-                    <div className="flex space-x-4 mt-4">
-                        <button
-                            onClick={() => handleRestrictUser(user.id)}
-                            className="bg-red-500 text-white px-4 py-2 rounded"
-                        >
-                            Restrict
-                        </button>
-                        <button
-                            className="bg-red-600 text-white px-4 py-2 rounded-lg flex items-center"
-                            onClick={handleDelete}
-                        >
-                            <span className="mr-2">🗑️</span> Delete
-                        </button>
-                    </div>
+
 
                     <div className="mt-6 w-full border-t">
                         <div className="flex justify-center space-x-6 mt-4">

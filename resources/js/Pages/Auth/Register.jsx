@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import InputError from '@/Components/InputError';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
@@ -17,6 +17,10 @@ export default function Register() {
         password_confirmation: '',
     });
 
+    // State to toggle password visibility
+    const [showPassword, setShowPassword] = useState(false);
+    const [showPasswordConfirmation, setShowPasswordConfirmation] = useState(false);
+
     useEffect(() => {
         return () => {
             reset('password', 'password_confirmation');
@@ -31,9 +35,7 @@ export default function Register() {
     return (
         <>
             <Head title="Register" />
-            <div
-                    className={`fixed inset-0 w-full h-screen bg-black opacity-50 z-[1]`}
-                ></div>
+            <div className={`fixed inset-0 w-full h-screen bg-black opacity-50 z-[1]`}></div>
             <div
                 className="min-h-screen flex items-center justify-center bg-cover bg-center"
                 style={{
@@ -47,6 +49,7 @@ export default function Register() {
 
                     <form onSubmit={submit}>
                         <div className="grid grid-cols-1 gap-4 mb-4">
+                            {/* Other form fields */}
                             <TextInput
                                 id="id_number"
                                 name="id_number"
@@ -58,6 +61,7 @@ export default function Register() {
                             />
                             <InputError message={errors.id_number} className="mt-2" />
 
+                            {/* Name fields */}
                             <div className="grid grid-cols-3 gap-4">
                                 <TextInput
                                     id="lastName"
@@ -88,6 +92,7 @@ export default function Register() {
                             </div>
                             <InputError message={errors.firstName || errors.lastName || errors.middleName} className="mt-2" />
 
+                            {/* Gender and Role Select Fields */}
                             <div className="grid grid-cols-2 gap-4">
                                 <select
                                     id="gender"
@@ -117,6 +122,7 @@ export default function Register() {
                             </div>
                             <InputError message={errors.gender || errors.role} className="mt-2" />
 
+                            {/* Email Field */}
                             <TextInput
                                 id="email"
                                 type="email"
@@ -129,35 +135,55 @@ export default function Register() {
                             />
                             <InputError message={errors.email} className="mt-2" />
 
-                            <TextInput
-                                id="password"
-                                type="password"
-                                name="password"
-                                value={data.password}
-                                className="w-full bg-white text-black !text-black border-b border-black placeholder-black focus:ring-0 focus:border-black"
-                                placeholder="Password"
-                                onChange={(e) => setData('password', e.target.value)}
-                                required
-                            />
+                            {/* Password Field with Toggle Visibility */}
+                            <div className="relative">
+                                <TextInput
+                                    id="password"
+                                    type={showPassword ? "text" : "password"}
+                                    name="password"
+                                    value={data.password}
+                                    className="w-full bg-white text-black !text-black border-b border-black placeholder-black focus:ring-0 focus:border-black"
+                                    placeholder="Password"
+                                    onChange={(e) => setData('password', e.target.value)}
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500"
+                                >
+                                    {showPassword ? '👁️' : '👁️‍🗨️'}
+                                </button>
+                            </div>
                             <InputError message={errors.password} className="mt-2" />
 
-                            <TextInput
-                                id="password_confirmation"
-                                type="password"
-                                name="password_confirmation"
-                                value={data.password_confirmation}
-                                className="w-full bg-white text-black !text-black border-b border-black placeholder-black focus:ring-0 focus:border-black"
-                                placeholder="Confirm Password"
-                                onChange={(e) => setData('password_confirmation', e.target.value)}
-                                required
-                            />
+                            {/* Confirm Password Field with Toggle Visibility */}
+                            <div className="relative">
+                                <TextInput
+                                    id="password_confirmation"
+                                    type={showPasswordConfirmation ? "text" : "password"}
+                                    name="password_confirmation"
+                                    value={data.password_confirmation}
+                                    className="w-full bg-white text-black !text-black border-b border-black placeholder-black focus:ring-0 focus:border-black"
+                                    placeholder="Confirm Password"
+                                    onChange={(e) => setData('password_confirmation', e.target.value)}
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPasswordConfirmation(!showPasswordConfirmation)}
+                                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500"
+                                >
+                                    {showPasswordConfirmation ? '👁️' : '👁️‍🗨️'}
+                                </button>
+                            </div>
                             <InputError message={errors.password_confirmation} className="mt-2" />
                         </div>
 
                         <div className="flex flex-col items-center mt-6">
                             <PrimaryButton
                                 type="submit"
-                                className=" bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:ring"
+                                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:ring"
                                 disabled={processing}
                             >
                                 SIGN UP

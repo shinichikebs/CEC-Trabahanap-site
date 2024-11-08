@@ -18,26 +18,29 @@ class AdminLoginController extends Controller
     }
 
     // Handle admin login
-    public function login(Request $request)
-    {
-        // Validate the request
-        $request->validate([
-            'id_number' => 'required|string',
-            'password' => 'required|string',
-        ]);
-    
-        // Attempt to login the admin using the custom guard
-        $credentials = $request->only('id_number', 'password');
-        $admin = Admin::where('id_number', $credentials['id_number'])->first();
+    // In AdminLoginController.php
+
+public function login(Request $request)
+{
+    $request->validate([
+        'id_number' => 'required|string',
+        'password' => 'required|string',
+    ]);
+
+    $credentials = $request->only('id_number', 'password');
+    $admin = Admin::where('id_number', $credentials['id_number'])->first();
+
+    if ($admin && Hash::check($credentials['password'], $admin->password)) {
+        Auth::guard('admin')->login($admin); 
         
-        if ($admin && Hash::check($credentials['password'], $admin->password)) {
-            // Use the custom admin guard
-            Auth::guard('admin')->login($admin); 
-            return redirect()->intended(route('admin.dashboardAdmin'));
-        } else {
-            return back()->withErrors(['id_number' => 'Invalid credentials']);
-        }
+        return redirect()->intended(route('admin.dashboardAdmin'))->with([
+            'role' => $admin->role  // Pass role to frontend
+        ]);
+    } else {
+        return back()->withErrors(['id_number' => 'Invalid credentials']);
     }
+}
+
     
     // Handle admin logout
     public function logout(Request $request)

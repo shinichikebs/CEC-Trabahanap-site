@@ -22,17 +22,18 @@ class AdminDashboardController extends Controller
         $totalUsers = DB::table('users')->count();
         $totalJobOffers = DB::table('job_offers')->count();
         $totalJobsDone = DB::table('job_done')->count();
-
-        Log::info('Total Users: ' . $totalUsers);
-        Log::info('Total Job Offers: ' . $totalJobOffers);
-        Log::info('Total Jobs Done: ' . $totalJobsDone);
-
+    
+        $role = Auth::guard('admin')->user()->role; // Retrieve the role of the logged-in admin
+    
         return Inertia::render('Dashboard', [
             'totalUsers' => $totalUsers,
             'totalPosts' => $totalJobOffers,
-            'totalJobsDone' => $totalJobsDone, 
+            'totalJobsDone' => $totalJobsDone,
+            'role' => $role, // Pass role to Inertia view
         ]);
     }
+    
+    
 
     public function getHeaderDetails()
     {
@@ -358,21 +359,20 @@ class AdminDashboardController extends Controller
                 
                 
 
-                // Backend in AdminDashboardController.php
                 public function getDoneJobs($userId)
                 {
                     try {
-                        // Make sure the database query is fetching the correct data
                         $doneJobs = JobDone::where('user_id', $userId)->get();
-
+                
                         return response()->json([
                             'doneJobs' => $doneJobs
                         ]);
                     } catch (\Exception $e) {
-                        Log::error('Error fetching done jobs: ' . $e->getMessage());
+                        \Log::error('Error fetching done jobs: ' . $e->getMessage());
                         return response()->json(['error' => 'Internal Server Error'], 500);
                     }
                 }
+                
 
                 
 

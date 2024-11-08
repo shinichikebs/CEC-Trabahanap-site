@@ -25,8 +25,6 @@ export default function Dashboard() {
     const [selectedPost, setSelectedPost] = useState(null);
     const [selectedUser, setSelectedUser] = useState(null);
 
-    
-
     useEffect(() => {
         fetchData();
     }, []);
@@ -65,7 +63,6 @@ export default function Dashboard() {
                 console.error("Error fetching pending users:", error);
             });
     };
-
 
     const fetchPendingPosts = () => {
         axios
@@ -160,7 +157,6 @@ export default function Dashboard() {
         return description;
     };
 
-
     const openModal = (post) => {
         setSelectedPost(post);
         setIsModalOpen(true);
@@ -171,12 +167,11 @@ export default function Dashboard() {
         setIsModalOpen(false);
     };
 
-
     // Search functionality handlers
     const handleSearchChange = (e) => {
         const query = e.target.value;
         setSearchQuery(query);
-        
+
         if (query) {
             fetchSearchResults(query);
             setIsSearchModalOpen(true);
@@ -186,11 +181,16 @@ export default function Dashboard() {
     };
 
     const fetchSearchResults = (query) => {
-        axios.get(`/admin/search-approved-users?query=${encodeURIComponent(query)}`)
-            .then(response => {
+        axios
+            .get(
+                `/admin/search-approved-users?query=${encodeURIComponent(
+                    query
+                )}`
+            )
+            .then((response) => {
                 setSearchResults(response.data.users);
             })
-            .catch(error => {
+            .catch((error) => {
                 console.error("Error fetching search results:", error);
             });
     };
@@ -204,30 +204,26 @@ export default function Dashboard() {
         setSelectedUser(null); // Reset selected user to hide profile
     };
 
-    
-// To hide dropdown when clicking outside
-        const closeSearchModal = () => {
-            setIsSearchModalOpen(false);
-            setSearchQuery("");
-        };
+    // To hide dropdown when clicking outside
+    const closeSearchModal = () => {
+        setIsSearchModalOpen(false);
+        setSearchQuery("");
+    };
 
-// Add User modal handlers
-const openAddUserModal = () => setIsAddUserModalOpen(true);
-const closeAddUserModal = () => setIsAddUserModalOpen(false);
+    // Add User modal handlers
+    const openAddUserModal = () => setIsAddUserModalOpen(true);
+    const closeAddUserModal = () => setIsAddUserModalOpen(false);
 
-const openAddStaffModal = () => setIsAddStaffModalOpen(true);
-const closeAddStaffModal = () => setIsAddStaffModalOpen(false);
+    const openAddStaffModal = () => setIsAddStaffModalOpen(true);
+    const closeAddStaffModal = () => setIsAddStaffModalOpen(false);
 
-
-
-
-    
-
-const renderContent = () => {
-    // Check if a user profile is selected
-    if (selectedUser) {
-        return <UserProfile user={selectedUser} onClose={closeUserProfile} />;
-    }
+    const renderContent = () => {
+        // Check if a user profile is selected
+        if (selectedUser) {
+            return (
+                <UserProfile user={selectedUser} onClose={closeUserProfile} />
+            );
+        }
         switch (activeTab) {
             case "dashboard":
                 return (
@@ -237,7 +233,7 @@ const renderContent = () => {
                                 <h3 className="text-lg font-semibold mb-2">
                                     Total Users
                                 </h3>
-                                
+
                                 <p className="text-4xl font-bold">
                                     {totalUsers}
                                 </p>
@@ -280,34 +276,34 @@ const renderContent = () => {
                                         : "0"}
                                 </p>
                             </div>
-                        </div>                        
-                        
-
-                        <div className="mt-6">
-                                <a 
-                                    onClick={() => Inertia.visit(route('report.all'))}
-                                    className="ml-4 py-2 px-9 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer">
-                                    All
-                                </a>
-                                <a 
-                                    onClick={() => Inertia.visit(route('report.user'))}
-                                    className="ml-4 py-2 px-9 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer">
-                                    Users
-                                </a>
-                                <a 
-                                    onClick={() => Inertia.visit(route('report.post'))}
-                                    className="ml-4 py-2 px-9 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer">
-                                    Posts
-                                </a>
-
-
-
-
-
-
-
                         </div>
 
+                        <div className="mt-6">
+                            <a
+                                onClick={() =>
+                                    Inertia.visit(route("report.all"))
+                                }
+                                className="ml-4 py-2 px-9 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer"
+                            >
+                                All
+                            </a>
+                            <a
+                                onClick={() =>
+                                    Inertia.visit(route("report.user"))
+                                }
+                                className="ml-4 py-2 px-9 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer"
+                            >
+                                Users
+                            </a>
+                            <a
+                                onClick={() =>
+                                    Inertia.visit(route("report.post"))
+                                }
+                                className="ml-4 py-2 px-9 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer"
+                            >
+                                Posts
+                            </a>
+                        </div>
                     </div>
                 );
 
@@ -322,8 +318,18 @@ const renderContent = () => {
                                 List of Users Pending Approval
                             </h3>
                             {/* button to add a user */}
-                            <button onClick={openAddUserModal} className="bg-green-500 text-white px-4 py-2 rounded">Add User</button>
-                            <button onClick={openAddStaffModal} className="bg-green-500 text-white mb-5 ml-5 px-4 py-2 rounded">Add Staff</button>
+                            <button
+                                onClick={openAddUserModal}
+                                className="bg-green-500 text-white px-4 py-2 rounded"
+                            >
+                                Add User
+                            </button>
+                            <button
+                                onClick={openAddStaffModal}
+                                className="bg-green-500 text-white mb-5 ml-5 px-4 py-2 rounded"
+                            >
+                                Add Staff
+                            </button>
                             {pendingUsers.length > 0 ? (
                                 <div className="space-y-4">
                                     {pendingUsers.map((user) => (
@@ -428,14 +434,14 @@ const renderContent = () => {
                     </div>
                 );
 
-                // report case
-                case "Report":
-                    return (
-                        <div>
-                            <h2 className="text-xl font-bold mb-4">Report</h2>
-                            <ReportList /> {/* Render the ReportList component */}
-                        </div>
-                    );
+            // report case
+            case "Report":
+                return (
+                    <div>
+                        <h2 className="text-xl font-bold mb-4">Report</h2>
+                        <ReportList /> {/* Render the ReportList component */}
+                    </div>
+                );
             case "settings":
                 return (
                     <div>
@@ -460,23 +466,48 @@ const renderContent = () => {
                 );
         }
     };
-//  Main content
+    //  Main content
     return (
-         <div className="min-h-screen flex flex-col">
+        <div className="min-h-screen flex flex-col">
             <header className="bg-[#231955] text-white py-4 px-6">
                 <div className="flex justify-between items-center">
-                <img src="/cecLogo.png" width="70" />
+                    <img src="/cecLogo.png" width="70" />
 
+                    <div className="relative mt-4 max-w-md mx-auto">
+                        <div className="relative">
+                            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                                <svg
+                                    className="w-5 h-5 text-gray-400"
+                                    aria-hidden="true"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 20 20"
+                                >
+                                    <path
+                                        stroke="currentColor"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+                                    />
+                                </svg>
+                            </div>
+                            <input
+                                type="text"
+                                value={searchQuery}
+                                onChange={handleSearchChange}
+                                placeholder="Search User..."
+                                className="block w-full pl-10 pr-24 p-3 text-sm text-white border border-gray-700 rounded-full bg-gray-800 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400"
+                            />
+                            <button
+                                type="button"
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                            >
+                                Search
+                            </button>
+                        </div>
+                    </div>
 
-                    <div className="relative mt-4">
-                    <input
-                            type="text"
-                            placeholder="Search for users..."
-                            value={searchQuery}
-                            onChange={handleSearchChange}
-                            className="py-2 px-4 rounded-lg text-black w-full"
-                        />
-                </div>
                     <button
                         className="bg-blue-600 py-2 px-4 rounded-lg ml-4"
                         onClick={() => Inertia.post("/admin/logout")}
@@ -569,15 +600,20 @@ const renderContent = () => {
 
                 <main className="flex-1 p-6">
                     {renderContent()}
-                    <AddUserModal isOpen={isAddUserModalOpen} onClose={closeAddUserModal} />
-                    <AddStaffModal isOpen={isAddStaffModalOpen} onClose={closeAddStaffModal} />
-                    <SearchUserModal 
-                        isOpen={isSearchModalOpen} 
-                        searchResults={searchResults} 
+                    <AddUserModal
+                        isOpen={isAddUserModalOpen}
+                        onClose={closeAddUserModal}
+                    />
+                    <AddStaffModal
+                        isOpen={isAddStaffModalOpen}
+                        onClose={closeAddStaffModal}
+                    />
+                    <SearchUserModal
+                        isOpen={isSearchModalOpen}
+                        searchResults={searchResults}
                         onSelect={handleUserSelect}
                         onClose={() => setIsSearchModalOpen(false)} // Closes modal
                     />
-
                 </main>
             </div>
         </div>

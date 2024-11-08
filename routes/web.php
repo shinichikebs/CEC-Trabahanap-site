@@ -141,7 +141,6 @@ Route::group(['middleware' => ['auth:admin']], function () {
     Route::get('/admin/user/{userId}/done-jobs', [AdminDashboardController::class, 'getDoneJobs']);
 
 
-
 });
 
 Route::get('/admin-dashboard-data', [AdminDashboardController::class, 'getHeaderDetails']);
