@@ -3,8 +3,8 @@ import React, { useState } from "react";
 export default function ChatPage({ contactUser }) {
     const [message, setMessage] = useState("");
     const [messages, setMessages] = useState([
-        { sender: "Jelbert", text: "Hi sir, This is Jelbert I sent you a proposal for digital" },
-        { sender: "Jelbert", text: "Hello, This noted" },
+        // { sender: "Jelbert", text: "Hi sir, This is Jelbert I sent you a proposal for digital" },
+        // { sender: "Jelbert", text: "Hello, This noted" },
     ]);
 
     const handleSendMessage = () => {
@@ -19,7 +19,7 @@ export default function ChatPage({ contactUser }) {
 
     return (
         <div className="flex flex-col h-screen">
-            <header className="bg-gray-800 text-white py-4 px-6 shadow">
+            <header className="bg-[#231955] text-white py-4 px-6 shadow">
                 <h2 className="font-semibold text-xl">
                     Chat with {contactUser.firstName} {contactUser.lastName}
                 </h2>

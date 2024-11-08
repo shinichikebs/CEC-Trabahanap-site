@@ -320,21 +320,25 @@ export default function PostProject({ auth, jobOffer }) {
                 </div>
             </div>
 
-            {/* Modal for success message */}
-            {showModal && (
-                <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
-                    <div className="bg-white p-6 rounded shadow-lg max-w-md mx-auto">
-                        <h2 className="text-xl font-semibold mb-4">Success</h2>
-                        <p className="text-gray-700 mb-4">{jobOffer ? 'Project successfully updated!' : 'Project uploaded successfully!'}</p>
-                        <button
-                            onClick={() => setShowModal(false)}
-                            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                        >
-                            Close
-                        </button>
-                    </div>
-                </div>
-            )}
+           {/* Modal for success message */}
+{showModal && (
+    <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+        <div className="bg-white p-6 rounded shadow-lg max-w-md mx-auto text-center">
+            <h2 className="text-xl font-semibold mb-4">Success</h2>
+            <p className="text-gray-700 mb-4">
+                {jobOffer ? 'Project successfully updated!' : 'Project uploaded successfully!'}
+            </p>
+            <div className="flex justify-center">
+                <button
+                    onClick={() => setShowModal(false)}
+                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                >
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+)}
         </AuthenticatedLayout>
     );
 }

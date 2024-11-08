@@ -162,28 +162,28 @@ export default function MyProject({ auth }) {
                             
                             <div className="flex space-x-2">
                                 <button
-                                    className="bg-blue-500 text-white px-4 py-2 rounded"
+                                    className="bg-[#231955] text-white px-4 py-2 rounded"
                                     onClick={() => handleEdit(project)} 
                                 >
                                     Edit
                                 </button>
 
                                 <button
-                                    className="bg-green-500 text-white px-4 py-2 rounded"
+                                    className="bg-[#231955] text-white px-4 py-2 rounded"
                                     onClick={() => handleDone(project.id)}
                                 >
                                     Done
                                 </button>
 
                                 <button
-                                    className="bg-yellow-500 text-white px-4 py-2 rounded"
+                                    className="bg-[#231955] text-white px-4 py-2 rounded"
                                     onClick={() => handleShowProposal(project.id)} 
                                 >
                                     Proposal
                                 </button>
 
                                 <button
-                                    className="bg-red-500 text-white px-4 py-2 rounded"
+                                    className="bg-[#231955] text-white px-4 py-2 rounded"
                                     onClick={() => handleDelete(project.id)} 
                                 >
                                     Delete
