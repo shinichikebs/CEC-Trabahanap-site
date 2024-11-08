@@ -11,18 +11,22 @@ class UserController extends Controller
     public function searchUser(Request $request)
     {
         $query = $request->input('query');
-        
-        // Search for users by firstName or lastName
-        $users = User::where('firstName', 'LIKE', "%$query%")
-                    ->orWhere('lastName', 'LIKE', "%$query%")
-                    ->get(); // Get all matching users
+
+        // Search for users who are approved (is_approved = 1) and match the query in firstName or lastName
+        $users = User::where('is_approved', 1)
+            ->where(function ($q) use ($query) {
+                $q->where('firstName', 'LIKE', "%$query%")
+                  ->orWhere('lastName', 'LIKE', "%$query%");
+            })
+            ->get();
 
         if ($users->isNotEmpty()) {
             return response()->json(['users' => $users]); // Return the list of users
         }
 
-        return response()->json(['message' => 'No users found'], 404);
+        return response()->json(['message' => 'No approved users found'], 404);
     }
+
 
     public function show($id)
     {
@@ -36,4 +40,6 @@ class UserController extends Controller
     
         return redirect()->back()->with('error', 'User not found');
     }
+    
 }
+

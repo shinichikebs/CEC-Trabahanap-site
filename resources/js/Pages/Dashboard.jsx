@@ -281,7 +281,7 @@ export default function Dashboard({ auth }) {
                     }`}
                 ></div>
 
-                <div className={`fixed top-14 w-8/12 h-[92vh] shadow-md bg-white text-black ${click ? "right-100" : "right-[-100%]"} ease-in-out duration-500 p-4 space-y-4 overflow-y-auto`}>
+                <div className={`fixed top-20 w-8/12 h-[90vh] shadow-md bg-white text-black ${click ? "right-100" : "right-[-100%]"} ease-in-out duration-500 p-4 space-y-4 overflow-y-auto`}>
                     <div className="flex items-center justify-between">
                         <IoMdArrowBack size={25} onClick={() => setClick(false)} className="cursor-pointer" />
                         <ImNewTab size={25} />

@@ -4,34 +4,45 @@ import { IoSettingsOutline, IoLogOutOutline } from "react-icons/io5";
 import { BiFolderOpen } from "react-icons/bi";
 import { TbMessageShare } from "react-icons/tb";
 import axios from 'axios';
-import NotificationsDropdown from "../Components/NotificationsDropdown"; 
+import NotificationsDropdown from "../Components/NotificationsDropdown";
+
 export default function Authenticated({ user, header, children, showNavbar = true }) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
-    const [searchResults, setSearchResults] = useState([]); 
+    const [searchResults, setSearchResults] = useState([]);
 
-    const handleSearchSubmit = async (e) => {
-        e.preventDefault();
-        if (searchQuery.trim()) {
+    const handleSearchChange = async (query) => {
+        setSearchQuery(query);
+
+        if (query.trim() !== "") {
             try {
                 const response = await axios.get(`/search-user`, {
-                    params: { query: searchQuery }
+                    params: { query },
                 });
-
                 if (response.data.users) {
-                  
                     setSearchResults(response.data.users);
                 } else {
-                    alert("No users found");
                     setSearchResults([]);
                 }
             } catch (error) {
                 console.error("Error searching for users:", error);
-                alert("There was an error processing your search.");
             }
         } else {
-            alert("Please enter a valid name");
+            setSearchResults([]);
         }
+    };
+
+    const handleSearchSubmit = async (e) => {
+        e.preventDefault();
+        if (searchQuery.trim()) {
+            // If you want additional logic on submit, add it here
+            console.log("Search submitted:", searchQuery);
+        }
+    };
+
+    const handleSelectResult = (result) => {
+        // Handle selection of an autocomplete result (e.g., redirect to profile page)
+        window.location.href = `/profile/${result.id}`;
     };
 
     return (
@@ -51,13 +62,13 @@ export default function Authenticated({ user, header, children, showNavbar = tru
                             </li>
                         </ul>
 
-                        <div className="flex items-center space-x-6 ml-auto">
+                        <div className="flex items-center space-x-6 ml-auto relative">
                             <form onSubmit={handleSearchSubmit} className="relative flex items-center">
                                 <input
                                     type="text"
                                     placeholder="Search"
                                     value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    onChange={(e) => handleSearchChange(e.target.value)}
                                     className="bg-gray-200 rounded-full px-5 py-2 pl-8 w-[22rem] text-gray-900 outline-none placeholder-gray-500"
                                 />
                                 <button type="submit" className="absolute left-2 top-1/2 transform -translate-y-1/2">
@@ -78,30 +89,33 @@ export default function Authenticated({ user, header, children, showNavbar = tru
                                 </button>
                             </form>
 
-                            {/* Display search results */}
-                            {searchResults.length > 0 && (
-                                <ul className="absolute mt-20 bg-white w-[22rem] max-h-64 overflow-y-auto border border-gray-300 rounded-lg">
-                                    {searchResults.map((result) => (
-                                        <li key={result.id} className="p-2 border-b hover:bg-gray-100">
-                                            <a href={`/profile/${result.id}`}>
+                            {/* Autocomplete search results */}
+                                {searchResults.length > 0 && (
+                                    <ul className="absolute z-10 top-full left-0 bg-white w-[22rem] max-h-64 overflow-y-auto border border-gray-300 rounded-lg shadow-lg">
+                                        {searchResults.map((result) => (
+                                            <li
+                                                key={result.id}
+                                                className="p-2 border-b hover:bg-gray-100 cursor-pointer"
+                                                onClick={() => handleSelectResult(result)}
+                                            >
                                                 {result.firstName} {result.lastName}
-                                            </a>
-                                        </li>
-                                    ))}
-                                </ul>
-                            )}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
 
-                            <NavLink 
-                                href={route('post-project')} 
+
+                            <NavLink
+                                href={route('post-project')}
                                 className="bg-[#E8AA42] text-white font-bold py-2 px-4 rounded-full hover:bg-[#D18C33] shadow-md"
                             >
                                 Post Project
                             </NavLink>
 
                             <TbMessageShare size={25} className="text-white" />
-                            
+
                             {/* NotificationsDropdown */}
-                            <NotificationsDropdown /> {/* Replace the IoMdNotificationsOutline icon with this */}
+                            <NotificationsDropdown />
 
                             <div className="ms-3 relative">
                                 <Dropdown>
@@ -169,4 +183,3 @@ export default function Authenticated({ user, header, children, showNavbar = tru
         </div>
     );
 }
-0
