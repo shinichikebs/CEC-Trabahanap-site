@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Proposal;
 use Illuminate\Http\Request;
 
@@ -46,5 +47,26 @@ class ProposalController extends Controller
         }
 
         return response()->json(['proposal' => $proposal], 200);
+    }
+
+    public function getProposals($jobOfferId)
+    {
+        $proposals = Proposal::with('user') // Load user data with each proposal
+            ->where('job_offer_id', $jobOfferId)
+            ->get();
+
+        return response()->json(['proposals' => $proposals]);
+    }
+
+    // Fetch user profile details
+    public function getUserProfile($userId)
+    {
+        $user = User::find($userId);
+
+        if ($user) {
+            return response()->json($user);
+        }
+
+        return response()->json(['error' => 'User not found'], 404);
     }
 }

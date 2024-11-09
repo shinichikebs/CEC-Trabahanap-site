@@ -18,14 +18,16 @@ export default defineConfig({
         },
     },
     server: {
+        host: '192.168.254.104', // Use your local IP address to make Vite accessible on other devices
+        port: 5173, // This is the default port for Vite; you can change it if needed
         proxy: {
             '/api': {
-                target: 'http://127.0.0.1:8000', // Ensure this matches Laravel's running port
+                target: 'http://192.168.254.104:8000', // Match Laravel's running IP and port
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/api/, ''),
             },
             '/sanctum': {
-                target: 'http://127.0.0.1:8000', // For Sanctum CSRF requests
+                target: 'http://192.168.254.104:8000', // For Sanctum CSRF requests
                 changeOrigin: true,
             },
         },

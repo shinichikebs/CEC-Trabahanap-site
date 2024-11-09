@@ -166,12 +166,12 @@ export default function PostProject({ auth, jobOffer }) {
                                     </select>
                                 </div>
                                 <div>
-                                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="sub-category">Sub-category</label>
+                                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="sub-category">Other's</label>
                                     <input
                                         id="sub-category"
                                         name="subCategory"
                                         type="text"
-                                        placeholder="Sub-category"
+                                        placeholder="Other's"
                                         value={formData.subCategory}
                                         onChange={(e) => setFormData({ ...formData, subCategory: e.target.value })}
                                         className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring"
