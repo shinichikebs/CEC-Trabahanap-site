@@ -145,7 +145,7 @@ Route::group(['middleware' => ['auth:admin']], function () {
     Route::get('/admin/reports', [AdminDashboardController::class, 'reportUsers']);
     Route::get('/admin/user/{id}', [AdminDashboardController::class, 'getUserById']);
     Route::get('/admin/user/{id}/approved-posts', [AdminDashboardController::class, 'getUserApprovedPosts']);
-
+    Route::post('/admin/confirm-password', [AdminDashboardController::class, 'confirmPassword']);
     Route::get('/admin/user/{userId}/done-jobs', [AdminDashboardController::class, 'getDoneJobs']);
 
 

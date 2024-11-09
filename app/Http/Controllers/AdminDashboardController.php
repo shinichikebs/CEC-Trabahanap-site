@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
+
 
 class AdminDashboardController extends Controller
 {
@@ -325,7 +327,27 @@ class AdminDashboardController extends Controller
             }
             
             
+            public function confirmPassword(Request $request)
+                {
+                    $request->validate([
+                        'password' => 'required|string',
+                    ]);
 
+                    // Ensure the admin is logged in and retrieve their information
+                    $admin = Auth::guard('admin')->user();
+
+                    if (!$admin) {
+                        return response()->json(['success' => false, 'message' => 'Admin not authenticated'], 401);
+                    }
+
+                    // Check if the provided password matches the hashed password in the database
+                    if (Hash::check($request->password, $admin->password)) {
+                        return response()->json(['success' => true]);
+                    } else {
+                        return response()->json(['success' => false, 'message' => 'Invalid password'], 401);
+                    }
+                }
+            
 
             
             public function getUserById($id)

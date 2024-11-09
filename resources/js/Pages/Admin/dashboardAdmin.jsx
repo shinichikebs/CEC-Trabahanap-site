@@ -210,6 +210,73 @@ export default function Dashboard() {
         setSearchQuery("");
     };
 
+
+    const getNiceMax = (maxValue) => {
+        if (maxValue <= 5) return 5;
+        const magnitude = Math.pow(10, Math.floor(Math.log10(maxValue)));
+        const niceMax = Math.ceil(maxValue / magnitude) * magnitude;
+        return niceMax;
+    };
+
+    // Function to render the dynamic bar graph
+    const renderBarGraph = () => {
+        // Find the maximum count
+        const maxCount = Math.max(totalUsers, totalPosts, totalJobsDone, pendingUsers.length, pendingPosts.length);
+        const niceMax = getNiceMax(maxCount); // Adjusted max for better display
+
+        // Generate dynamic Y-axis labels
+        const yAxisLabels = Array.from({ length: 8 }, (_, i) => Math.round((niceMax / 2) * i)).reverse();
+
+        return (
+            <div className="relative flex flex-col items-center left-20 mt-10 w-full max-w-3xl">
+                {/* Y-axis Labels */}
+                <div className="absolute left-0 transform -translate-x-8 flex flex-col justify-between h-80 text-gray-600 text-sm">
+                    {yAxisLabels.map((value) => (
+                        <span key={value}>{value.toLocaleString()}</span>
+                    ))}
+                </div>
+
+                {/* Grid Lines */}
+                <div className="relative w-full h-80 border-l border-b border-gray-400">
+                    {yAxisLabels.map((_, i) => (
+                        <div
+                            key={i}
+                            className="absolute left-0 right-0 border-t border-gray-300"
+                            style={{ bottom: `${(i / (yAxisLabels.length - 1)) * 100}%` }}
+                        ></div>
+                    ))}
+
+                    {/* Bars */}
+                    <div className="flex justify-around items-end h-full space-x-4">
+                        <Bar label="Total Users" count={totalUsers} color="bg-blue-300" maxCount={niceMax} />
+                        <Bar label="Total Job Offers" count={totalPosts} color="bg-green-300" maxCount={niceMax} />
+                        <Bar label="Jobs Done" count={totalJobsDone} color="bg-purple-300" maxCount={niceMax} />
+                        <Bar label="Pending Users" count={pendingUsers.length} color="bg-yellow-300" maxCount={niceMax} />
+                        <Bar label="Pending Job Offers" count={pendingPosts.length} color="bg-red-300" maxCount={niceMax} />
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    // Bar Component for rendering each bar with dynamic height
+    const Bar = ({ label, count, color, maxCount }) => {
+        const heightPercentage = (count / maxCount) * 100;
+        const height = Math.max((heightPercentage / 100) * 250, 2); // Scale height within 320px with minimum height 20px
+
+        return (
+            <div className="flex flex-col items-center">
+                <div
+                    style={{ height: `${height}px` }}
+                    className={`${color} w-12 border border-gray-500 transition-all duration-300 ease-in-out`}
+                ></div>
+                <span className="mt-2 text-center text-gray-700 font-medium text-sm">{label}</span>
+                <span className="text-center font-semibold">{count.toLocaleString()}</span>
+            </div>
+        );
+    };
+    
+
     // Add User modal handlers
     const openAddUserModal = () => setIsAddUserModalOpen(true);
     const closeAddUserModal = () => setIsAddUserModalOpen(false);
@@ -228,84 +295,34 @@ export default function Dashboard() {
             case "dashboard":
                 return (
                     <div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-                            <div className="bg-white p-4 rounded-lg shadow">
-                                <h3 className="text-lg font-semibold mb-2">
-                                    Total Users
-                                </h3>
-
-                                <p className="text-4xl font-bold">
-                                    {totalUsers}
-                                </p>
-                            </div>
-                            <div className="bg-white p-4 rounded-lg shadow">
-                                <h3 className="text-lg font-semibold mb-2">
-                                    Total Job Offers
-                                </h3>
-                                <p className="text-4xl font-bold">
-                                    {totalPosts}
-                                </p>
-                            </div>
-                            <div className="bg-white p-4 rounded-lg shadow">
-                                <h3 className="text-lg font-semibold mb-2">
-                                    Total Job Offers Done
-                                </h3>
-                                <p className="text-4xl font-bold">
-                                    {totalJobsDone}
-                                </p>
-                            </div>
-
-                            <div className="bg-white p-4 rounded-lg shadow">
-                                <h3 className="text-lg font-semibold mb-2">
-                                    Pending Users
-                                </h3>
-                                <p className="text-4xl font-bold">
-                                    {pendingUsers.length > 0
-                                        ? pendingUsers.length
-                                        : "0"}
-                                </p>
-                            </div>
-
-                            <div className="bg-white p-4 rounded-lg shadow">
-                                <h3 className="text-lg font-semibold mb-2">
-                                    Pending Job Offers
-                                </h3>
-                                <p className="text-4xl font-bold">
-                                    {pendingPosts.length > 0
-                                        ? pendingPosts.length
-                                        : "0"}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="mt-6">
+                        <h2 className="text-2xl font-bold mb-4">Dashboard Overview</h2>
+                        {renderBarGraph()}
+        
+                        {/* Report Links */}
+                        <div className="mt-8 flex space-x-4">
                             <a
-                                onClick={() =>
-                                    Inertia.visit(route("report.all"))
-                                }
-                                className="ml-4 py-2 px-9 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer"
+                                onClick={() => Inertia.visit(route("report.all"))}
+                                className="py-3 px-6 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-200 cursor-pointer"
                             >
-                                All
+                                All Reports
                             </a>
                             <a
-                                onClick={() =>
-                                    Inertia.visit(route("report.user"))
-                                }
-                                className="ml-4 py-2 px-9 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer"
+                                onClick={() => Inertia.visit(route("report.user"))}
+                                className="py-3 px-6 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition duration-200 cursor-pointer"
                             >
-                                Users
+                                User Reports
                             </a>
                             <a
-                                onClick={() =>
-                                    Inertia.visit(route("report.post"))
-                                }
-                                className="ml-4 py-2 px-9 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer"
+                                onClick={() => Inertia.visit(route("report.post"))}
+                                className="py-3 px-6 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition duration-200 cursor-pointer"
                             >
-                                Posts
+                                Post Reports
                             </a>
                         </div>
                     </div>
                 );
+        
+        
 
             case "users":
                 return (

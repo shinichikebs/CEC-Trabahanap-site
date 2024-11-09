@@ -8,6 +8,9 @@ const UserProfile = ({ user, onClose }) => {
     const [isJobDoneVisible, setIsJobDoneVisible] = useState(false);
     const [selectedPost, setSelectedPost] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+    const [adminPassword, setAdminPassword] = useState("");
+    const [actionToConfirm, setActionToConfirm] = useState(null);
 
     if (!user) return null;
 
@@ -45,7 +48,35 @@ const UserProfile = ({ user, onClose }) => {
         }
     }, [user]);
 
-    const handleDelete = async () => {
+    const handleConfirmAction = async () => {
+        try {
+            const response = await axios.post(`/admin/confirm-password`, { password: adminPassword });
+    
+            if (response.data.success) {
+                if (actionToConfirm === "delete") {
+                    await handleDeleteUser();
+                } else if (actionToConfirm === "restrict") {
+                    await handleRestrictUser();
+                }
+            } else {
+                Swal.fire("Error", response.data.message || "Invalid password", "error");
+            }
+        } catch (error) {
+            console.error("Password confirmation failed:", error.response || error);
+            Swal.fire("Error", "Failed to confirm password", "error");
+        } finally {
+            setIsPasswordModalOpen(false);
+            setAdminPassword("");
+        }
+    };
+    
+
+    const handleDelete = () => {
+        setActionToConfirm("delete");
+        setIsPasswordModalOpen(true);
+    };
+
+    const handleDeleteUser = async () => {
         try {
             const response = await axios.delete(`/admin/delete-user/${user.id}`);
             if (response.status === 200) {
@@ -58,22 +89,20 @@ const UserProfile = ({ user, onClose }) => {
         }
     };
 
-    const handleRestrictUser = (userId) => {
-        axios
-            .post(`/admin/restrict-user/${userId}`)
-            .then(() => {
-                Swal.fire({
-                    title: "Success!",
-                    text: "User restricted successfully!",
-                    icon: "success",
-                    confirmButtonText: "Okay",
-                });
-                onClose();
-            })
-            .catch((error) => {
-                Swal.fire("Error", "Failed to restrict user", "error");
-                console.error("Error restricting user:", error);
-            });
+    const handleRestrict = () => {
+        setActionToConfirm("restrict");
+        setIsPasswordModalOpen(true);
+    };
+
+    const handleRestrictUser = async () => {
+        try {
+            await axios.post(`/admin/restrict-user/${user.id}`);
+            Swal.fire("Success", "User restricted successfully!", "success");
+            onClose();
+        } catch (error) {
+            Swal.fire("Error", "Failed to restrict user", "error");
+            console.error("Error restricting user:", error);
+        }
     };
 
     const handlePostClick = (post) => {
@@ -111,7 +140,7 @@ const UserProfile = ({ user, onClose }) => {
 
                     <div className="flex space-x-4 mt-4">
                         <button
-                            onClick={() => handleRestrictUser(user.id)}
+                            onClick={handleRestrict}
                             className="bg-red-500 text-white px-4 py-2 rounded"
                         >
                             Restrict
@@ -196,6 +225,36 @@ const UserProfile = ({ user, onClose }) => {
                         <p><strong>Work Type:</strong> {selectedPost.work_type === 0 ? "Full-time" : "Part-time"}</p>
                         <p><strong>Days Until End:</strong> {selectedPost.days_post_end} days</p>
                         <p><strong>Post Created At:</strong> {new Date(selectedPost.created_at).toLocaleString()}</p>
+                    </div>
+                </div>
+            )}
+
+            {/* Password confirmation modal */}
+            {isPasswordModalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+                        <h3 className="text-xl font-semibold mb-4">Enter Admin Password</h3>
+                        <input
+                            type="password"
+                            value={adminPassword}
+                            onChange={(e) => setAdminPassword(e.target.value)}
+                            className="border px-4 py-2 mb-4 w-full"
+                            placeholder="Admin Password"
+                        />
+                        <div className="flex space-x-4">
+                            <button
+                                onClick={handleConfirmAction}
+                                className="bg-blue-500 text-white px-4 py-2 rounded"
+                            >
+                                Confirm
+                            </button>
+                            <button
+                                onClick={() => setIsPasswordModalOpen(false)}
+                                className="bg-gray-500 text-white px-4 py-2 rounded"
+                            >
+                                Cancel
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
