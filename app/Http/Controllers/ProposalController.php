@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Proposal;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ProposalController extends Controller
 {
@@ -68,5 +69,24 @@ class ProposalController extends Controller
         }
 
         return response()->json(['error' => 'User not found'], 404);
+    }
+
+    public function approveProposal($id)
+    {
+        $proposal = Proposal::findOrFail($id);
+
+        // Optional: Check if the current user is authorized to approve this proposal
+        $jobOffer = $proposal->jobOffer;
+        if ($jobOffer->user_id !== Auth::id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $proposal->approved = true;
+        $proposal->save();
+
+        // Notify the user (implement notification logic if needed)
+        // $proposal->user->notify(new ProposalApproved($proposal));
+
+        return response()->json(['message' => 'Proposal approved successfully.']);
     }
 }

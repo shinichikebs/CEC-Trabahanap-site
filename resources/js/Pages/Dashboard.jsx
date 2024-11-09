@@ -2,7 +2,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link } from "@inertiajs/react";
 import { IoMdArrowBack } from "react-icons/io";
 import { ImNewTab } from "react-icons/im";
-import { useEffect, useState, useRef } from "react";  // Added useRef to handle file input reset
+import { useEffect, useState, useRef } from "react"; 
 import axios from "axios";
 import { FaFileAlt } from "react-icons/fa";
 
@@ -228,7 +228,9 @@ export default function Dashboard({ auth }) {
                         </div>
                     ))}
                 </div>
-                <div className="flex flex-col bg-gray-200 w-1/4 rounded-lg p-4 space-y-4 sticky top-[70px]">
+
+                {/* hide this if it is mobile mode */}
+                <div className="hidden md:flex flex-col bg-gray-200 w-1/4 rounded-lg p-4 space-y-4 sticky top-[70px]">
                     <div className="flex items-start space-x-5">
                         <img
                             src={
@@ -245,7 +247,6 @@ export default function Dashboard({ auth }) {
                         </div>
                     </div>
 
-                    {}
                     <Link
                         href={route("profile.edit")}
                         className={`underline text-sm ${
@@ -273,7 +274,7 @@ export default function Dashboard({ auth }) {
             </div>
 
             <div className="flex">
-                {}
+                {/* Overlay and Proposal Details */}
                 <div
                     onClick={() => setClick(false)}
                     className={`fixed top-0 w-full h-screen bg-black opacity-50 ease-in-out duration-500 cursor-pointer ${
@@ -287,11 +288,9 @@ export default function Dashboard({ auth }) {
                         <ImNewTab size={25} />
                     </div>
 
+                    {/* Proposal Details */}
                     <div className="flex mx-8 flex-col space-y-8">
-                        {}
                         <h1 className="font-bold  text-3xl italic underline text-gray-800 ">{click ? details.job_title : ""}</h1>
-
-                        {}
                         <p className="text-3xl font-medium">Description</p>
                         <article className="leading-6 px-5">{click ? details.job_description : ""}</article>
                         <p className="text-1xl font-medium">Category: {click ? details.category : ""}</p>
@@ -299,8 +298,7 @@ export default function Dashboard({ auth }) {
                         <p className="text-1xl font-medium">Budget: {click ? details.budget : ""}</p>
                         <p className="text-1xl font-medium">Days Post End: {click ? details.days_post_end : ""}</p>
                         
-
-                        {}
+                        {/* Attachments */}
                         <div className="flex flex-col space-y-2">
                             <p className="text-gray-500 text-sm">Attachments:</p>
                             {click && details.attachments && details.attachments.length > 0 ? (
@@ -314,7 +312,7 @@ export default function Dashboard({ auth }) {
                             )}
                         </div>
 
-                        {}
+                        {/* New Proposal */}
                         <div className="mt-4">
                             <h1 className="text-3xl font-medium">New Proposal</h1>
                             <div className="px-4">
@@ -328,7 +326,7 @@ export default function Dashboard({ auth }) {
                             </div>
                         </div>
 
-                        {}
+                        {/* Attachments */}
                         <div className="mt-4 px-5">
                             <label className="block text-sm font-medium text-gray-700">Attachments</label>
                             <input
@@ -340,7 +338,7 @@ export default function Dashboard({ auth }) {
                             />
                         </div>
 
-                        {}
+                        {/* Submit Button */}
                         <div className="mt-4 flex justify-end">
                             <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700" onClick={handleProposalSubmit}>
                                 Submit Proposal
@@ -350,10 +348,8 @@ export default function Dashboard({ auth }) {
                 </div>
             </div>
 
-            {}
+            {/* Modals */}
             <SuccessModal showModal={showModal} closeModal={() => setShowModal(false)} />
-
-            {}
             <ErrorModal showErrorModal={showErrorModal} closeErrorModal={() => setShowErrorModal(false)} errorMessage={errorMessage} />
         </AuthenticatedLayout>
     );

@@ -51,6 +51,10 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     // Route to search users
     Route::get('/search-user', [UserController::class, 'searchUser']);
 
+    // notification
+    Route::get('/notifications', [UserController::class, 'getNotifications']);
+
+
     // Route to view a user profile
     Route::get('/profile/{id}', [UserController::class, 'show'])->name('profile.show');
 
@@ -70,6 +74,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 
     // Route to submit a proposal
     Route::post('/submit-proposal', [ProposalController::class, 'store'])->name('submit-proposal');
+    Route::post('/approve-proposal/{id}', [ProposalController::class, 'approveProposal']);
 
     // Route to get a proposal for a specific project
     Route::get('/proposal/{projectId}', [ProposalController::class, 'getProposal'])->name('proposal.get');
@@ -78,6 +83,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::post('/report/user/{id}', [ReportController::class, 'store'])->name('reportted.user'); // <-- Add this line
     Route::get('/proposal/{jobOfferId}', [ProposalController::class, 'getProposals']);
     Route::get('/api/users/{userId}', [ProposalController::class, 'getUserProfile']);
+    
 });
 
 Route::get('/pending-approval', function () {

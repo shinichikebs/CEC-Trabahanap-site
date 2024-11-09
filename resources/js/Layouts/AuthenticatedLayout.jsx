@@ -7,6 +7,8 @@ import axios from 'axios';
 import NotificationsDropdown from "../Components/NotificationsDropdown";
 import { MdDashboard } from "react-icons/md";
 import { MdOutlinePostAdd } from "react-icons/md";
+import { AiOutlineMenu } from "react-icons/ai";
+import { IoMdNotificationsOutline } from "react-icons/io";
 
 export default function Authenticated({ user, header, children, showNavbar = true }) {
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
@@ -103,14 +105,19 @@ export default function Authenticated({ user, header, children, showNavbar = tru
                                     <IoSearchOutline className="w-5 h-5 text-gray-600" />
                                 </button>
                             </form>
+                            
+                        )}
+                        {isMobile && (
+                        <NotificationsDropdown />
                         )}
                         {isMobile ? (
+                            
                             <button
-                                className="text-white px-4 py-2 rounded-lg bg-[#E8AA42] hover:bg-[#D18C33] flex items-center shadow-lg"
-                                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            >
-                                Menu
-                            </button>
+                            className="text-white px-4 py-2 rounded-lg bg-[#231955] hover:bg-[#D18C33] flex items-center shadow-lg"
+                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        >
+                            <AiOutlineMenu size={24} /> {/* Use the menu icon here */}
+                        </button>
                         ) : (
                             <div className="flex items-center space-x-6 ml-auto relative">
                                 <form
@@ -214,6 +221,14 @@ export default function Authenticated({ user, header, children, showNavbar = tru
                             >
                                 <BiFolderOpen size={16} />
                                 &nbsp; My Project
+                            </Dropdown.Link>
+                            <Dropdown.Link
+                                className="block py-2 px-4 text-white rounded-lg mb-2 hover:bg-[#D18C33] flex items-center"
+                                href={route("My-project")}
+                            > 
+                                <IoMdNotificationsOutline size={16}/>
+                                &nbsp; Notification
+                                {/* change this chatgpt to open the commponent NotificationsDropdown.jsx */}
                             </Dropdown.Link>
                             <Dropdown.Link
                                 className="block py-2 px-4 text-white rounded-lg mb-2 hover:bg-[#D18C33] flex items-center"

@@ -14,6 +14,7 @@ class CreateProposalsTable extends Migration
             $table->unsignedBigInteger('job_offer_id'); 
             $table->text('proposal_text');
             $table->string('attachment_path')->nullable(); 
+            $table->boolean('approved')->default(false); // Added approved column
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
