@@ -45,35 +45,62 @@ class UserController extends Controller
         return redirect()->back()->with('error', 'User not found');
     }
 
-    public function getNotifications()
+    
+    public function myprofile($id)
     {
-        try {
-            // Retrieve unread notifications from the authenticated user specifically for approved proposals
-            $notifications = Auth::user()->notifications()
-                ->where('type', ProposalApproved::class) // Filter for ProposalApproved notifications
-                ->whereNull('read_at') // Only unread notifications
-                ->latest() // Order by latest
-                ->get()
-                ->map(function ($notification) {
-                    return [
-                        'id' => $notification->id,
-                        'message' => $notification->data['message'] ?? 'No message provided',
-                        'created_at' => $notification->created_at->toDateTimeString(),
-                    ];
-                });
-                
-            return response()->json($notifications);
-        } catch (\Exception $e) {
-            Log::error('Error fetching notifications: ' . $e->getMessage(), [
-                'exception' => $e,
-                'trace' => $e->getTraceAsString(),
+        $user = User::find($id);
+    
+        if ($user) {
+            return Inertia::render('userProfileEdit', [ // Ensure this matches 'resources/js/Pages/UserProfile.jsx'
+                'user' => $user,
             ]);
-            return response()->json(['error' => 'Could not fetch notifications'], 500);
         }
+    
+        return redirect()->back()->with('error', 'User not found');
+    }
+    
+    public function uploadAvatar(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+    
+        if ($request->hasFile('avatar')) {
+            $path = $request->file('avatar')->store('avatars', 'public'); // Store in 'public/avatars' directory
+            $user->avatar = "/storage/" . $path; // Adjust path for public access
+            $user->save();
+    
+            return response()->json(['avatar' => $user->avatar], 200);
+        }
+    
+        return response()->json(['error' => 'File upload failed'], 500);
     }
     
 
-    
+    // public function getNotifications()
+    // {
+    //     try {
+    //         // Retrieve unread notifications from the authenticated user specifically for approved proposals
+    //         $notifications = Auth::user()->notifications()
+    //             ->where('type', ProposalApproved::class) // Filter for ProposalApproved notifications
+    //             ->whereNull('read_at') // Only unread notifications
+    //             ->latest() // Order by latest
+    //             ->get()
+    //             ->map(function ($notification) {
+    //                 return [
+    //                     'id' => $notification->id,
+    //                     'message' => $notification->data['message'] ?? 'No message provided',
+    //                     'created_at' => $notification->created_at->toDateTimeString(),
+    //                 ];
+    //             });
+                
+    //         return response()->json($notifications);
+    //     } catch (\Exception $e) {
+    //         Log::error('Error fetching notifications: ' . $e->getMessage(), [
+    //             'exception' => $e,
+    //             'trace' => $e->getTraceAsString(),
+    //         ]);
+    //         return response()->json(['error' => 'Could not fetch notifications'], 500);
+    //     }
+    // }
     
 
     

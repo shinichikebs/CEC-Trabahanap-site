@@ -57,6 +57,9 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 
     // Route to view a user profile
     Route::get('/profile/{id}', [UserController::class, 'show'])->name('profile.show');
+    Route::get('/myprofile/{id}', [UserController::class, 'myprofile'])->name('myprofile.edit');
+
+    Route::post('/user/{id}/avatar', [UserController::class, 'uploadAvatar'])->name('user.avatar.upload');
 
     // Route to mark a project as done
     Route::post('/post-project/{id}/done', [PostProjectController::class, 'markAsDone']);

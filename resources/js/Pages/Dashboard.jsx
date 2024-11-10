@@ -295,7 +295,7 @@ export default function Dashboard({ auth }) {
                         <article className="leading-6 px-5">{click ? details.job_description : ""}</article>
                         <p className="text-1xl font-medium">Category: {click ? details.category : ""}</p>
                         <p className="text-1xl font-medium">Sub-Category: {click ? details.sub_category : ""}</p>
-                        <p className="text-1xl font-medium">Budget: {click ? details.budget : ""}</p>
+                        <p className="text-1xl font-medium">Budget: ₱{click ? details.budget : ""}</p>
                         <p className="text-1xl font-medium">Days Post End: {click ? details.days_post_end : ""}</p>
                         
                         {/* Attachments */}

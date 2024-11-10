@@ -1,8 +1,8 @@
-import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import React, { useState } from "react";
 import { Head, Link } from "@inertiajs/react";
 import Swal from 'sweetalert2';
 import axios from 'axios';
+import { IoMdArrowBack } from "react-icons/io";
 
 export default function UserProfile({ user }) {
     const [selectedViolation, setSelectedViolation] = useState('');
@@ -34,7 +34,7 @@ export default function UserProfile({ user }) {
         Swal.fire({
             title: 'Select the reason for reporting:',
             input: 'select',
-            inputOptions: violations.reduce((options, violation, index) => {
+            inputOptions: violations.reduce((options, violation) => {
                 options[violation] = violation;
                 return options;
             }, {}),
@@ -52,6 +52,9 @@ export default function UserProfile({ user }) {
                 handleSubmitViolation(result.value);
             }
         });
+    };
+    const handleBackClick = () => {
+        window.history.back();
     };
 
     const handleSubmitViolation = async (violation) => {
@@ -77,16 +80,29 @@ export default function UserProfile({ user }) {
     };
 
     return (
-        <AuthenticatedLayout
-            user={user}
-            header={
-                <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                    {user.firstName} {user.lastName}'s Profile
-                </h2>
-            }
-        >
+        <div className="min-h-screen bg-gray-100">
             <Head title={`${user.firstName} ${user.lastName} Profile`} />
 
+            {/* Custom Header */}
+            <header className="bg-[#231955] py-4 px-8 flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+                {/* Logo */}
+                <img src="/cecLogo.png" alt="CeC Logo" className="w-10 h-10" /> 
+                
+                {/* Title */}
+                <h1 className="text-[#E8AA42] text-lg font-semibold uppercase">
+                    CEC-TRABAHANAP
+                </h1>
+            </div>
+            <button
+                onClick={handleBackClick}
+                className="text-[#E8AA42] bg-transparent border border-[#E8AA42] rounded-lg py-2 px-4 hover:bg-[#D18C33] hover:text-white transition duration-200"
+            >
+                <IoMdArrowBack />
+            </button>
+        </header>
+
+            {/* Profile Content */}
             <div className="flex flex-col lg:flex-row justify-between items-start mt-8 px-6 lg:px-20 space-y-6 lg:space-y-0">
                 {/* User Info Section */}
                 <div className="bg-gray-200 w-full lg:w-1/4 rounded-lg p-6">
@@ -122,7 +138,6 @@ export default function UserProfile({ user }) {
                     <h3 className="text-lg font-semibold text-gray-800 mb-4">About {user.firstName}</h3>
                     <p className="text-gray-600 mb-4">{user.bio || "This user has not added a bio."}</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    
                         <div>
                             <h4 className="font-semibold text-gray-800">Skills</h4>
                             <p className="text-gray-600">
@@ -138,6 +153,6 @@ export default function UserProfile({ user }) {
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </div>
     );
 }

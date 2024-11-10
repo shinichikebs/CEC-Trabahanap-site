@@ -41,6 +41,17 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
+        // Retrieve the user based on the provided email
+        $user = \App\Models\User::where('email', $this->input('email'))->first();
+
+        // Check if the user exists and lacks an `id_number`, indicating they should log in with Google
+        if ($user && is_null($user->id_number)) {
+            throw ValidationException::withMessages([
+                'email' => 'This account was created using Google. Please log in using "Continue with Google".',
+            ]);
+        }
+
+        // Attempt to authenticate with email and password
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 

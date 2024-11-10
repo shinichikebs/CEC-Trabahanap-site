@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import Checkbox from "@/Components/Checkbox";
-// import GuestLayout from '@/Layouts/GuestLayout'; *note comment imports if not used (because it will still be rendered even if not used)
 import InputError from "@/Components/InputError";
 import InputLabel from "@/Components/InputLabel";
 import PrimaryButton from "@/Components/PrimaryButton";
@@ -9,15 +8,15 @@ import { Head, Link, useForm } from "@inertiajs/react";
 import { AnchorLink } from "@/Components";
 import { FaGooglePlusG } from "react-icons/fa";
 
-export default function Login({ status, canResetPassword }) {
+export default function Login({ status, canResetPassword, isGoogleOnlyAccount }) {
     const { data, setData, post, processing, errors, reset } = useForm({
-        id_number: "",
         email: "",
         password: "",
         remember: false,
     });
 
     const [showPassword, setShowPassword] = useState(false);
+    const [googleOnlyError, setGoogleOnlyError] = useState(""); // Error message for Google-only accounts
 
     useEffect(() => {
         return () => {
@@ -27,6 +26,13 @@ export default function Login({ status, canResetPassword }) {
 
     const submit = (e) => {
         e.preventDefault();
+        
+        // Check if the account requires Google login and prevent password login
+        if (isGoogleOnlyAccount) {
+            setGoogleOnlyError("This account was created using Google. Please log in using 'Continue with Google'.");
+            return;
+        }
+
         post(route("login"));
     };
 
@@ -48,20 +54,21 @@ export default function Login({ status, canResetPassword }) {
 
                         <form onSubmit={submit}>
                             <div className="mt-4">
-    <InputLabel htmlFor="email" value="Email" />
-    <TextInput
-        id="email"
-        type="email"
-        name="email"
-        value={data.email}
-        className="mt-1 block w-full h-9 text-black border-b border-black"
-        style={{ color: 'black' }} // Ensures text color is black
-        autoComplete="username"
-        isFocused={true}
-        onChange={(e) =>
-            setData("email", e.target.value)
-        }
-    />
+                                <InputLabel htmlFor="email" value="Email" />
+                                <TextInput
+                                    id="email"
+                                    type="email"
+                                    name="email"
+                                    value={data.email}
+                                    className="mt-1 block w-full h-9 text-black border-b border-black"
+                                    style={{ color: 'black' }}
+                                    autoComplete="username"
+                                    isFocused={true}
+                                    onChange={(e) => {
+                                        setData("email", e.target.value);
+                                        setGoogleOnlyError(""); // Clear the Google-only error when email changes
+                                    }}
+                                />
                                 <InputError
                                     message={errors.email}
                                     className="mt-2"
@@ -69,21 +76,21 @@ export default function Login({ status, canResetPassword }) {
                             </div>
 
                             <div className="mt-4">
-    <InputLabel htmlFor="password" value="Password" />
-    
-    <div className="relative mt-1">
-        <TextInput
-            id="password"
-            type={showPassword ? "text" : "password"}
-            name="password"
-            value={data.password}
-            className="block w-full h-9 text-black border-b border-black pr-10" // Padding-right for icon
-            style={{ color: 'black' }} // Ensures text color is black
-            autoComplete="current-password"
-            onChange={(e) =>
-                setData("password", e.target.value)
-            }
-        />
+                                <InputLabel htmlFor="password" value="Password" />
+                                <div className="relative mt-1">
+                                    <TextInput
+                                        id="password"
+                                        type={showPassword ? "text" : "password"}
+                                        name="password"
+                                        value={data.password}
+                                        className="block w-full h-9 text-black border-b border-black pr-10"
+                                        style={{ color: 'black' }}
+                                        autoComplete="current-password"
+                                        onChange={(e) => {
+                                            setData("password", e.target.value);
+                                            setGoogleOnlyError(""); // Clear the Google-only error when password changes
+                                        }}
+                                    />
                                     <button
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
@@ -114,10 +121,9 @@ export default function Login({ status, canResetPassword }) {
                                         )}
                                     </button>
                                 </div>
-
                                 <InputError
-                                    message={errors.password}
-                                    className="mt-2"
+                                    message={errors.password || googleOnlyError}
+                                    className="mt-2 text-red-500"
                                 />
                             </div>
 
@@ -152,7 +158,7 @@ export default function Login({ status, canResetPassword }) {
                                     href={route("register")}
                                     className="underline text-sm text-white hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
                                 >
-                                    Don't have account?
+                                    Don't have an account?
                                 </Link>
                             </div>
                         </form>
