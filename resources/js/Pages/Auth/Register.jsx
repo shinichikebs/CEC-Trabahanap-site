@@ -123,7 +123,7 @@ export default function Register() {
                                 name="email"
                                 value={data.email}
                                 className="w-full bg-white text-black !text-black border-b border-black placeholder-black focus:ring-0 focus:border-black"
-                                placeholder="Email"
+                                placeholder="CeC Email"
                                 onChange={(e) => setData('email', e.target.value)}
                                 required
                             />

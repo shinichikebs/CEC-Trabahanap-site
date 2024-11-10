@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
+import html2pdf from 'html2pdf.js';
 
 const NewReport = () => {
     const [approvedUsers, setApprovedUsers] = useState([]);
@@ -8,6 +9,8 @@ const NewReport = () => {
     const [totalUsers, setTotalUsers] = useState(0);
     const [totalPosts, setTotalPosts] = useState(0);
     const [totalJobsDone, setTotalJobsDone] = useState(0);
+
+    const reportRef = useRef();
 
     useEffect(() => {
         fetchData();
@@ -43,14 +46,35 @@ const NewReport = () => {
     const fetchRestrictUsers = () => {
         axios
             .get("/admin/restricted-users")
-            .then((response) => setRestrictUsers(response.data.restrictUsers)) // Corrected response data key
+            .then((response) => setRestrictUsers(response.data.restrictUsers))
             .catch((error) => console.error("Error fetching restricted users:", error));
+    };
+
+    const handlePrint = () => {
+        const element = reportRef.current;
+        const options = {
+            margin: 0.5,
+            filename: 'User_Account_Report.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf().from(element).set(options).save();
     };
 
     return (
         <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold">User Account Report</h1>
-            <div className="mt-8">
+            <div className="flex justify-between items-center">
+                <h1 className="text-2xl font-bold">User Account Report</h1>
+                <button
+                    onClick={handlePrint}
+                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                >
+                    Print PDF
+                </button>
+            </div>
+
+            <div ref={reportRef} className="mt-8">
                 <table className="min-w-full border border-gray-300">
                     <thead>
                         <tr className="bg-gray-200">

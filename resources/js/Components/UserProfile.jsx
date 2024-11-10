@@ -141,7 +141,7 @@ const UserProfile = ({ user, onClose }) => {
                     <div className="flex space-x-4 mt-4">
                         <button
                             onClick={handleRestrict}
-                            className="bg-red-500 text-white px-4 py-2 rounded"
+                            className="bg-red-500 text-white px-4 py-2 rounded-lg"
                         >
                             Restrict
                         </button>
@@ -149,7 +149,7 @@ const UserProfile = ({ user, onClose }) => {
                             className="bg-red-600 text-white px-4 py-2 rounded-lg flex items-center"
                             onClick={handleDelete}
                         >
-                            <span className="mr-2">🗑️</span> Delete
+                            <span className="mr-2">🗑️</span> Remove
                         </button>
                     </div>
 

@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { router } from '@inertiajs/react';
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { AiOutlineLoading3Quarters, AiFillFile } from 'react-icons/ai';
 
-const MAX_FILE_SIZE = 2 * 1024 * 1024; // 5MB
+const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
 
 export default function PostProject({ auth, jobOffer }) { 
     const [formData, setFormData] = useState({
@@ -23,6 +23,11 @@ export default function PostProject({ auth, jobOffer }) {
     const [termsWarning, setTermsWarning] = useState(false);
     const [showModal, setShowModal] = useState(false); // Modal state
     const [fileWarning, setFileWarning] = useState(''); // File size warning
+    const [isFormValid, setIsFormValid] = useState(false); // Form validation state
+
+    useEffect(() => {
+        checkFormValidity(); // Initial check
+    }, [formData]);
 
     const handleFileChange = async (e) => {
         const files = Array.from(e.target.files);
@@ -72,6 +77,8 @@ export default function PostProject({ auth, jobOffer }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        if (!isFormValid) return; // Prevent submission if form is not valid
+
         if (!formData.terms) {
             setTermsWarning(true); // Show warning if checkbox isn't checked
             return;
@@ -88,7 +95,6 @@ export default function PostProject({ auth, jobOffer }) {
             }
         });
 
-        // Check if the jobOffer exists, then perform update, otherwise create a new one
         const routeUrl = jobOffer ? `/post-project/${jobOffer.id}/update` : '/post-project-offer';
 
         router.post(routeUrl, data, {
@@ -118,6 +124,20 @@ export default function PostProject({ auth, jobOffer }) {
         return new Promise((resolve) => {
             setTimeout(() => resolve("File uploaded successfully"), 2000);
         });
+    };
+
+    // Function to check if all required text fields are filled
+    const checkFormValidity = () => {
+        const { title, category, description, workType, budget, daysPostEnd, terms } = formData;
+        const isValid =
+            title.trim() !== '' &&
+            category.trim() !== '' &&
+            description.trim() !== '' &&
+            workType.trim() !== '' &&
+            budget.trim() !== '' &&
+            daysPostEnd.trim() !== '' &&
+            terms;
+        setIsFormValid(isValid);
     };
 
     return (
@@ -248,7 +268,7 @@ export default function PostProject({ auth, jobOffer }) {
                                         id="work-type"
                                         name="workType"
                                         value={formData.workType}
-                                        onChange={(e) => setFormData({ ...formData, workType: Number(e.target.value) })}
+                                        onChange={(e) => setFormData({ ...formData, workType: e.target.value })}
                                         className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring"
                                     >
                                         <option value="">Select Work Type</option>
@@ -309,8 +329,8 @@ export default function PostProject({ auth, jobOffer }) {
                             <div className="flex justify-center">
                                 <button
                                     type="submit"
-                                    className={`bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg focus:outline-none focus:ring ${!formData.terms ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                    disabled={!formData.terms}
+                                    className={`bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg focus:outline-none focus:ring ${!isFormValid ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    disabled={!isFormValid}
                                 >
                                     {jobOffer ? 'UPDATE PROJECT' : 'POST PROJECT'}
                                 </button>
@@ -320,25 +340,25 @@ export default function PostProject({ auth, jobOffer }) {
                 </div>
             </div>
 
-           {/* Modal for success message */}
-{showModal && (
-    <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
-        <div className="bg-white p-6 rounded shadow-lg max-w-md mx-auto text-center">
-            <h2 className="text-xl font-semibold mb-4">Success</h2>
-            <p className="text-gray-700 mb-4">
-                {jobOffer ? 'Project successfully updated!' : 'Project uploaded successfully!'}
-            </p>
-            <div className="flex justify-center">
-                <button
-                    onClick={() => setShowModal(false)}
-                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                >
-                    Close
-                </button>
-            </div>
-        </div>
-    </div>
-)}
+            {/* Modal for success message */}
+            {showModal && (
+                <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+                    <div className="bg-white p-6 rounded shadow-lg max-w-md mx-auto text-center">
+                        <h2 className="text-xl font-semibold mb-4">Success</h2>
+                        <p className="text-gray-700 mb-4">
+                            {jobOffer ? 'Project successfully updated!' : 'Project uploaded successfully!'}
+                        </p>
+                        <div className="flex justify-center">
+                            <button
+                                onClick={() => setShowModal(false)}
+                                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                            >
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </AuthenticatedLayout>
     );
 }

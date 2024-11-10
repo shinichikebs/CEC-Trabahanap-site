@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
+import html2pdf from 'html2pdf.js';
 
 const NewReport = () => {
-    const [approvedUsers, setApprovedUsers] = useState([]);
     const [approvedPosts, setApprovedPosts] = useState([]);
-    const [pendingUsers, setPendingUsers] = useState([]);
     const [pendingPosts, setPendingPosts] = useState([]);
     const [totalUsers, setTotalUsers] = useState(0);
     const [totalPosts, setTotalPosts] = useState(0);
     const [totalJobsDone, setTotalJobsDone] = useState(0);
+
+    const reportRef = useRef();
 
     useEffect(() => {
         fetchData();
@@ -35,8 +36,6 @@ const NewReport = () => {
             .catch((error) => console.error("Error fetching approved posts:", error));
     };
 
-
-
     const fetchPendingPosts = () => {
         axios
             .get("/admin/pending-approval-posts")
@@ -44,26 +43,41 @@ const NewReport = () => {
             .catch((error) => console.error("Error fetching pending posts:", error));
     };
 
+    const handlePrint = () => {
+        const element = reportRef.current;
+        const options = {
+            margin: 0.5,
+            filename: 'Post_Report.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf().from(element).set(options).save();
+    };
+
     return (
         <div className="container mx-auto p-4">
-            <h1 className="text-2xl font-bold">Post Report</h1>
+            <div className="flex justify-between items-center">
+                <h1 className="text-2xl font-bold">Post Report</h1>
+                <button
+                    onClick={handlePrint}
+                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                >
+                    Print PDF
+                </button>
+            </div>
 
-            <div className="mt-8">
+            <div ref={reportRef} className="mt-8">
                 <table className="min-w-full border border-gray-300">
                     <thead>
                         <tr className="bg-gray-200">
- 
                             <th className="border border-gray-300 p-2">Approved Posts</th>
-
                             <th className="border border-gray-300 p-2">Pending Posts</th>
-                            
                         </tr>
                     </thead>
                     <tbody>
-                        {Array.from({ length: Math.max(approvedUsers.length, approvedPosts.length, pendingUsers.length, pendingPosts.length) }).map((_, index) => (
+                        {Array.from({ length: Math.max(approvedPosts.length, pendingPosts.length) }).map((_, index) => (
                             <tr key={index}>
-
-                                {/* Approved Posts */}
                                 <td className="border border-gray-300 p-2">
                                     {approvedPosts[index] ? (
                                         <div>
@@ -72,9 +86,6 @@ const NewReport = () => {
                                         </div>
                                     ) : "—"}
                                 </td>
-
-
-                                {/* Pending Posts */}
                                 <td className="border border-gray-300 p-2">
                                     {pendingPosts[index] ? (
                                         <div>
