@@ -106,8 +106,8 @@ export default function UserProfile({ user }) {
 
                 {/* Profile Details Section */}
                 <div className="w-full lg:w-3/4 bg-white shadow-md rounded-lg p-6">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4">About {user.firstName}</h3>
-                    <p className="text-gray-600 mb-4">{user.bio || "This user has not added a bio."}</p>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4"> {user.firstName}</h3>
+                    <p className="text-gray-600 mb-4">{user.bio || "You're not adding a bio"}</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
                             <h4 className="font-semibold text-gray-800">Skills</h4>

@@ -1,9 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import { Dropdown, NavLink } from "@/Components";
-import { IoSettingsOutline, IoLogOutOutline, IoSearchOutline } from "react-icons/io5";
+import {
+    IoSettingsOutline,
+    IoLogOutOutline,
+    IoSearchOutline,
+} from "react-icons/io5";
 import { BiFolderOpen } from "react-icons/bi";
 import { TbMessageShare } from "react-icons/tb";
-import axios from 'axios';
+import axios from "axios";
 import NotificationsDropdown from "../Components/NotificationsDropdown";
 import { MdDashboard } from "react-icons/md";
 import { MdOutlinePostAdd } from "react-icons/md";
@@ -11,8 +15,14 @@ import { AiOutlineMenu } from "react-icons/ai";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import { CgProfile } from "react-icons/cg";
 
-export default function Authenticated({ user, header, children, showNavbar = true }) {
-    const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
+export default function Authenticated({
+    user,
+    header,
+    children,
+    showNavbar = true,
+}) {
+    const [showingNavigationDropdown, setShowingNavigationDropdown] =
+        useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState([]);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -28,21 +38,27 @@ export default function Authenticated({ user, header, children, showNavbar = tru
     // Close the menu if clicking outside of it
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target)) {
+            if (
+                mobileMenuRef.current &&
+                !mobileMenuRef.current.contains(event.target)
+            ) {
                 setIsMobileMenuOpen(false);
             }
         };
 
         // Add event listener to detect clicks outside
         document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
+        return () =>
+            document.removeEventListener("mousedown", handleClickOutside);
     }, [mobileMenuRef]);
 
     const handleSearchChange = async (query) => {
         setSearchQuery(query);
         if (query.trim() !== "") {
             try {
-                const response = await axios.get(`/search-user`, { params: { query } });
+                const response = await axios.get(`/search-user`, {
+                    params: { query },
+                });
                 setSearchResults(response.data.users || []);
             } catch (error) {
                 console.error("Error searching for users:", error);
@@ -63,7 +79,9 @@ export default function Authenticated({ user, header, children, showNavbar = tru
             {showNavbar && (
                 <header className="sticky top-0 bg-[#231955] z-50 shadow-lg">
                     <nav className="flex justify-between items-center min-w-full px-4 py-3">
-                        <img src={`cecLogo.png`} width={70} alt="Logo" />
+                        <NavLink href={route("dashboard")}>
+                            <img src={`cecLogo.png`} width={50} alt="Logo" />
+                        </NavLink>
                         {!isMobile && (
                             <NavLink
                                 href={route("dashboard")}
@@ -75,15 +93,23 @@ export default function Authenticated({ user, header, children, showNavbar = tru
 
                         {/* Mobile Search Bar */}
                         {isMobile && (
-                            <form onSubmit={handleSearchSubmit} className={`relative flex items-center flex-grow mx-4`}>
+                            <form
+                                onSubmit={handleSearchSubmit}
+                                className={`relative flex items-center flex-grow mx-4`}
+                            >
                                 <input
                                     type="text"
                                     placeholder="Search"
                                     value={searchQuery}
-                                    onChange={(e) => handleSearchChange(e.target.value)}
+                                    onChange={(e) =>
+                                        handleSearchChange(e.target.value)
+                                    }
                                     className="bg-gray-200 rounded-lg px-8 py-2 w-full text-gray-900 outline-none placeholder-gray-500"
                                 />
-                                <button type="submit" className="absolute left-2 top-1/2 transform -translate-y-1/2">
+                                <button
+                                    type="submit"
+                                    className="absolute left-2 top-1/2 transform -translate-y-1/2"
+                                >
                                     <IoSearchOutline className="w-5 h-5 text-gray-600" />
                                 </button>
                             </form>
@@ -92,7 +118,9 @@ export default function Authenticated({ user, header, children, showNavbar = tru
                         {isMobile ? (
                             <button
                                 className="text-white px-4 py-2 rounded-lg bg-[#231955] hover:bg-[#D18C33] flex items-center shadow-lg"
-                                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                                onClick={() =>
+                                    setIsMobileMenuOpen(!isMobileMenuOpen)
+                                }
                             >
                                 <AiOutlineMenu size={24} />
                             </button>
@@ -106,20 +134,28 @@ export default function Authenticated({ user, header, children, showNavbar = tru
                                         type="text"
                                         placeholder="Search"
                                         value={searchQuery}
-                                        onChange={(e) => handleSearchChange(e.target.value)}
+                                        onChange={(e) =>
+                                            handleSearchChange(e.target.value)
+                                        }
                                         className="bg-gray-200 rounded-lg px-8 py-2 w-70 max-w-[300px] text-gray-900 outline-none placeholder-gray-500"
                                     />
-                                    <button type="submit" className="absolute left-2 top-1/2 transform -translate-y-1/2">
+                                    <button
+                                        type="submit"
+                                        className="absolute left-2 top-1/2 transform -translate-y-1/2"
+                                    >
                                         <IoSearchOutline className="w-5 h-5 text-gray-600" />
                                     </button>
                                 </form>
                                 <NavLink
-                                    href={route('post-project')}
+                                    href={route("post-project")}
                                     className="bg-[#E8AA42] text-white font-bold py-2 px-4 rounded-lg hover:bg-[#D18C33] shadow-md"
                                 >
                                     Post Project
                                 </NavLink>
-                                <TbMessageShare size={25} className="text-white" />
+                                <TbMessageShare
+                                    size={25}
+                                    className="text-white"
+                                />
                                 <NotificationsDropdown />
                                 <div className="ms-3 relative">
                                     <Dropdown>
@@ -130,7 +166,11 @@ export default function Authenticated({ user, header, children, showNavbar = tru
                                                     className="transition ease-in-out duration-150"
                                                 >
                                                     <img
-                                                        src={user.avatar ? user.avatar : "https://www.pngall.com/wp-content/uploads/12/Avatar-Profile-Vector-PNG-Pic.png"}
+                                                        src={
+                                                            user.avatar
+                                                                ? user.avatar
+                                                                : "https://www.pngall.com/wp-content/uploads/12/Avatar-Profile-Vector-PNG-Pic.png"
+                                                        }
                                                         width={35}
                                                         className="object-cover rounded-full shadow-md"
                                                         draggable="false"
@@ -141,7 +181,11 @@ export default function Authenticated({ user, header, children, showNavbar = tru
                                         </Dropdown.Trigger>
                                         <Dropdown.Content>
                                             <img
-                                                src={user.avatar ? user.avatar : "https://www.pngall.com/wp-content/uploads/12/Avatar-Profile-Vector-PNG-Pic.png"}
+                                                src={
+                                                    user.avatar
+                                                        ? user.avatar
+                                                        : "https://www.pngall.com/wp-content/uploads/12/Avatar-Profile-Vector-PNG-Pic.png"
+                                                }
                                                 width={80}
                                                 className="object-cover rounded-full shadow-md mt-2 border-4 border-green-700"
                                                 draggable="false"
@@ -150,20 +194,34 @@ export default function Authenticated({ user, header, children, showNavbar = tru
                                             <h1 className="text-sm mt-2 font-semibold uppercase">
                                                 {user.firstName} {user.lastName}
                                             </h1>
-                                            <p className="text-xs font-sans">{user.role}</p>
-                                            <Dropdown.Link className="flex items-center" href={route("dashboard")}>
-                                            <MdDashboard size={16}/>
+                                            <p className="text-xs font-sans">
+                                                {user.role}
+                                            </p>
+                                            <Dropdown.Link
+                                                className="flex items-center"
+                                                href={route("dashboard")}
+                                            >
+                                                <MdDashboard size={16} />
                                                 &nbsp; Dashbaord
                                             </Dropdown.Link>
-                                            <Dropdown.Link className="flex items-center " href={route("My-project")}>
+                                            <Dropdown.Link
+                                                className="flex items-center "
+                                                href={route("My-project")}
+                                            >
                                                 <BiFolderOpen size={16} />
                                                 &nbsp; My Project
                                             </Dropdown.Link>
-                                            <Dropdown.Link className="flex items-center" href={`/myprofile/${user.id}`}>
+                                            <Dropdown.Link
+                                                className="flex items-center"
+                                                href={`/myprofile/${user.id}`}
+                                            >
                                                 <CgProfile size={16} />
                                                 &nbsp; Profile
                                             </Dropdown.Link>
-                                            <Dropdown.Link className="flex items-center" href={route("profile.edit")}>
+                                            <Dropdown.Link
+                                                className="flex items-center"
+                                                href={route("profile.edit")}
+                                            >
                                                 <IoSettingsOutline size={16} />
                                                 &nbsp; Settings
                                             </Dropdown.Link>
@@ -184,26 +242,29 @@ export default function Authenticated({ user, header, children, showNavbar = tru
                     </nav>
 
                     {isMobile && isMobileMenuOpen && (
-                        <div ref={mobileMenuRef} className="bg-[#231955] text-white p-4 rounded-lg shadow-lg absolute top-16 right-0 w-52">
+                        <div
+                            ref={mobileMenuRef}
+                            className="bg-[#231955] text-white p-4 rounded-lg shadow-lg absolute top-16 right-0 w-52"
+                        >
                             <Dropdown.Link
                                 className="block py-2 px-4 text-white rounded-lg mb-2 hover:bg-[#D18C33] flex items-center"
                                 href={route("dashboard")}
                             >
-                                <MdDashboard size={16}/>
+                                <MdDashboard size={16} />
                                 &nbsp; Dashboard
                             </Dropdown.Link>
                             <Dropdown.Link
                                 className="block py-2 px-4 text-white rounded-lg mb-2 hover:bg-[#D18C33] flex items-center"
                                 href={`/myprofile/${user.id}`}
                             >
-                                <CgProfile size={16}/>
+                                <CgProfile size={16} />
                                 &nbsp; My Profile
                             </Dropdown.Link>
                             <Dropdown.Link
                                 className="block py-2 px-4 text-white rounded-lg mb-2 hover:bg-[#D18C33] flex items-center"
                                 href={route("post-project")}
                             >
-                                <MdOutlinePostAdd size={16}/>
+                                <MdOutlinePostAdd size={16} />
                                 &nbsp; Post Project
                             </Dropdown.Link>
                             <Dropdown.Link
@@ -213,11 +274,13 @@ export default function Authenticated({ user, header, children, showNavbar = tru
                                 <BiFolderOpen size={16} />
                                 &nbsp; My Project
                             </Dropdown.Link>
-                            <Dropdown.Link className="block py-2 px-4 text-white rounded-lg hover:bg-[#D18C33] flex items-center" 
-                                href={route("profile.edit")}>
+                            <Dropdown.Link
+                                className="block py-2 px-4 text-white rounded-lg hover:bg-[#D18C33] flex items-center"
+                                href={route("profile.edit")}
+                            >
                                 <IoSettingsOutline size={16} />
                                 &nbsp; Settings
-                                </Dropdown.Link>
+                            </Dropdown.Link>
                             <Dropdown.Link
                                 className="block py-2 px-4 text-white rounded-lg hover:bg-[#D18C33] flex items-center"
                                 href={route("logout")}

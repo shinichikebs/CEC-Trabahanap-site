@@ -1,152 +1,176 @@
-import React, { useState, useEffect } from 'react';
-import { router } from '@inertiajs/react';
+import React, { useState, useEffect } from "react";
+import { router } from "@inertiajs/react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { AiOutlineLoading3Quarters, AiFillFile } from 'react-icons/ai';
+import { AiOutlineLoading3Quarters, AiFillFile } from "react-icons/ai";
 
-const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+const MAX_FILE_SIZE = 30 * 1024 * 1024; // 30MB
 
-export default function PostProject({ auth, jobOffer }) { 
+export default function PostProject({ auth, jobOffer }) {
     const [formData, setFormData] = useState({
-        title: jobOffer?.job_title || '',
-        category: jobOffer?.category || '',
-        subCategory: jobOffer?.subCategory || '',
-        description: jobOffer?.job_description || '',
+        title: jobOffer?.job_title || "",
+        category: jobOffer?.category || "",
+        customCategory: "",
+        subCategory: jobOffer?.subCategory || "",
+        description: jobOffer?.job_description || "",
         uploads: [],
-        workType: jobOffer?.workType || '',
-        budget: jobOffer?.budget || '', 
-        daysPostEnd: jobOffer?.daysPostEnd || '',
+        workType: jobOffer?.workType || "",
+        budget: jobOffer?.budget || "",
+        daysPostEnd: jobOffer?.daysPostEnd || "",
         terms: false,
     });
 
+    const [errors, setErrors] = useState({});
     const [uploadStatus, setUploadStatus] = useState([]);
-    const [existingFiles, setExistingFiles] = useState(jobOffer?.attachments || []);
+    const [existingFiles, setExistingFiles] = useState(
+        jobOffer?.attachments || []
+    );
     const [termsWarning, setTermsWarning] = useState(false);
-    const [showModal, setShowModal] = useState(false); // Modal state
-    const [fileWarning, setFileWarning] = useState(''); // File size warning
-    const [isFormValid, setIsFormValid] = useState(false); // Form validation state
+    const [showModal, setShowModal] = useState(false);
+    const [fileWarning, setFileWarning] = useState("");
+    const [isFormValid, setIsFormValid] = useState(false);
 
     useEffect(() => {
-        checkFormValidity(); // Initial check
-    }, [formData]);
+        checkFormValidity();
+    }, [formData, errors]);
+
+    const validateField = (field, value) => {
+        let errorMsg = "";
+        switch (field) {
+            case "title":
+                if (!value) errorMsg = "Title is required.";
+                break;
+            case "category":
+                if (!value) errorMsg = "Category is required.";
+                break;
+            case "description":
+                if (!value) errorMsg = "Description is required.";
+                break;
+            case "budget":
+                if (value && !/^\d+$/.test(value)) {
+                    errorMsg =
+                        "Budget must be a valid numeric amount without commas or decimal points (e.g., 1000).";
+                }
+                break;
+
+            case "daysPostEnd":
+                if (!value || isNaN(value))
+                    errorMsg = "Days to post end must be a valid number.";
+                break;
+            case "terms":
+                if (!value) errorMsg = "You must agree to the terms.";
+                break;
+            default:
+                break;
+        }
+        setErrors((prevErrors) => ({ ...prevErrors, [field]: errorMsg }));
+    };
+
+    const handleChange = (e) => {
+        const { name, value, checked } = e.target;
+        const fieldValue = name === "terms" ? checked : value;
+        setFormData({ ...formData, [name]: fieldValue });
+        validateField(name, fieldValue);
+    };
 
     const handleFileChange = async (e) => {
         const files = Array.from(e.target.files);
-
-        // Check file sizes
-        const oversizedFiles = files.filter(file => file.size > MAX_FILE_SIZE);
+        const oversizedFiles = files.filter(
+            (file) => file.size > MAX_FILE_SIZE
+        );
         if (oversizedFiles.length > 0) {
-            setFileWarning('Some files are too large to upload. Please choose files smaller than 2MB.');
+            setFileWarning(
+                `Some files are too large to upload. Please choose files smaller than ${
+                    MAX_FILE_SIZE / (1024 * 1024)
+                }MB.`
+            );
             return;
         } else {
-            setFileWarning('');
+            setFileWarning("");
         }
-
         setFormData({ ...formData, uploads: files });
-
-        const initialStatus = files.map(file => ({ file, status: 'uploading' }));
+        const initialStatus = files.map((file) => ({
+            file,
+            status: "uploading",
+        }));
         setUploadStatus(initialStatus);
-
-        for (let i = 0; i < files.length; i++) {
-            const file = files[i];
-            const fileData = new FormData();
-            fileData.append('file', file);
-
-            try {
-                await fakeUploadFile(fileData);
-
-                setUploadStatus((prevStatus) =>
-                    prevStatus.map((status, index) =>
-                        index === i ? { ...status, status: 'done' } : status
-                    )
-                );
-            } catch (error) {
-                console.error('Upload error:', error);
-                setUploadStatus((prevStatus) =>
-                    prevStatus.map((status, index) =>
-                        index === i ? { ...status, status: 'error' } : status
-                    )
-                );
-            }
-        }
-    };
-
-    const handleTermsChange = (e) => {
-        setFormData({ ...formData, terms: e.target.checked });
-        setTermsWarning(false); // Remove warning when checkbox is checked
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (!isFormValid) return; // Prevent submission if form is not valid
-
+        if (!isFormValid) return;
         if (!formData.terms) {
-            setTermsWarning(true); // Show warning if checkbox isn't checked
+            setTermsWarning(true);
             return;
         }
-
         const data = new FormData();
-        Object.keys(formData).forEach(key => {
-            if (key === 'uploads') {
+        Object.keys(formData).forEach((key) => {
+            if (key === "uploads") {
                 for (const file of formData.uploads) {
-                    data.append('uploads[]', file);
+                    data.append("uploads[]", file);
                 }
             } else {
-                data.append(key, formData[key] || '');
+                data.append(key, formData[key] || "");
             }
         });
 
-        const routeUrl = jobOffer ? `/post-project/${jobOffer.id}/update` : '/post-project-offer';
+        const routeUrl = jobOffer
+            ? `/post-project/${jobOffer.id}/update`
+            : "/post-project-offer";
 
         router.post(routeUrl, data, {
             forceFormData: true,
             onSuccess: () => {
-                setShowModal(true); // Show modal on success
+                setShowModal(true);
                 setFormData({
-                    title: '',
-                    category: '',
-                    subCategory: '',
-                    description: '',
+                    title: "",
+                    category: "",
+                    subCategory: "",
+                    description: "",
                     uploads: [],
-                    workType: '',
-                    budget: '',
-                    daysPostEnd: '',
+                    workType: "",
+                    budget: "",
+                    daysPostEnd: "",
                     terms: false,
                 });
                 setUploadStatus([]);
             },
             onError: (errors) => {
-                console.error('Error:', errors);
+                console.error("Error:", errors);
             },
         });
     };
 
-    const fakeUploadFile = (formData) => {
-        return new Promise((resolve) => {
-            setTimeout(() => resolve("File uploaded successfully"), 2000);
-        });
-    };
-
-    // Function to check if all required text fields are filled
     const checkFormValidity = () => {
-        const { title, category, description, workType, budget, daysPostEnd, terms } = formData;
         const isValid =
-            title.trim() !== '' &&
-            category.trim() !== '' &&
-            description.trim() !== '' &&
-            workType.trim() !== '' &&
-            budget.trim() !== '' &&
-            daysPostEnd.trim() !== '' &&
-            terms;
+            Object.values(errors).every((error) => !error) &&
+            Object.keys(formData).every(
+                (field) =>
+                    formData[field] ||
+                    field === "subCategory" ||
+                    field === "budget"
+            );
         setIsFormValid(isValid);
     };
 
+    const handleSelectedChange = (e) => {
+        const { name, value } = e.target;
+
+        // If a predefined category is selected, don't touch the customCategory
+        if (name === "category" && value !== "Others") {
+            setFormData({ ...formData, [name]: value });
+        } else {
+            // If "Others" is selected, allow custom input
+            setFormData({ ...formData, [name]: value, customCategory: "" }); // Clear customCategory if "Others" is selected
+        }
+    };
+
     return (
-        <AuthenticatedLayout 
-            user={auth.user} 
+        <AuthenticatedLayout
+            user={auth.user}
             header={
                 <div className="bg-purple-900 text-white py-4 px-6 shadow-lg">
                     <h2 className="font-semibold text-xl leading-tight">
-                        {jobOffer ? 'Edit Project' : 'Post Project'}
+                        {jobOffer ? "Edit Project" : "Post Project"}
                     </h2>
                 </div>
             }
@@ -154,9 +178,17 @@ export default function PostProject({ auth, jobOffer }) {
             <div className="bg-gray-100 py-10">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="bg-white shadow-md rounded-lg px-8 py-6">
-                        <form onSubmit={handleSubmit} encType="multipart/form-data">
+                        <form
+                            onSubmit={handleSubmit}
+                            encType="multipart/form-data"
+                        >
                             <div className="mb-6">
-                                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="title">What Do You Need To Get Done</label>
+                                <label
+                                    className="block text-gray-700 text-sm font-bold mb-2"
+                                    htmlFor="title"
+                                >
+                                    What Do You Need To Get Done
+                                </label>
                                 <input
                                     required
                                     id="title"
@@ -164,43 +196,103 @@ export default function PostProject({ auth, jobOffer }) {
                                     type="text"
                                     placeholder="Title"
                                     value={formData.title}
-                                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                                    onChange={handleChange}
                                     className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring"
                                 />
+                                {errors.title && (
+                                    <p className="text-red-600 text-sm mt-1">
+                                        {errors.title}
+                                    </p>
+                                )}
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                                 <div>
-                                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="category">Pick Category</label>
+                                    <label
+                                        className="block text-gray-700 text-sm font-bold mb-2"
+                                        htmlFor="category"
+                                    >
+                                        Pick Category
+                                    </label>
                                     <select
                                         required
                                         id="category"
                                         name="category"
                                         value={formData.category}
-                                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                                        onChange={handleSelectedChange}
                                         className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring"
                                     >
-                                        <option value="">Select Category</option>
-                                        <option value="Video Editing">Video Editing</option>
-                                        <option value="Photo Editing">Photo Editing</option>
+                                        <option value="">
+                                            Select Category
+                                        </option>
+                                        <option value="Video Editing">
+                                            Video Editing
+                                        </option>
+                                        <option value="Photo Editing">
+                                            Photo Editing
+                                        </option>
+                                        <option value="Others">Others</option>
                                     </select>
+
+                                    {/* Show the "Specify Category" input only if "Others" is selected */}
+                                    {formData.category === "Others" && (
+                                        <div className="mt-4">
+                                            <label
+                                                className="block text-gray-700 text-sm font-bold mb-2"
+                                                htmlFor="customCategory"
+                                            >
+                                                Specify Category
+                                            </label>
+                                            <input
+                                                type="text"
+                                                id="customCategory"
+                                                name="customCategory"
+                                                placeholder="Enter your custom category"
+                                                value={formData.customCategory}
+                                                onChange={(e) =>
+                                                    setFormData({
+                                                        ...formData,
+                                                        customCategory:
+                                                            e.target.value,
+                                                    })
+                                                }
+                                                className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring"
+                                            />
+                                        </div>
+                                    )}
+
+                                    {errors.category && (
+                                        <p className="text-red-600 text-sm mt-1">
+                                            {errors.category}
+                                        </p>
+                                    )}
                                 </div>
                                 <div>
-                                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="sub-category">Other's</label>
+                                    <label
+                                        className="block text-gray-700 text-sm font-bold mb-2"
+                                        htmlFor="sub-category"
+                                    >
+                                        sub-category
+                                    </label>
                                     <input
                                         id="sub-category"
                                         name="subCategory"
                                         type="text"
-                                        placeholder="Other's"
+                                        placeholder="sub-category"
                                         value={formData.subCategory}
-                                        onChange={(e) => setFormData({ ...formData, subCategory: e.target.value })}
+                                        onChange={handleChange}
                                         className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring"
                                     />
                                 </div>
                             </div>
 
                             <div className="mb-6">
-                                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="description">Description</label>
+                                <label
+                                    className="block text-gray-700 text-sm font-bold mb-2"
+                                    htmlFor="description"
+                                >
+                                    Description
+                                </label>
                                 <textarea
                                     required
                                     id="description"
@@ -208,33 +300,67 @@ export default function PostProject({ auth, jobOffer }) {
                                     placeholder="Description about what you need"
                                     rows="4"
                                     value={formData.description}
-                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                    onChange={handleChange}
                                     className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring"
                                 ></textarea>
+                                {errors.description && (
+                                    <p className="text-red-600 text-sm mt-1">
+                                        {errors.description}
+                                    </p>
+                                )}
                             </div>
 
                             {/* File Upload */}
                             <div className="mb-6">
-                                <h1 className="flex flex-col text-gray-700 text-sm font-bold mb-2">Upload Samples and Other Helpful Material</h1>
+                                <h1 className="flex flex-col text-gray-700 text-sm font-bold mb-2">
+                                    Upload Samples and Other Helpful Material
+                                </h1>
                                 <div>
-                                    <label className="block w-full h-24 flex justify-center items-center border-2 border-dashed border-gray-400 rounded-lg items-center cursor-pointer" htmlFor="uploads">
+                                    <label
+                                        className="block w-full h-24 flex justify-center items-center border-2 border-dashed border-gray-400 rounded-lg items-center cursor-pointer"
+                                        htmlFor="uploads"
+                                    >
                                         {uploadStatus.length > 0 ? (
                                             <div className="flex flex-col space-y-2">
-                                                {uploadStatus.map((fileStatus, index) => (
-                                                    <div key={index} className="flex items-center space-x-2">
-                                                        {fileStatus.status === 'uploading' ? (
-                                                            <AiOutlineLoading3Quarters className="animate-spin text-blue-500" size={20} />
-                                                        ) : (
-                                                            <AiFillFile className="text-green-500" size={20} />
-                                                        )}
-                                                        <span className="text-gray-700 text-sm">
-                                                            {fileStatus.file.name} - {fileStatus.status === 'uploading' ? 'Uploading...' : 'Done uploading'}
-                                                        </span>
-                                                    </div>
-                                                ))}
+                                                {uploadStatus.map(
+                                                    (fileStatus, index) => (
+                                                        <div
+                                                            key={index}
+                                                            className="flex items-center space-x-2"
+                                                        >
+                                                            {fileStatus.status ===
+                                                            "uploading" ? (
+                                                                <AiOutlineLoading3Quarters
+                                                                    className="animate-spin text-blue-500"
+                                                                    size={20}
+                                                                />
+                                                            ) : (
+                                                                <AiFillFile
+                                                                    className="text-green-500"
+                                                                    size={20}
+                                                                />
+                                                            )}
+                                                            <span className="text-gray-700 text-sm">
+                                                                {
+                                                                    fileStatus
+                                                                        .file
+                                                                        .name
+                                                                }{" "}
+                                                                -{" "}
+                                                                {fileStatus.status ===
+                                                                "uploading"
+                                                                    ? "Uploading..."
+                                                                    : "Done uploading"}
+                                                            </span>
+                                                        </div>
+                                                    )
+                                                )}
                                             </div>
                                         ) : (
-                                            <span>Drop files here or Browse to add attachments</span>
+                                            <span>
+                                                Drop files here or Browse to add
+                                                attachments
+                                            </span>
                                         )}
                                     </label>
                                     <input
@@ -244,68 +370,114 @@ export default function PostProject({ auth, jobOffer }) {
                                         onChange={handleFileChange}
                                         multiple
                                         className="hidden"
+                                        accept="*"
                                     />
                                 </div>
                                 {existingFiles.length > 0 && (
                                     <div className="mt-4">
-                                        <h2 className="text-sm font-semibold text-gray-700">Existing Attachments:</h2>
+                                        <h2 className="text-sm font-semibold text-gray-700">
+                                            Existing Attachments:
+                                        </h2>
                                         <ul>
-                                            {existingFiles.map((file, index) => (
-                                                <li key={index} className="text-sm text-gray-600">{file.attachment_path}</li>
-                                            ))}
+                                            {existingFiles.map(
+                                                (file, index) => (
+                                                    <li
+                                                        key={index}
+                                                        className="text-sm text-gray-600"
+                                                    >
+                                                        {file.attachment_path}
+                                                    </li>
+                                                )
+                                            )}
                                         </ul>
                                     </div>
                                 )}
                                 {fileWarning && (
-                                    <p className="text-red-600 text-sm mt-2">{fileWarning}</p>
+                                    <p className="text-red-600 text-sm mt-2">
+                                        {fileWarning}
+                                    </p>
                                 )}
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                                 <div>
-                                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="work-type">Work Type</label>
+                                    <label
+                                        className="block text-gray-700 text-sm font-bold mb-2"
+                                        htmlFor="work-type"
+                                    >
+                                        Work Type
+                                    </label>
                                     <select
                                         id="work-type"
                                         name="workType"
                                         value={formData.workType}
-                                        onChange={(e) => setFormData({ ...formData, workType: e.target.value })}
+                                        onChange={handleChange}
                                         className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring"
                                     >
-                                        <option value="">Select Work Type</option>
+                                        <option value="">
+                                            Select Work Type
+                                        </option>
                                         <option value="1">Full Time</option>
                                         <option value="2">Part Time</option>
                                     </select>
+                                    {errors.workType && (
+                                        <p className="text-red-600 text-sm mt-1">
+                                            {errors.workType}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div>
-                                    <label className="block text-gray-700 text-sm font-bold mb-2">Currency</label>
+                                    <label className="block text-gray-700 text-sm font-bold mb-2">
+                                        Currency
+                                    </label>
                                     <p className="py-1">PHP*</p>
                                 </div>
 
                                 <div>
-                                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="budget">Budget (Optional)</label>
+                                    <label
+                                        className="block text-gray-700 text-sm font-bold mb-2"
+                                        htmlFor="budget"
+                                    >
+                                        Budget (Optional)
+                                    </label>
                                     <input
                                         id="budget"
                                         name="budget"
-                                        type="decimal"
+                                        type="text"
                                         placeholder="₱"
                                         value={formData.budget}
-                                        onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
+                                        onChange={handleChange}
                                         className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring"
                                     />
+                                    {errors.budget && (
+                                        <p className="text-red-600 text-sm mt-1">
+                                            {errors.budget}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
 
                             <div className="mb-6">
-                                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="days-post-end">Days Post End</label>
+                                <label
+                                    className="block text-gray-700 text-sm font-bold mb-2"
+                                    htmlFor="days-post-end"
+                                >
+                                    Days Post End
+                                </label>
                                 <input
                                     id="days-post-end"
                                     name="daysPostEnd"
                                     type="number"
                                     value={formData.daysPostEnd}
-                                    onChange={(e) => setFormData({ ...formData, daysPostEnd: e.target.value })}
+                                    onChange={handleChange}
                                     className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring"
                                 />
+                                {errors.daysPostEnd && (
+                                    <p className="text-red-600 text-sm mt-1">
+                                        {errors.daysPostEnd}
+                                    </p>
+                                )}
                             </div>
 
                             <div className="mb-6">
@@ -315,24 +487,50 @@ export default function PostProject({ auth, jobOffer }) {
                                         name="terms"
                                         type="checkbox"
                                         checked={formData.terms}
-                                        onChange={handleTermsChange}
+                                        onChange={handleChange}
                                         className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                                     />
-                                    <label htmlFor="terms" className="ml-2 text-sm text-gray-600">
-                                        I have read and agree to the <a href="#" className="text-blue-600 underline">Terms of Service</a> and <a href="#" className="text-blue-600 underline">Privacy Policy</a>.
+                                    <label
+                                        htmlFor="terms"
+                                        className="ml-2 text-sm text-gray-600"
+                                    >
+                                        I have read and agree to the{" "}
+                                        <a
+                                            href="#"
+                                            className="text-blue-600 underline"
+                                        >
+                                            Terms of Service
+                                        </a>{" "}
+                                        and{" "}
+                                        <a
+                                            href="#"
+                                            className="text-blue-600 underline"
+                                        >
+                                            Privacy Policy
+                                        </a>
+                                        .
                                     </label>
                                 </div>
                                 {termsWarning && (
-                                    <p className="text-red-600 text-sm">You must agree to the Terms of Service.</p>
+                                    <p className="text-red-600 text-sm">
+                                        You must agree to the Terms of Service.
+                                    </p>
                                 )}
                             </div>
+
                             <div className="flex justify-center">
                                 <button
                                     type="submit"
-                                    className={`bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg focus:outline-none focus:ring ${!isFormValid ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    className={`bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg focus:outline-none focus:ring ${
+                                        !isFormValid
+                                            ? "opacity-50 cursor-not-allowed"
+                                            : ""
+                                    }`}
                                     disabled={!isFormValid}
                                 >
-                                    {jobOffer ? 'UPDATE PROJECT' : 'POST PROJECT'}
+                                    {jobOffer
+                                        ? "UPDATE PROJECT"
+                                        : "POST PROJECT"}
                                 </button>
                             </div>
                         </form>
@@ -340,13 +538,14 @@ export default function PostProject({ auth, jobOffer }) {
                 </div>
             </div>
 
-            {/* Modal for success message */}
             {showModal && (
                 <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
                     <div className="bg-white p-6 rounded shadow-lg max-w-md mx-auto text-center">
                         <h2 className="text-xl font-semibold mb-4">Success</h2>
                         <p className="text-gray-700 mb-4">
-                            {jobOffer ? 'Project successfully updated!' : 'Project uploaded successfully!'}
+                            {jobOffer
+                                ? "Project successfully updated!"
+                                : "Project uploaded successfully!"}
                         </p>
                         <div className="flex justify-center">
                             <button
