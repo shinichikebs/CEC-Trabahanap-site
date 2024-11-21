@@ -18,9 +18,17 @@ export default defineConfig({
         },
     },
     server: {
+<<<<<<< HEAD
         proxy: {
             '/api': {
                 target: 'http://127.0.0.1:8000', // Ensure this matches Laravel's running port
+=======
+        host: '127.0.0.1', // Use your local IP address to make Vite accessible on other devices
+        port: 5173, // This is the default port for Vite; you can change it if needed
+        proxy: {
+            '/api': {
+                target: 'http://127.0.0.1:8000', // Match Laravel's running IP and port
+>>>>>>> d486c52ca987f04693d1eb2e36f7b115e730cc92
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/api/, ''),
             },
