@@ -58,7 +58,7 @@ class PostProjectController extends Controller
 
     public function uploadFile(Request $request)
     {
-        $request->validate(['file' => 'required|file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx,ppt,pptx,txt,rtf,odt,csv,html,htm,mp3,wav,aac,flac,mp4,avi,mkv,mov,wmv,zip,rar,7z|max:3030720720']); // 30MB
+        $request->validate(['file' => 'required|file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx,ppt,pptx,txt,rtf,odt,csv,html,htm,mp3,wav,aac,flac,mp4,avi,mkv,mov,wmv,zip,rar,7z|max:30720']); // 30MB
         
         $filePath = $request->file('file')->store('uploads', 'public');
     

@@ -42,6 +42,11 @@ export default function PostProject({ auth, jobOffer }) {
             case "category":
                 if (!value) errorMsg = "Category is required.";
                 break;
+            case "customCategory":
+                if (formData.category === "Others" && !value) {
+                    errorMsg = "Custom category is required when 'Others' is selected.";
+                }
+                break;
             case "description":
                 if (!value) errorMsg = "Description is required.";
                 break;
@@ -51,7 +56,6 @@ export default function PostProject({ auth, jobOffer }) {
                         "Budget must be a valid numeric amount without commas or decimal points (e.g., 1000).";
                 }
                 break;
-
             case "daysPostEnd":
                 if (!value || isNaN(value))
                     errorMsg = "Days to post end must be a valid number.";
@@ -64,6 +68,7 @@ export default function PostProject({ auth, jobOffer }) {
         }
         setErrors((prevErrors) => ({ ...prevErrors, [field]: errorMsg }));
     };
+    
 
     const handleChange = (e) => {
         const { name, value, checked } = e.target;
@@ -74,9 +79,9 @@ export default function PostProject({ auth, jobOffer }) {
 
     const handleFileChange = async (e) => {
         const files = Array.from(e.target.files);
-        const oversizedFiles = files.filter(
-            (file) => file.size > MAX_FILE_SIZE
-        );
+    
+        // Check for oversized files
+        const oversizedFiles = files.filter((file) => file.size > MAX_FILE_SIZE);
         if (oversizedFiles.length > 0) {
             setFileWarning(
                 `Some files are too large to upload. Please choose files smaller than ${
@@ -87,21 +92,65 @@ export default function PostProject({ auth, jobOffer }) {
         } else {
             setFileWarning("");
         }
+    
+        // Update the form data
         setFormData({ ...formData, uploads: files });
+    
+        // Set initial status
         const initialStatus = files.map((file) => ({
             file,
             status: "uploading",
         }));
         setUploadStatus(initialStatus);
+    
+        // Upload files and update their status
+        const updatedStatus = await Promise.all(
+            files.map(async (file) => {
+                const data = new FormData();
+                data.append("file", file);
+    
+                try {
+                    const response = await fetch("/api/upload", {
+                        method: "POST",
+                        body: data,
+                    });
+    
+                    if (response.ok) {
+                        return { file, status: "done" };
+                    } else {
+                        throw new Error("Upload failed");
+                    }
+                } catch (error) {
+                    console.error("File upload error:", error);
+                    return { file, status: "error" };
+                }
+            })
+        );
+    
+        // Update the upload status
+        setUploadStatus(updatedStatus);
+    
+        // Filter successful uploads and update formData
+        const successfulFiles = updatedStatus
+            .filter((status) => status.status === "done")
+            .map((status) => status.file);
+    
+        setFormData((prev) => ({
+            ...prev,
+            uploads: successfulFiles,
+        }));
     };
+    
 
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!isFormValid) return;
+    
         if (!formData.terms) {
             setTermsWarning(true);
             return;
         }
+    
         const data = new FormData();
         Object.keys(formData).forEach((key) => {
             if (key === "uploads") {
@@ -112,11 +161,11 @@ export default function PostProject({ auth, jobOffer }) {
                 data.append(key, formData[key] || "");
             }
         });
-
+    
         const routeUrl = jobOffer
             ? `/post-project/${jobOffer.id}/update`
             : "/post-project-offer";
-
+    
         router.post(routeUrl, data, {
             forceFormData: true,
             onSuccess: () => {
@@ -139,30 +188,38 @@ export default function PostProject({ auth, jobOffer }) {
             },
         });
     };
+    
 
     const checkFormValidity = () => {
         const isValid =
             Object.values(errors).every((error) => !error) &&
-            Object.keys(formData).every(
-                (field) =>
-                    formData[field] ||
-                    field === "subCategory" ||
-                    field === "budget"
-            );
+            formData.title &&
+            formData.category &&
+            (formData.category !== "Others" || formData.customCategory) && // Ensure customCategory is filled only if category is "Others"
+            formData.description &&
+            formData.terms;
+    
         setIsFormValid(isValid);
     };
+    
 
     const handleSelectedChange = (e) => {
         const { name, value } = e.target;
-
-        // If a predefined category is selected, don't touch the customCategory
-        if (name === "category" && value !== "Others") {
-            setFormData({ ...formData, [name]: value });
+    
+        // Update formData based on category selection
+        if (name === "category") {
+            if (value !== "Others") {
+                // Clear customCategory if not "Others"
+                setFormData({ ...formData, category: value, customCategory: "" });
+            } else {
+                // Allow input for customCategory when "Others" is selected
+                setFormData({ ...formData, category: value });
+            }
         } else {
-            // If "Others" is selected, allow custom input
-            setFormData({ ...formData, [name]: value, customCategory: "" }); // Clear customCategory if "Others" is selected
+            setFormData({ ...formData, [name]: value });
         }
     };
+    
 
     return (
         <AuthenticatedLayout
