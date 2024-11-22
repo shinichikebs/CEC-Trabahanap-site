@@ -86,6 +86,8 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::post('/report/user/{id}', [ReportController::class, 'store'])->name('reportted.user'); // <-- Add this line
     Route::get('/proposal/{jobOfferId}', [ProposalController::class, 'getProposals']);
     Route::get('/api/users/{userId}', [ProposalController::class, 'getUserProfile']);
+    Route::post('/users/{id}/rate', [UserController::class, 'rate'])->name('rate.user');
+
     
 });
 

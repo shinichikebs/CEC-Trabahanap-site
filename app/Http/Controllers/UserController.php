@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Proposal;
+use App\Models\Rating;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -44,6 +45,7 @@ class UserController extends Controller
     
         return redirect()->back()->with('error', 'User not found');
     }
+    
 
     
     public function myprofile($id)
@@ -73,6 +75,43 @@ class UserController extends Controller
     
         return response()->json(['error' => 'File upload failed'], 500);
     }
+
+    
+    public function rate(Request $request, $id)
+{
+    $request->validate([
+        'rating' => 'required|integer|min:1|max:5',
+    ]);
+
+    $ratedUser = User::findOrFail($id);
+
+    // Check if the user already rated this user
+    $existingRating = Rating::where('rated_user_id', $id)
+        ->where('rater_user_id', Auth::id())
+        ->first();
+
+    if ($existingRating) {
+        // Update existing rating
+        $existingRating->update(['rating' => $request->rating]);
+    } else {
+        // Create a new rating
+        Rating::create([
+            'rated_user_id' => $id,
+            'rater_user_id' => Auth::id(),
+            'rating' => $request->rating,
+        ]);
+    }
+
+    // Calculate and return the new average rating
+    $newAverageRating = $ratedUser->ratingsReceived()->avg('rating');
+
+    return response()->json([
+        'success' => true,
+        'newAverageRating' => $newAverageRating,
+    ]);
+}
+
+    
     
 
     // public function getNotifications()
