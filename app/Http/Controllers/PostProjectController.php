@@ -24,23 +24,26 @@ class PostProjectController extends Controller
             'category' => 'required|string|max:255',
             'subCategory' => 'required|string|max:255',
             'description' => 'required|string',
-            'uploads.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx,ppt,pptx,txt,rtf,odt,csv,html,htm,mp3,wav,aac,flac,mp4,avi,mkv,mov,wmv,zip,rar,7z|max:30720', // 30MB
+            'uploads.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx,ppt,pptx,txt,rtf,odt,csv,html,htm,mp3,wav,aac,flac,mp4,avi,mkv,mov,wmv,zip,rar,7z|max:30720',
             'workType' => 'integer',
             'budget' => 'nullable|numeric',
             'daysPostEnd' => 'integer',
         ]);
 
-        $project = new JobOffer();
-        $project->job_title = $validated['title'];
-        $project->job_description = $validated['description'];
-        $project->category = $validated['category'];
-        $project->budget = $validated['budget'];
-        $project->sub_category = $validated['subCategory'];
-        $project->work_type = $validated['workType'];
-        $project->days_post_end = $validated['daysPostEnd'];
-        $project->user_id = Auth::id();
-        $project->save();
 
+        // Create the job offer
+        $project = JobOffer::create([
+            'job_title' => $validated['title'],
+            'job_description' => $validated['description'],
+            'category' => $validated['category'],
+            'budget' => $validated['budget'],
+            'sub_category' => $validated['subCategory'],
+            'work_type' => $validated['workType'],
+            'days_post_end' => $validated['daysPostEnd'],
+            'user_id' => Auth::id(),
+        ]);
+
+        // Handle file uploads
         if ($request->hasFile('uploads')) {
             foreach ($request->file('uploads') as $file) {
                 $filePath = $file->store('uploads', 'public');
@@ -56,12 +59,14 @@ class PostProjectController extends Controller
         return back()->with('success', 'Project successfully posted!');
     }
 
+
+
     public function uploadFile(Request $request)
     {
-        $request->validate(['file' => 'required|file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx,ppt,pptx,txt,rtf,odt,csv,html,htm,mp3,wav,aac,flac,mp4,avi,mkv,mov,wmv,zip,rar,7z|max:30720']); // 30MB
-        
-        $filePath = $request->file('file')->store('uploads', 'public');
+        $request->validate(['file' => 'required|file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx,ppt,pptx,txt,rtf,odt,csv,html,htm,mp3,wav,aac,flac,mp4,avi,mkv,mov,wmv,zip,rar,7z|max:3030720720']);
     
+        $filePath = $request->file('file')->store('uploads', 'public');
+
         return response()->json(['filePath' => $filePath]);
     }
 
@@ -75,45 +80,47 @@ class PostProjectController extends Controller
     // Method to handle updating an existing job offer
     public function update(Request $request, $id)
     {
-        // Validate the incoming request data
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'category' => 'required|string|max:255',
+            'subCategory' => 'required|string|max:255',
             'description' => 'required|string',
-            'uploads.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx,ppt,pptx,txt,rtf,odt,csv,html,htm,mp3,wav,aac,flac,mp4,avi,mkv,mov,wmv,zip,rar,7z|size:30720', 
-            'workType' => 'nullable|string',
-            'budget' => 'nullable|regex',
-            'daysPostEnd' => 'nullable|numeric',
+            'uploads.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx,ppt,pptx,txt,rtf,odt,csv,html,htm,mp3,wav,aac,flac,mp4,avi,mkv,mov,wmv,zip,rar,7z|max:30720',
+            'workType' => 'integer',
+            'budget' => 'nullable|numeric',
+            'daysPostEnd' => 'integer',
         ]);
-
+    
         // Find the existing job offer
         $jobOffer = JobOffer::findOrFail($id);
-
-        // Update the job offer with new data
+    
+        // Update job offer fields
         $jobOffer->update([
             'job_title' => $validated['title'],
-            'category' => $validated['category'],
             'job_description' => $validated['description'],
-            'workType' => $validated['workType'] ?? '',
-            'budget' => $validated['budget'] ?? 0,
-            'daysPostEnd' => $validated['daysPostEnd'] ?? 0,
+            'category' => $validated['category'],
+            'sub_category' => $validated['subCategory'],
+            'budget' => $validated['budget'],
+            'work_type' => $validated['workType'],
+            'days_post_end' => $validated['daysPostEnd'],
         ]);
-
-        // If new uploads are provided, handle file uploads and update attachments
+    
+        // Handle new file uploads
         if ($request->hasFile('uploads')) {
             foreach ($request->file('uploads') as $file) {
                 $filePath = $file->store('uploads', 'public');
-
-                $attachment = new Attachment();
-                $attachment->job_id = $jobOffer->id;
-                $attachment->user_id = Auth::id();
-                $attachment->attachment_path = $filePath;
-                $attachment->save();
+    
+                Attachment::create([
+                    'job_id' => $jobOffer->id,
+                    'user_id' => Auth::id(),
+                    'attachment_path' => $filePath,
+                ]);
             }
         }
-
+    
         return back()->with('success', 'Project successfully updated!');
     }
+    
 
     public function destroy($id)
     {
