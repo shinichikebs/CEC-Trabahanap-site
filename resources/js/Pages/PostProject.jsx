@@ -79,66 +79,43 @@ export default function PostProject({ auth, jobOffer }) {
 
     const handleFileChange = async (e) => {
         const files = Array.from(e.target.files);
-    
-        // Check for oversized files
-        const oversizedFiles = files.filter((file) => file.size > MAX_FILE_SIZE);
+
+        // Check file sizes
+        const oversizedFiles = files.filter(file => file.size > MAX_FILE_SIZE);
         if (oversizedFiles.length > 0) {
-            setFileWarning(
-                `Some files are too large to upload. Please choose files smaller than ${
-                    MAX_FILE_SIZE / (1024 * 1024)
-                }MB.`
-            );
+            setFileWarning('Some files are too large to upload. Please choose files smaller than 2MB.');
             return;
         } else {
-            setFileWarning("");
+            setFileWarning('');
         }
-    
-        // Update the form data
+
         setFormData({ ...formData, uploads: files });
-    
-        // Set initial status
-        const initialStatus = files.map((file) => ({
-            file,
-            status: "uploading",
-        }));
+
+        const initialStatus = files.map(file => ({ file, status: 'uploading' }));
         setUploadStatus(initialStatus);
-    
-        // Upload files and update their status
-        const updatedStatus = await Promise.all(
-            files.map(async (file) => {
-                const data = new FormData();
-                data.append("file", file);
-    
-                try {
-                    const response = await fetch("/api/upload", {
-                        method: "POST",
-                        body: data,
-                    });
-    
-                    if (response.ok) {
-                        return { file, status: "done" };
-                    } else {
-                        throw new Error("Upload failed");
-                    }
-                } catch (error) {
-                    console.error("File upload error:", error);
-                    return { file, status: "error" };
-                }
-            })
-        );
-    
-        // Update the upload status
-        setUploadStatus(updatedStatus);
-    
-        // Filter successful uploads and update formData
-        const successfulFiles = updatedStatus
-            .filter((status) => status.status === "done")
-            .map((status) => status.file);
-    
-        setFormData((prev) => ({
-            ...prev,
-            uploads: successfulFiles,
-        }));
+
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const fileData = new FormData();
+            fileData.append('file', file);
+
+            try {
+                await fakeUploadFile(fileData);
+
+                setUploadStatus((prevStatus) =>
+                    prevStatus.map((status, index) =>
+                        index === i ? { ...status, status: 'done' } : status
+                    )
+                );
+            } catch (error) {
+                console.error('Upload error:', error);
+                setUploadStatus((prevStatus) =>
+                    prevStatus.map((status, index) =>
+                        index === i ? { ...status, status: 'error' } : status
+                    )
+                );
+            }
+        }
     };
     
 
@@ -152,13 +129,13 @@ export default function PostProject({ auth, jobOffer }) {
         }
     
         const data = new FormData();
-        Object.keys(formData).forEach((key) => {
-            if (key === "uploads") {
+        Object.keys(formData).forEach(key => {
+            if (key === 'uploads') {
                 for (const file of formData.uploads) {
-                    data.append("uploads[]", file);
+                    data.append('uploads[]', file);
                 }
             } else {
-                data.append(key, formData[key] || "");
+                data.append(key, formData[key] || '');
             }
         });
     
@@ -201,7 +178,11 @@ export default function PostProject({ auth, jobOffer }) {
     
         setIsFormValid(isValid);
     };
-    
+    const fakeUploadFile = (formData) => {
+        return new Promise((resolve) => {
+            setTimeout(() => resolve("File uploaded successfully"), 2000);
+        });
+    };
 
     const handleSelectedChange = (e) => {
         const { name, value } = e.target;
@@ -369,55 +350,26 @@ export default function PostProject({ auth, jobOffer }) {
 
                             {/* File Upload */}
                             <div className="mb-6">
-                                <h1 className="flex flex-col text-gray-700 text-sm font-bold mb-2">
-                                    Upload Samples and Other Helpful Material
-                                </h1>
+                                <h1 className="flex flex-col text-gray-700 text-sm font-bold mb-2">Upload Samples and Other Helpful Material</h1>
                                 <div>
-                                    <label
-                                        className="block w-full h-24 flex justify-center items-center border-2 border-dashed border-gray-400 rounded-lg items-center cursor-pointer"
-                                        htmlFor="uploads"
-                                    >
+                                    <label className="block w-full h-24 flex justify-center items-center border-2 border-dashed border-gray-400 rounded-lg items-center cursor-pointer" htmlFor="uploads">
                                         {uploadStatus.length > 0 ? (
                                             <div className="flex flex-col space-y-2">
-                                                {uploadStatus.map(
-                                                    (fileStatus, index) => (
-                                                        <div
-                                                            key={index}
-                                                            className="flex items-center space-x-2"
-                                                        >
-                                                            {fileStatus.status ===
-                                                            "uploading" ? (
-                                                                <AiOutlineLoading3Quarters
-                                                                    className="animate-spin text-blue-500"
-                                                                    size={20}
-                                                                />
-                                                            ) : (
-                                                                <AiFillFile
-                                                                    className="text-green-500"
-                                                                    size={20}
-                                                                />
-                                                            )}
-                                                            <span className="text-gray-700 text-sm">
-                                                                {
-                                                                    fileStatus
-                                                                        .file
-                                                                        .name
-                                                                }{" "}
-                                                                -{" "}
-                                                                {fileStatus.status ===
-                                                                "uploading"
-                                                                    ? "Uploading..."
-                                                                    : "Done uploading"}
-                                                            </span>
-                                                        </div>
-                                                    )
-                                                )}
+                                                {uploadStatus.map((fileStatus, index) => (
+                                                    <div key={index} className="flex items-center space-x-2">
+                                                        {fileStatus.status === 'uploading' ? (
+                                                            <AiOutlineLoading3Quarters className="animate-spin text-blue-500" size={20} />
+                                                        ) : (
+                                                            <AiFillFile className="text-green-500" size={20} />
+                                                        )}
+                                                        <span className="text-gray-700 text-sm">
+                                                            {fileStatus.file.name} - {fileStatus.status === 'uploading' ? 'Uploading...' : 'Done uploading'}
+                                                        </span>
+                                                    </div>
+                                                ))}
                                             </div>
                                         ) : (
-                                            <span>
-                                                Drop files here or Browse to add
-                                                attachments
-                                            </span>
+                                            <span>Drop files here or Browse to add attachments</span>
                                         )}
                                     </label>
                                     <input
@@ -427,32 +379,20 @@ export default function PostProject({ auth, jobOffer }) {
                                         onChange={handleFileChange}
                                         multiple
                                         className="hidden"
-                                        accept="*"
                                     />
                                 </div>
                                 {existingFiles.length > 0 && (
                                     <div className="mt-4">
-                                        <h2 className="text-sm font-semibold text-gray-700">
-                                            Existing Attachments:
-                                        </h2>
+                                        <h2 className="text-sm font-semibold text-gray-700">Existing Attachments:</h2>
                                         <ul>
-                                            {existingFiles.map(
-                                                (file, index) => (
-                                                    <li
-                                                        key={index}
-                                                        className="text-sm text-gray-600"
-                                                    >
-                                                        {file.attachment_path}
-                                                    </li>
-                                                )
-                                            )}
+                                            {existingFiles.map((file, index) => (
+                                                <li key={index} className="text-sm text-gray-600">{file.attachment_path}</li>
+                                            ))}
                                         </ul>
                                     </div>
                                 )}
                                 {fileWarning && (
-                                    <p className="text-red-600 text-sm mt-2">
-                                        {fileWarning}
-                                    </p>
+                                    <p className="text-red-600 text-sm mt-2">{fileWarning}</p>
                                 )}
                             </div>
 
