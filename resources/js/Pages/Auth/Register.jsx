@@ -155,14 +155,15 @@ export default function Register() {
                         </div>
 
                         <div className="flex flex-col items-center mt-6">
-                            <PrimaryButton
-                                type="submit"
-                                className=" bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:ring"
-                                disabled={processing}
-                            >
-                                SIGN UP
-                            </PrimaryButton>
-                        </div>
+    <PrimaryButton
+        type="submit"
+        className="bg-blue-600 hover:bg-blue-700 text-black font-bold py-2 px-4 rounded-lg focus:outline-none focus:ring"
+        disabled={processing}
+    >
+        SIGN UP
+    </PrimaryButton>
+</div>
+
 
                         <div className="mt-4 text-center">
                             <Link

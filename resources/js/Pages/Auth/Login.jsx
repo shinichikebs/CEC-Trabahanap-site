@@ -136,7 +136,7 @@ export default function Login({ status, canResetPassword, isGoogleOnlyAccount })
                                             setData("remember", e.target.checked)
                                         }
                                     />
-                                    <span className="ms-2 text-xs text-gray-600 dark:text-gray-400">
+                                    <span className="ms-2 text-xs text-white dark:text-gray-400">
                                         Remember me
                                     </span>
                                 </label>
@@ -156,7 +156,7 @@ export default function Login({ status, canResetPassword, isGoogleOnlyAccount })
                                 </AnchorLink>
                                 <Link
                                     href={route("register")}
-                                    className="underline text-sm text-white hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800"
+                                    className="underline text-sm text-white hover:text-white dark:hover:text-white"
                                 >
                                     Don't have an account?
                                 </Link>
