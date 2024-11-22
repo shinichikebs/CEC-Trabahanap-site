@@ -26,8 +26,6 @@ function ProposalModal({ showProposalModal, closeProposalModal, proposals, onPro
             }
         }
     };
-    
-    
 
     return (
         showProposalModal && (
@@ -61,7 +59,6 @@ function ProposalModal({ showProposalModal, closeProposalModal, proposals, onPro
                                     </a>
                                 </p>
                             )}
-                            {/* Approve proposal button */}
                             {!selectedProposal.approved ? (
                                 <button
                                     onClick={approveProposal}
@@ -72,7 +69,6 @@ function ProposalModal({ showProposalModal, closeProposalModal, proposals, onPro
                             ) : (
                                 <p className="text-green-600 font-semibold mt-2">Proposal Approved</p>
                             )}
-                            
                         </div>
                     ) : (
                         <div className="max-h-60 overflow-auto">
@@ -105,18 +101,20 @@ function ProposalModal({ showProposalModal, closeProposalModal, proposals, onPro
                             )}
                         </div>
                     )}
-                    <button
-                        onClick={closeProposalModal}
-                        className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                    >
-                        Close
-                    </button>
-                    <button
-                                onClick={handleBackToList}
-                                className="mt-2 px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
-                            >
-                                Back to Proposals List
-                            </button>
+                    <div className="mt-4 flex justify-between space-x-2">
+                        <button
+                            onClick={closeProposalModal}
+                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                        >
+                            Close
+                        </button>
+                        <button
+                            onClick={handleBackToList}
+                            className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
+                        >
+                            Back to Proposals List
+                        </button>
+                    </div>
                 </div>
             </div>
         )

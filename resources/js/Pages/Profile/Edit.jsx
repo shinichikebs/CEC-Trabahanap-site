@@ -35,37 +35,41 @@ export default function Edit({ auth, mustVerifyEmail, status, hasPassword }) {
             <Head title="Profile" />
 
             <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-                    {/* Update Profile Information Section */}
-                    <div className="p-4 sm:p-8 bg-white dark:bg-gradient-to-r from-[#231955] to-[#3720ac] shadow sm:rounded-lg">
-                        <UpdateProfileInformationForm
-                            mustVerifyEmail={mustVerifyEmail}
-                            status={status}
-                            className="max-w-xl"
-                        />
-                    </div>
+    <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+        {/* Update Profile Information Section */}
+        <div className="p-4 sm:p-8 bg-gradient-to-r from-[#231955] to-[#3720ac] shadow sm:rounded-lg">
+            <UpdateProfileInformationForm
+                mustVerifyEmail={mustVerifyEmail}
+                status={status}
+                className="max-w-xl"
+            />
+        </div>
 
-                    {/* Update Password Section */}
-                    <div className="p-4 sm:p-8 bg-white dark:bg-gradient-to-r from-[#231955] to-[#3720ac] shadow sm:rounded-lg">
-                        <UpdatePasswordForm className="max-w-xl" hasPassword={hasPassword} />
-                    </div>
+                   {/* Update Password Section */}
+<div className="p-4 sm:p-8 bg-gradient-to-r from-[#231955] to-[#3720ac] shadow sm:rounded-lg">
+    <UpdatePasswordForm className="max-w-xl" hasPassword={hasPassword} />
+</div>
 
-                    {/* Personal Description Section (Skills and Bio) */}
-                    <div className="p-4 sm:p-8 bg-white dark:bg-gradient-to-r from-[#231955] to-[#3720ac] shadow sm:rounded-lg">
-                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Personal Description</h3>
-                        <form onSubmit={handleSave} className="mt-4 space-y-4">
-                            {/* Skills Input */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Skills</label>
-                                <input
-                                    type="text"
-                                    name="skills"
-                                    placeholder="Add Skills"
-                                    value={skills}
-                                    onChange={(e) => setSkills(e.target.value)}
-                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                />
-                            </div>
+                   {/* Personal Description Section (Skills and Bio) */}
+                   <div className="p-4 sm:p-8 bg-gradient-to-r from-[#231955] to-[#3720ac] shadow sm:rounded-lg">
+    <h3 className="text-lg font-medium text-gray-100">
+        Personal Description
+    </h3>
+    <form onSubmit={handleSave} className="mt-4 space-y-4">
+        {/* Skills Input */}
+        <div>
+            <label className="block text-sm font-medium text-gray-300">
+                Skills
+            </label>
+            <input
+                type="text"
+                name="skills"
+                placeholder="Add Skills"
+                value={skills}
+                onChange={(e) => setSkills(e.target.value)}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            />
+        </div>
 
                             {/* Bio Input */}
                             <div>
@@ -80,20 +84,22 @@ export default function Edit({ auth, mustVerifyEmail, status, hasPassword }) {
                                 />
                             </div>
 
-                            {/* Save Button */}
-                            <div className="flex justify-start">
-                                <button
-                                    type="submit"
-                                    className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-black bg-white hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                                >
-                                    Save
-                                </button>
-                            </div>
+{/* Save Button */}
+<div className="flex justify-start">
+    <button
+        type="submit"
+        className="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md bg-white text-black hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+    >
+        Save
+    </button>
+</div>
+
+
                         </form>
                     </div>
 
                     {/* Delete User Section */}
-                    <div className="p-4 sm:p-8 bg-white dark:bg-gradient-to-r from-[#231955] to-[#3720ac] shadow sm:rounded-lg">
+                    <div className="p-4 sm:p-8 bg-gradient-to-r from-[#231955] to-[#3720ac] shadow sm:rounded-lg">
                         <DeleteUserForm className="max-w-xl" />
                     </div>
                 </div>

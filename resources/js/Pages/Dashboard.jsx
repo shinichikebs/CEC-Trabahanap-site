@@ -11,16 +11,18 @@ function SuccessModal({ showModal, closeModal }) {
     return (
         showModal && (
             <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
-                <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
-                    <h2 className="text-xl font-semibold mb-4">Proposal Sent Successfully!</h2>
-                    <p className="text-gray-700 mb-4">Your proposal has been sent successfully.</p>
-                    <button
-                        onClick={closeModal}
-                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                    >
-                        Close
-                    </button>
-                </div>
+    <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
+        <h2 className="text-xl font-semibold mb-4">Proposal Sent Successfully!</h2>
+        <p className="text-gray-700 mb-4">Your proposal has been sent successfully.</p>
+        <div className="flex justify-center">
+            <button
+                onClick={closeModal}
+                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+                Close
+            </button>
+        </div>
+    </div>
             </div>
         )
     );
