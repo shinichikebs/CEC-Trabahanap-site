@@ -14,32 +14,12 @@ class Notification extends Model
     protected $table = 'notifications';
 
     protected $fillable = [
-        'user_id',     
-        'message',     
-        'read',        
-        'data',       
+        'user_id',
+        'message',
+        'read',
     ];
 
-    protected $casts = [
-        'read' => 'boolean', 
-        'data' => 'array',   
-    ];
-
-    
-    public function user()
-    {
+    public function user(){
         return $this->belongsTo(User::class);
-    }
-
-    
-    public function markAsRead()
-    {
-        $this->update(['read' => true]);
-    }
-
-  
-    public function scopeUnread($query)
-    {
-        return $query->where('read', false);
     }
 }
