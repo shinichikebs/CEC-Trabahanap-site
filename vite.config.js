@@ -17,6 +17,8 @@ export default defineConfig({
             '@styles': path.resolve(__dirname, 'resources/css'), // Optional alias for styles
         },
     },
+
+    // ---------------pulihi rana http://127.0.0.1:8000  ---------------------
     server: {
         host: '192.168.1.8', // Use your local IP address to make Vite accessible on other devices
         port: 5173, // This is the default port for Vite; you can change it if needed
