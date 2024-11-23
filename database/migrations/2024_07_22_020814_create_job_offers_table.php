@@ -19,8 +19,8 @@ return new class extends Migration
             $table->string('category');
             $table->decimal('budget', 10, 2)->nullable();
             $table->string('sub_category');
-            $table->integer('work_type')->default(0);
-            $table->integer('days_post_end')->default(0);
+            $table->integer('work_type')->nullable(); // Set to nullable
+            $table->integer('days_post_end')->nullable();
             $table->boolean('is_approved')->default(false);
             $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

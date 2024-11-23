@@ -112,7 +112,26 @@ class UserController extends Controller
 }
 
     
-    
+public function getUserApprovedPosts($userId)
+{
+    $approvedPosts = JobOffer::where('user_id', $userId)
+        ->where('is_approved', 1)
+        ->get();
+
+    \Log::info('Approved Posts:', $approvedPosts->toArray()); // Log the results
+
+    return response()->json(['approvedPosts' => $approvedPosts]);
+}
+
+public function getUserDoneJobs($userId)
+{
+    $doneJobs = JobDone::where('user_id', $userId)->get();
+
+    \Log::info('Done Jobs:', $doneJobs->toArray()); // Log the results
+
+    return response()->json(['doneJobs' => $doneJobs]);
+}
+
 
     // public function getNotifications()
     // {

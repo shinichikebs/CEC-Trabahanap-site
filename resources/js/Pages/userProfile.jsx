@@ -4,7 +4,6 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import { IoMdArrowBack } from "react-icons/io";
 
-
 export default function UserProfile({ user }) {
     const [selectedViolation, setSelectedViolation] = useState("");
     const [rating, setRating] = useState(0);
@@ -79,61 +78,28 @@ export default function UserProfile({ user }) {
     };
 
     const handleRateClick = () => {
-        let selectedRating = 0; // Use a local variable to track the rating
-    
         Swal.fire({
             title: "Rate This User",
-            html: `
-                <div style="font-size: 24px;">
-                    ${[1, 2, 3, 4, 5]
-                        .map(
-                            (star) => `
-                            <span 
-                                style="cursor: pointer; color: ${star <= rating ? "gold" : "gray"};" 
-                                data-star="${star}"
-                            >
-                                ★
-                            </span>`
-                        )
-                        .join("")}
-                </div>
-            `,
+            input: "range",
+            inputAttributes: {
+                min: 1,
+                max: 5,
+                step: 1,
+            },
+            inputValue: rating,
+            confirmButtonText: "Submit",
             showCancelButton: true,
-            confirmButtonText: "Submit Rating",
-            cancelButtonText: "Cancel",
-            preConfirm: () => {
-                if (selectedRating > 0) {
-                    return selectedRating; // Return the selected rating
-                }
-                Swal.showValidationMessage("Please select a rating");
-            },
-            didOpen: () => {
-                const stars = Swal.getHtmlContainer().querySelectorAll("[data-star]");
-                stars.forEach((star) => {
-                    star.addEventListener("click", () => {
-                        const starValue = parseInt(star.getAttribute("data-star"));
-                        selectedRating = starValue; // Update the local variable
-    
-                        // Update star colors dynamically
-                        stars.forEach((s) => {
-                            s.style.color = parseInt(s.getAttribute("data-star")) <= starValue ? "gold" : "gray";
-                        });
-                    });
-                });
-            },
         }).then((result) => {
             if (result.isConfirmed) {
-                submitRating(result.value); // Pass the rating to the submit function
+                setRating(result.value);
+                submitRating(result.value);
             }
         });
     };
-    
-
 
     const submitRating = async (rate) => {
         try {
-            console.log("Submitting rating:", rate); // Debug log
-            const response = await axios.post(route("rate.user", { id: user.id }), {
+            await axios.post(route("rate.user", { id: user.id }), {
                 rating: rate,
             });
             Swal.fire({
@@ -142,8 +108,6 @@ export default function UserProfile({ user }) {
                 icon: "success",
                 confirmButtonColor: "#3085d6",
             });
-    
-            // Optionally refresh average rating or other UI elements here
         } catch (error) {
             console.error("Error submitting rating:", error);
             Swal.fire({
@@ -154,8 +118,6 @@ export default function UserProfile({ user }) {
             });
         }
     };
-    
-    
 
     const handleBackClick = () => {
         window.history.back();
@@ -165,13 +127,10 @@ export default function UserProfile({ user }) {
         <div className="min-h-screen bg-gray-100">
             <Head title={`${user.firstName} ${user.lastName} Profile`} />
 
-            {/* Custom Header */}
+            {/* Header */}
             <header className="bg-[#231955] py-4 px-8 flex items-center justify-between">
                 <div className="flex items-center space-x-4">
-                    {/* Logo */}
                     <img src="/cecLogo.png" alt="CeC Logo" className="w-10 h-10" />
-
-                    {/* Title */}
                     <h1 className="text-[#E8AA42] text-lg font-semibold uppercase">
                         CEC-TRABAHANAP
                     </h1>
@@ -194,7 +153,7 @@ export default function UserProfile({ user }) {
                                 user.avatar ||
                                 "https://www.pngall.com/wp-content/uploads/12/Avatar-Profile-Vector-PNG-Pic.png"
                             }
-                            alt={`${user.firstName} {user.lastName}`}
+                            alt={`${user.firstName} ${user.lastName}`}
                             className="rounded-full w-24 h-24 mb-4"
                             loading="lazy"
                         />
@@ -244,6 +203,29 @@ export default function UserProfile({ user }) {
                             <h4 className="font-semibold text-gray-800">Email</h4>
                             <p className="text-gray-600">{user.email || "Email not available"}</p>
                         </div>
+                    </div>
+
+                    {/* Table Section */}
+                    <div className="mt-6">
+                        <h4 className="font-semibold text-gray-800 mb-4">Details</h4>
+                        <table className="w-full table-auto border-collapse border ">
+                            <thead>
+                                <tr className="bg-gray-200">
+                                    <th className="border  px-4 py-2">POST</th>
+                                    <th className="border  px-4 py-2">JOB DONE</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td className="border  px-4 py-2 text-center">
+                                        {user.posts || 0}
+                                    </td>
+                                    <td className="border  px-4 py-2 text-center">
+                                        {user.jobsDone || 0}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
