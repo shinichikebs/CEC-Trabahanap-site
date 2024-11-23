@@ -58,7 +58,7 @@ export default function Edit({ auth, mustVerifyEmail, status, hasPassword }) {
     <form onSubmit={handleSave} className="mt-4 space-y-4">
         {/* Skills Input */}
         <div>
-            <label className="block text-sm font-medium text-gray-300">
+            <label className="block text-sm font-medium text-white">
                 Skills
             </label>
             <input
@@ -73,7 +73,7 @@ export default function Edit({ auth, mustVerifyEmail, status, hasPassword }) {
 
                             {/* Bio Input */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Bio</label>
+                                <label className="block text-sm font-medium text-white dark:text-gray-300">Bio</label>
                                 <textarea
                                     name="bio"
                                     placeholder="Add your Bio"
@@ -90,7 +90,7 @@ export default function Edit({ auth, mustVerifyEmail, status, hasPassword }) {
         type="submit"
         className="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md bg-white text-black hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
     >
-        Save
+        SAVE
     </button>
 </div>
 

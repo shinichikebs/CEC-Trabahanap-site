@@ -26,10 +26,12 @@ export default function Login({ status, canResetPassword, isGoogleOnlyAccount })
 
     const submit = (e) => {
         e.preventDefault();
-        
+
         // Check if the account requires Google login and prevent password login
         if (isGoogleOnlyAccount) {
-            setGoogleOnlyError("This account was created using Google. Please log in using 'Continue with Google'.");
+            setGoogleOnlyError(
+                "This account was created using Google. Please log in using 'Continue with Google'."
+            );
             return;
         }
 
@@ -54,14 +56,17 @@ export default function Login({ status, canResetPassword, isGoogleOnlyAccount })
 
                         <form onSubmit={submit}>
                             <div className="mt-4">
-                                <InputLabel htmlFor="email" value="Email" />
+                                <InputLabel
+                                    htmlFor="email"
+                                    value="Email"
+                                    className="text-white" // Set label color to white
+                                />
                                 <TextInput
                                     id="email"
                                     type="email"
                                     name="email"
                                     value={data.email}
                                     className="mt-1 block w-full h-9 text-black border-b border-black"
-                                    style={{ color: 'black' }}
                                     autoComplete="username"
                                     isFocused={true}
                                     onChange={(e) => {
@@ -76,7 +81,11 @@ export default function Login({ status, canResetPassword, isGoogleOnlyAccount })
                             </div>
 
                             <div className="mt-4">
-                                <InputLabel htmlFor="password" value="Password" />
+                                <InputLabel
+                                    htmlFor="password"
+                                    value="Password"
+                                    className="text-white" // Set label color to white
+                                />
                                 <div className="relative mt-1">
                                     <TextInput
                                         id="password"
@@ -84,7 +93,6 @@ export default function Login({ status, canResetPassword, isGoogleOnlyAccount })
                                         name="password"
                                         value={data.password}
                                         className="block w-full h-9 text-black border-b border-black pr-10"
-                                        style={{ color: 'black' }}
                                         autoComplete="current-password"
                                         onChange={(e) => {
                                             setData("password", e.target.value);
