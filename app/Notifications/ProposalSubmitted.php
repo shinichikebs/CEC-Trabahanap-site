@@ -6,41 +6,44 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\MailMessage;
 use App\Models\Proposal;
-use App\Models\User;
 
-class ProposalApproved extends Notification
+class ProposalSubmitted extends Notification
 {
     use Queueable;
 
     protected $proposal;
 
+  
     public function __construct(Proposal $proposal)
     {
         $this->proposal = $proposal;
     }
 
+   
     public function via($notifiable)
     {
         return ['mail', 'database']; 
     }
 
+    
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->subject('Proposal Approved')
-            ->greeting('Hello ' . $notifiable->firstName . ',')
-            ->line('Your proposal for the job "' . $this->proposal->jobOffer->job_title . '" has been approved.')
-            ->action('View Job', url('/job-offers/' . $this->proposal->job_offer_id))
+            ->subject('New Proposal Submitted')
+            ->greeting('Hello ' . $notifiable->name . ',')
+            ->line('A new proposal has been submitted for your job posting: "' . $this->proposal->jobOffer->job_title . '".')
+            ->action('View Proposal', url('/proposals/' . $this->proposal->id))
             ->line('Thank you for using our application!');
     }
 
-    public function toArray($notifiable)
+   
+    public function toDatabase($notifiable)
     {
         return [
-            'message' => 'Your proposal for "' . $this->proposal->jobOffer->job_title . '" has been approved.',
+            'message' => 'A new proposal has been submitted for your job posting: "' . $this->proposal->jobOffer->job_title . '".',
             'proposal_id' => $this->proposal->id,
             'job_offer_id' => $this->proposal->job_offer_id,
-            'approved' => 1, 
+            'submitted_by' => $this->proposal->user->name,
         ];
     }
 }
