@@ -19,8 +19,8 @@ class JobOffer extends Model
         'category',
         'budget',
         'sub_category',
-        'working_type',
-        'ays_post_end',
+        'work_type',
+        'days_post_end',
         'user_id',
     ];
 
@@ -31,5 +31,14 @@ class JobOffer extends Model
     public function attachments()
 {
     return $this->hasMany(Attachment::class, 'job_id');
+}
+public function getWorkTypeTextAttribute()
+{
+    $types = [
+        1 => 'Full Time',
+        2 => 'Part Time',
+    ];
+
+    return $types[$this->work_type] ?? 'N/A';
 }
 }

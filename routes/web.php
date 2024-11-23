@@ -87,6 +87,9 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::get('/proposal/{jobOfferId}', [ProposalController::class, 'getProposals']);
     Route::get('/api/users/{userId}', [ProposalController::class, 'getUserProfile']);
     Route::post('/users/{id}/rate', [UserController::class, 'rate'])->name('rate.user');
+    Route::get('/user/{id}/approved-posts', [UserController::class, 'getUserApprovedPosts']);
+Route::get('/user/{id}/done-jobs', [UserController::class, 'getUserDoneJobs']);
+
 
     
 });

@@ -18,46 +18,52 @@ class PostProjectController extends Controller
 
     // Method to handle project posting along with file uploads
     public function postProject(Request $request)
-    {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'category' => 'required|string|max:255',
-            'subCategory' => 'required|string|max:255',
-            'description' => 'required|string',
-            'uploads.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx,ppt,pptx,txt,rtf,odt,csv,html,htm,mp3,wav,aac,flac,mp4,avi,mkv,mov,wmv,zip,rar,7z|max:30720',
-            'workType' => 'integer',
-            'budget' => 'nullable|numeric',
-            'daysPostEnd' => 'integer',
-        ]);
+{
+    // Log the incoming request data
+    \Log::info('Request Data Received: ', $request->all());
 
+    $validated = $request->validate([
+        'title' => 'required|string|max:255',
+        'category' => 'required|string|max:255',
+        'subCategory' => 'required|string|max:255',
+        'description' => 'required|string',
+        'uploads.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx,ppt,pptx,txt,rtf,odt,csv,html,htm,mp3,wav,aac,flac,mp4,avi,mkv,mov,wmv,zip,rar,7z|max:30720',
+        'workType' => 'required|integer',
+        'budget' => 'nullable|numeric',
+        'daysPostEnd' => 'required|integer',
+    ]);
 
-        // Create the job offer
-        $project = JobOffer::create([
-            'job_title' => $validated['title'],
-            'job_description' => $validated['description'],
-            'category' => $validated['category'],
-            'budget' => $validated['budget'],
-            'sub_category' => $validated['subCategory'],
-            'work_type' => $validated['workType'],
-            'days_post_end' => $validated['daysPostEnd'],
-            'user_id' => Auth::id(),
-        ]);
+    // Log the validated data
+    \Log::info('Validated Data: ', $validated);
 
-        // Handle file uploads
-        if ($request->hasFile('uploads')) {
-            foreach ($request->file('uploads') as $file) {
-                $filePath = $file->store('uploads', 'public');
+    $project = JobOffer::create([
+        'job_title' => $validated['title'],
+        'job_description' => $validated['description'],
+        'category' => $validated['category'],
+        'budget' => $validated['budget'],
+        'sub_category' => $validated['subCategory'],
+        'work_type' => $validated['workType'], // Ensure work_type is being passed here
+        'days_post_end' => $validated['daysPostEnd'], // Ensure days_post_end is being passed here
+        'user_id' => Auth::id(),
+    ]);
 
-                $attachment = new Attachment();
-                $attachment->job_id = $project->id;
-                $attachment->user_id = Auth::id();
-                $attachment->attachment_path = $filePath;
-                $attachment->save();
-            }
+    // Log the created project
+    \Log::info('Created Project: ', $project->toArray());
+
+    if ($request->hasFile('uploads')) {
+        foreach ($request->file('uploads') as $file) {
+            $filePath = $file->store('uploads', 'public');
+
+            $attachment = new Attachment();
+            $attachment->job_id = $project->id;
+            $attachment->user_id = Auth::id();
+            $attachment->attachment_path = $filePath;
+            $attachment->save();
         }
-
-        return back()->with('success', 'Project successfully posted!');
     }
+
+    return back()->with('success', 'Project successfully posted!');
+}
 
 
 
@@ -86,9 +92,9 @@ class PostProjectController extends Controller
             'subCategory' => 'required|string|max:255',
             'description' => 'required|string',
             'uploads.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx,ppt,pptx,txt,rtf,odt,csv,html,htm,mp3,wav,aac,flac,mp4,avi,mkv,mov,wmv,zip,rar,7z|max:30720',
-            'workType' => 'integer',
+            'workType' => 'required|integer',
             'budget' => 'nullable|numeric',
-            'daysPostEnd' => 'integer',
+            'daysPostEnd' => 'required|integer',
         ]);
     
         // Find the existing job offer

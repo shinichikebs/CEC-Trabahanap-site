@@ -42,11 +42,11 @@ export default function PostProject({ auth, jobOffer }) {
             case "category":
                 if (!value) errorMsg = "Category is required.";
                 break;
-            case "customCategory":
-                if (formData.category === "Others" && !value) {
-                    errorMsg = "Custom category is required when 'Others' is selected.";
-                }
-                break;
+                case "customCategory":
+                    if (formData.category === "Others" && !value) {
+                        errorMsg = "Custom category is required when 'Others' is selected.";
+                    }
+                    break;
             case "description":
                 if (!value) errorMsg = "Description is required.";
                 break;
@@ -56,10 +56,13 @@ export default function PostProject({ auth, jobOffer }) {
                         "Budget must be a valid numeric amount without commas or decimal points (e.g., 1000).";
                 }
                 break;
-            case "daysPostEnd":
-                if (!value || isNaN(value))
-                    errorMsg = "Days to post end must be a valid number.";
-                break;
+                case "workType":
+                    if (!value) errorMsg = "Work type is required.";
+                    break;
+                case "daysPostEnd":
+                    if (!value || isNaN(value))
+                        errorMsg = "Days to post end must be a valid number.";
+                    break;
             case "terms":
                 if (!value) errorMsg = "You must agree to the terms.";
                 break;
@@ -129,15 +132,23 @@ export default function PostProject({ auth, jobOffer }) {
         }
     
         const data = new FormData();
-        Object.keys(formData).forEach(key => {
-            if (key === 'uploads') {
+        Object.keys(formData).forEach((key) => {
+            if (key === "uploads") {
                 for (const file of formData.uploads) {
-                    data.append('uploads[]', file);
+                    data.append("uploads[]", file);
                 }
+            } else if (key === "category" && formData.category === "Others") {
+                // Replace "Others" with customCategory value
+                data.append("category", formData.customCategory || "");
             } else {
-                data.append(key, formData[key] || '');
+                data.append(key, formData[key] || "");
             }
         });
+    
+        // Debug: Log the FormData contents
+        for (let pair of data.entries()) {
+            console.log(`${pair[0]}: ${pair[1]}`);
+        }
     
         const routeUrl = jobOffer
             ? `/post-project/${jobOffer.id}/update`
@@ -165,6 +176,8 @@ export default function PostProject({ auth, jobOffer }) {
             },
         });
     };
+    
+    
     
 
     const checkFormValidity = () => {
