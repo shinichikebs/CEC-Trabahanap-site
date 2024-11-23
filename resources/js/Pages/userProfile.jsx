@@ -1,11 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Head, Link } from "@inertiajs/react";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { IoMdArrowBack } from "react-icons/io";
 
 export default function UserProfile({ user }) {
-    const [selectedViolation, setSelectedViolation] = useState("");
+    const [approvedPosts, setApprovedPosts] = useState([]);
+    const [doneJobs, setDoneJobs] = useState([]);
+    const [isJobDoneVisible, setIsJobDoneVisible] = useState(false);
+    const [selectedPost, setSelectedPost] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [rating, setRating] = useState(0);
 
     const violations = [
@@ -15,9 +19,52 @@ export default function UserProfile({ user }) {
         "Other",
     ];
 
+    useEffect(() => {
+        const fetchApprovedPosts = async (userId) => {
+            try {
+                const response = await axios.get(`/admin/user/${userId}/approved-posts`);
+                if (response.data && response.data.approvedPosts) {
+                    setApprovedPosts(response.data.approvedPosts);
+                } else {
+                    setApprovedPosts([]);
+                }
+            } catch (error) {
+                console.error("Error fetching approved posts:", error);
+            }
+        };
+
+        const fetchDoneJobs = async (userId) => {
+            try {
+                const response = await axios.get(`/admin/user/${userId}/done-jobs`);
+                if (response.data && response.data.doneJobs) {
+                    console.log("Done Jobs Data:", response.data.doneJobs);
+                    setDoneJobs(response.data.doneJobs);
+                } else {
+                    setDoneJobs([]);
+                }
+            } catch (error) {
+                console.error("Error fetching done jobs:", error);
+            }
+        };
+
+        if (user && user.id) {
+            fetchApprovedPosts(user.id);
+            fetchDoneJobs(user.id);
+        }
+    }, [user]);
+
+    const handlePostClick = (post) => {
+        setSelectedPost(post);
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setSelectedPost(null);
+        setIsModalOpen(false);
+    };
     const handleReportClick = () => {
         Swal.fire({
-            title: "Are you sure you want to report this user?",
+            title: `Are you sure you want to report ${user.firstName} ${user.lastName}?`,
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "Yes",
@@ -78,25 +125,50 @@ export default function UserProfile({ user }) {
     };
 
     const handleRateClick = () => {
+        let selectedRating = 0; // Local variable to track the selected rating
+    
         Swal.fire({
-            title: "Rate This User",
-            input: "range",
-            inputAttributes: {
-                min: 1,
-                max: 5,
-                step: 1,
-            },
-            inputValue: rating,
-            confirmButtonText: "Submit",
+            title: `Rate ${user.firstName} ${user.lastName}`,
+            html: `
+                <div style="font-size: 24px; display: flex; justify-content: center; gap: 5px;">
+                    ${[1, 2, 3, 4, 5]
+                        .map(
+                            (star) =>
+                                `<span data-star="${star}" style="cursor: pointer; color: gray;">★</span>`
+                        )
+                        .join("")}
+                </div>
+            `,
             showCancelButton: true,
+            confirmButtonText: "Submit Rating",
+            cancelButtonText: "Cancel",
+            preConfirm: () => {
+                if (selectedRating > 0) {
+                    return selectedRating; // Return the selected rating to the handler
+                }
+                Swal.showValidationMessage("Please select a rating");
+            },
+            didOpen: () => {
+                const stars = Swal.getHtmlContainer().querySelectorAll("[data-star]");
+                stars.forEach((star) => {
+                    star.addEventListener("click", () => {
+                        const starValue = parseInt(star.getAttribute("data-star"));
+                        selectedRating = starValue; // Update the selected rating
+    
+                        // Update star colors dynamically
+                        stars.forEach((s) => {
+                            s.style.color = parseInt(s.getAttribute("data-star")) <= starValue ? "gold" : "gray";
+                        });
+                    });
+                });
+            },
         }).then((result) => {
             if (result.isConfirmed) {
-                setRating(result.value);
-                submitRating(result.value);
+                submitRating(result.value); // Pass the selected rating to the submission function
             }
         });
     };
-
+    
     const submitRating = async (rate) => {
         try {
             await axios.post(route("rate.user", { id: user.id }), {
@@ -136,7 +208,7 @@ export default function UserProfile({ user }) {
                     </h1>
                 </div>
                 <button
-                    onClick={handleBackClick}
+                    onClick={() => window.history.back()}
                     className="text-[#E8AA42] bg-transparent border border-[#E8AA42] rounded-lg py-2 px-4 hover:bg-[#D18C33] hover:text-white transition duration-200"
                 >
                     <IoMdArrowBack />
@@ -160,7 +232,6 @@ export default function UserProfile({ user }) {
                         <p className="text-xl font-semibold">
                             {user.firstName} {user.lastName}
                         </p>
-
                         <Link
                             href={route("chat.show", { id: user.id })}
                             className="mt-4 bg-blue-600 text-white px-4 py-2 rounded"
@@ -184,9 +255,9 @@ export default function UserProfile({ user }) {
                     </div>
                 </div>
 
-                {/* Profile Details Section */}
+                {/* Posts and Jobs Section */}
                 <div className="w-full lg:w-3/4 bg-white shadow-md rounded-lg p-6">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">
                         About {user.firstName}
                     </h3>
                     <p className="text-gray-600 mb-4">{user.bio || "This user has not added a bio."}</p>
@@ -205,30 +276,84 @@ export default function UserProfile({ user }) {
                         </div>
                     </div>
 
-                    {/* Table Section */}
-                    <div className="mt-6">
-                        <h4 className="font-semibold text-gray-800 mb-4">Details</h4>
-                        <table className="w-full table-auto border-collapse border ">
-                            <thead>
-                                <tr className="bg-gray-200">
-                                    <th className="border  px-4 py-2">POST</th>
-                                    <th className="border  px-4 py-2">JOB DONE</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td className="border  px-4 py-2 text-center">
-                                        {user.posts || 0}
-                                    </td>
-                                    <td className="border  px-4 py-2 text-center">
-                                        {user.jobsDone || 0}
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div className="flex justify-center space-x-60 mt-10">
+                        <button
+                            className={`text-lg ${
+                                !isJobDoneVisible ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-500"
+                            }`}
+                            onClick={() => setIsJobDoneVisible(false)}
+                        >
+                            Posts
+                        </button>
+                        <button
+                            className={`text-lg ${
+                                isJobDoneVisible ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-500"
+                            }`}
+                            onClick={() => setIsJobDoneVisible(true)}
+                        >
+                            Jobs Done
+                        </button>
+                    </div>
+
+                    {/* Posts and Jobs Content */}
+                    <div className="mt-4 max-h-[60vh] overflow-y-auto">
+                        {!isJobDoneVisible ? (
+                            <div className="approved-posts">
+                                {approvedPosts.length > 0 ? (
+                                    approvedPosts.map((post) => (
+                                        <div
+                                            key={post.id}
+                                            className="post-item mb-4 p-4 border border-gray-200 rounded-lg shadow-sm"
+                                            onClick={() => handlePostClick(post)}
+                                        >
+                                            <p className="text-lg font-semibold">{post.job_title}</p>
+                                            <p>{post.job_description}</p>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p className="text-center text-gray-600">No approved posts found.</p>
+                                )}
+                            </div>
+                        ) : (
+                            <div className="done-jobs">
+                                {doneJobs.length > 0 ? (
+                                    doneJobs.map((job) => (
+                                        <div
+                                            key={job.id}
+                                            className="job-item mb-4 p-4 border border-gray-200 rounded-lg shadow-sm"
+                                        >
+                                            <p className="text-lg font-semibold">{job.job_title}</p>
+                                            <p>{job.job_description}</p>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p className="text-center text-gray-600">No jobs done found.</p>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
+
+            {/* Modal for Selected Post */}
+            {isModalOpen && selectedPost && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg">
+                        <button onClick={handleCloseModal} className="top-2 right-2 text-gray-600 hover:text-gray-900">
+                            ✖
+                        </button>
+
+                        <h3 className="text-2xl font-semibold mb-4">{selectedPost.job_title}</h3>
+                        <p><strong>Job Description:</strong> {selectedPost.job_description}</p>
+                        <p><strong>Category:</strong> {selectedPost.category}</p>
+                        <p><strong>Budget:</strong> {selectedPost.budget ? `₱ ${selectedPost.budget}` : "N/A"}</p>
+                        <p><strong>Sub Category:</strong> {selectedPost.sub_category}</p>
+                        <p><strong>Work Type:</strong> {selectedPost.work_type === 0 ? "Full-time" : "Part-time"}</p>
+                        <p><strong>Days Until End:</strong> {selectedPost.days_post_end} days</p>
+                        <p><strong>Post Created At:</strong> {new Date(selectedPost.created_at).toLocaleString()}</p>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

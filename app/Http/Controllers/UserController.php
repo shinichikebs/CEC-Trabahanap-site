@@ -116,21 +116,23 @@ public function getUserApprovedPosts($userId)
 {
     $approvedPosts = JobOffer::where('user_id', $userId)
         ->where('is_approved', 1)
-        ->get();
+        ->get(['id', 'job_title', 'job_description']);
 
-    \Log::info('Approved Posts:', $approvedPosts->toArray()); // Log the results
+    \Log::info('Approved Posts:', $approvedPosts->toArray());
 
     return response()->json(['approvedPosts' => $approvedPosts]);
 }
 
 public function getUserDoneJobs($userId)
 {
-    $doneJobs = JobDone::where('user_id', $userId)->get();
+    $doneJobs = JobDone::where('user_id', $userId)
+        ->get(['id', 'job_title', 'job_description']);
 
-    \Log::info('Done Jobs:', $doneJobs->toArray()); // Log the results
+    \Log::info('Done Jobs:', $doneJobs->toArray());
 
     return response()->json(['doneJobs' => $doneJobs]);
 }
+
 
 
     // public function getNotifications()
