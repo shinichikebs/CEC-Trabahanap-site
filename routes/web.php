@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PostProjectController;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 use App\Http\Controllers\Auth\RegisteredUserController;
+
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -30,6 +32,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
     Route::get('/dashboard-data', [DashboardController::class, 'getData']);
+    Route::get('/notification-data', [NotificationController::class, 'getNotification']);
 
     // Route to display the PostProject form
     Route::get('/post-project', function () {

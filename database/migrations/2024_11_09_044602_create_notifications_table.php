@@ -15,10 +15,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id'); // Notification recipient
             $table->string('message'); // Message for notification
-            $table->json('data'); // Stores additional data from notification
             $table->boolean('read')->default(false); // Tracks if notification has been read
             $table->timestamps();
-    
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }

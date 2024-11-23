@@ -28,17 +28,16 @@ class JobOffer extends Model
 		return $this->belongsTo(User::class);
 	}
 
-    public function attachments()
-{
-    return $this->hasMany(Attachment::class, 'job_id');
-}
-public function getWorkTypeTextAttribute()
-{
-    $types = [
-        1 => 'Full Time',
-        2 => 'Part Time',
-    ];
+    public function attachments(){
+        return $this->hasMany(Attachment::class, 'job_id');
+    }
 
-    return $types[$this->work_type] ?? 'N/A';
-}
+    public function getWorkTypeTextAttribute(){
+        $types = [
+            1 => 'Full Time',
+            2 => 'Part Time',
+        ];
+
+        return $types[$this->work_type] ?? 'N/A';
+    }
 }

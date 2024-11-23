@@ -12,21 +12,21 @@ export default function NotificationsDropdown() {
     };
 
     // Fetch notifications from the backend
+    
     useEffect(() => {
-        const fetchNotifications = async () => {
-            try {
-                const response = await axios.get('/notifications');
-                setNotifications(response.data);
-            } catch (error) {
-                console.error('Error fetching notifications:', error.response?.data || error.message);
-            }
-        };
-        
-        fetchNotifications();
-        const intervalId = setInterval(fetchNotifications, 10000); // Poll every 10 seconds
-
-        return () => clearInterval(intervalId);
+        fetchNotifData();
     }, []);
+
+    const fetchNotifData = () => {
+        axios
+            .get("/notification-data")
+            .then((response) => {
+                setNotifications(response.data.notifs);
+            })
+            .catch((error) => {
+                console.error("Error fetching data:", error);
+            });
+    };
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -80,6 +80,7 @@ export default function NotificationsDropdown() {
                         ) : (
                             <li className="p-4 text-gray-700">No new notifications</li>
                         )}
+                        
                     </ul>
                 </div>
             )}
