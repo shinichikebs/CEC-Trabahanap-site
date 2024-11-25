@@ -53,10 +53,14 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 
     // Route to search users
     Route::get('/search-user', [UserController::class, 'searchUser']);
+    
 
     // notification
-    Route::get('/notifications', [UserController::class, 'getNotifications']);
 
+    Route::post('/notifications', [NotificationController::class, 'store'])->name('notifications.store');
+    Route::get('/notification-data', [NotificationController::class, 'getNotification']);
+    Route::post('/approve-proposal/{id}', [ProposalController::class, 'approveProposal']);
+    
 
     // Route to view a user profile
     Route::get('/profile/{id}', [UserController::class, 'show'])->name('profile.show');

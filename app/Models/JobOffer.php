@@ -24,10 +24,12 @@ class JobOffer extends Model
         'user_id',
     ];
 
-    public function user() {
-		return $this->belongsTo(User::class);
-	}
-
+    
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+    
     public function attachments(){
         return $this->hasMany(Attachment::class, 'job_id');
     }

@@ -18,12 +18,13 @@ class Proposal extends Model
     {
         return $this->belongsTo(User::class);
     }
-
- 
+    
     public function jobOffer()
     {
-        return $this->belongsTo(JobOffer::class);
+        return $this->belongsTo(JobOffer::class, 'job_offer_id')->with('user');
     }
+    
+    
 
   
     public function approve()
@@ -34,5 +35,6 @@ class Proposal extends Model
         
         Notification::send($this->user, new ProposalApproved($this));
     }
+    
 }
 

@@ -11,22 +11,18 @@ export default function NotificationsDropdown() {
         setIsOpen(!isOpen);
     };
 
-    // Fetch notifications from the backend
-    
+    const fetchNotifData = async () => {
+        try {
+            const response = await axios.get('/notification-data');
+            setNotifications(response.data.notifs);
+        } catch (error) {
+            console.error('Error fetching notifications:', error);
+        }
+    };
+
     useEffect(() => {
         fetchNotifData();
     }, []);
-
-    const fetchNotifData = () => {
-        axios
-            .get("/notification-data")
-            .then((response) => {
-                setNotifications(response.data.notifs);
-            })
-            .catch((error) => {
-                console.error("Error fetching data:", error);
-            });
-    };
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -40,16 +36,6 @@ export default function NotificationsDropdown() {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, [dropdownRef]);
-
-    // Trigger a notification popup for approved proposals
-    useEffect(() => {
-        const approvedNotification = notifications.find(
-            (notification) => notification.message.includes('approved')
-        );
-        if (approvedNotification) {
-            alert('Your proposal has been approved!');
-        }
-    }, [notifications]);
 
     return (
         <div className="relative" ref={dropdownRef}>
@@ -80,7 +66,6 @@ export default function NotificationsDropdown() {
                         ) : (
                             <li className="p-4 text-gray-700">No new notifications</li>
                         )}
-                        
                     </ul>
                 </div>
             )}

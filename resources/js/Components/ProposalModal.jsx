@@ -17,6 +17,9 @@ function ProposalModal({ showProposalModal, closeProposalModal, proposals, onPro
             const response = await axios.post(`/approve-proposal/${selectedProposal.id}`);
             alert(response.data.message);
             setSelectedProposal({ ...selectedProposal, approved: true });
+    
+            // Optionally refresh notifications in the UI
+            // fetchNotifications(); // If you have a function to fetch notifications
         } catch (error) {
             console.error("Error approving proposal:", error.response?.data || error.message);
             if (error.response && error.response.data && error.response.data.message) {
@@ -26,6 +29,7 @@ function ProposalModal({ showProposalModal, closeProposalModal, proposals, onPro
             }
         }
     };
+    
 
     return (
         showProposalModal && (
