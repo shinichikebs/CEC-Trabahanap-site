@@ -81,6 +81,13 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 
     // Add the chat route here
     Route::get('/chat/{id}', [ChatController::class, 'show'])->name('chat.show');
+    Route::get('/messages/{id}', [ChatController::class, 'fetchMessages']);
+    Route::get('/messages', [ChatController::class, 'fetchMessages']);
+    Route::post('/messages', [ChatController::class, 'storeMessage']);
+    
+    Route::get('/messages', [ChatController::class, 'index'])->middleware('auth:sanctum');
+    Route::post('/messages', [ChatController::class, 'store'])->middleware('auth:sanctum');
+
 
     // Route to submit a proposal
     Route::post('/submit-proposal', [ProposalController::class, 'store'])->name('submit-proposal');
