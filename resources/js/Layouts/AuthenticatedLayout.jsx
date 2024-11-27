@@ -152,10 +152,10 @@ export default function Authenticated({
                                 >
                                     Post Project
                                 </NavLink>
-                                <TbMessageShare
+                                {/* <TbMessageShare
                                     size={25}
                                     className="text-white"
-                                />
+                                /> */}
                                 <NotificationsDropdown />
                                 <div className="ms-3 relative">
                                     <Dropdown>

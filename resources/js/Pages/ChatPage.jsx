@@ -1,97 +1,62 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import moment from "moment";
 
-// Set axios base URL for all requests
-axios.defaults.baseURL = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000/api";
-=======
-import React, { useState } from "react";
-=======
-import React, { useState, useEffect } from "react";
->>>>>>> 799b6669009074df6aabe96d31cabe67caac2ede
-import axios from "axios";
->>>>>>> 8c4c85d6463f30a1ded158f2ace42c97d962da9b
-
-export default function ChatPage({ contactUser }) {
+export default function ChatPage({ contactUser, currentUserId }) {
     const [message, setMessage] = useState("");
     const [messages, setMessages] = useState([]);
-<<<<<<< HEAD
-    const [error, setError] = useState(null); // To capture and display errors
-    const messageEndRef = useRef(null); // For auto-scrolling to the latest message
+    const [socket, setSocket] = useState(null);
+    const messagesEndRef = useRef(null);
 
-    // Fetch messages from the backend
+    // Fetch messages from the backend on initial page load
     useEffect(() => {
         const fetchMessages = async () => {
             try {
                 const response = await axios.get(`/messages/${contactUser.id}`);
-                const formattedMessages = response.data.map((msg) => ({
-                    sender: msg.sender_id === contactUser.id ? contactUser.firstName : "You",
-                    text: msg.content,
-                    timestamp: new Date(msg.created_at).toLocaleString(), // Full date and time
+                const enrichedMessages = response.data.map((msg) => ({
+                    ...msg,
+                    sender: msg.sender_id === currentUserId ? "You" : contactUser.firstName, // Replace 'Contact' with firstName
                 }));
-                setMessages(formattedMessages);
-                setError(null); // Clear any previous errors
-            } catch (err) {
-                setError("Failed to load messages. Please try again.");
-                console.error("Error fetching messages:", err);
+                setMessages(enrichedMessages);
+            } catch (error) {
+                console.error("Error fetching messages:", error);
             }
         };
-
         fetchMessages();
-    }, [contactUser.id]);
+    }, [contactUser.id, contactUser.firstName, currentUserId]);
 
-    // Auto-scroll to the latest message
+    // WebSocket setup for real-time message updates
     useEffect(() => {
-        messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [messages]);
+        const newSocket = new WebSocket(`ws://your-server.com/messages/${contactUser.id}`);
+        setSocket(newSocket);
 
-    const handleSendMessage = async () => {
-        if (message.trim()) {
-            const newMessage = {
-                recipient_id: contactUser.id,
-                content: message,
+        newSocket.onmessage = (event) => {
+            const newMessage = JSON.parse(event.data);
+
+            // Enrich new messages with 'sender' field
+            const enrichedMessage = {
+                ...newMessage,
+                sender: newMessage.sender_id === currentUserId ? "You" : contactUser.firstName, // Replace 'Contact' with firstName
             };
 
-            try {
-                const response = await axios.post("/messages", newMessage);
-                const sentMessage = {
-                    sender: "You",
-                    text: response.data.content,
-                    timestamp: new Date(response.data.created_at).toLocaleString(),
-                };
+            setMessages((prevMessages) => [...prevMessages, enrichedMessage]);
+        };
 
-                // Update the local messages list and clear input
-                setMessages((prevMessages) => [...prevMessages, sentMessage]);
-                setMessage("");
-                setError(null); // Clear any previous errors
-            } catch (err) {
-                setError("Failed to send the message. Please try again.");
-                console.error("Error sending message:", err);
-=======
+        return () => {
+            newSocket.close();
+        };
+    }, [contactUser.id, contactUser.firstName, currentUserId]);
 
-    // Fetch messages from the backend
-    const fetchMessages = async () => {
-        try {
-            const response = await axios.get(`/messages/${contactUser.id}`);
-            
-            // Log the response to inspect its structure
-            console.log("Fetched messages:", response.data);
-            setMessages(response.data);  // Update state with fetched messages
-        } catch (error) {
-            console.error("Error fetching messages:", error);
-        }
+    // Scroll to the bottom of the messages container
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
-    // Fetch messages when the component mounts
     useEffect(() => {
-        fetchMessages();  // Fetch messages when the component mounts
+        scrollToBottom();
+    }, [messages]);
 
-        // Set up an interval to refresh messages every 5 seconds
-        const interval = setInterval(fetchMessages, 5000);  // Adjust interval as needed
-        return () => clearInterval(interval);  // Clean up interval when the component unmounts
-    }, [contactUser.id]);
-
+    // Send message function
     const handleSendMessage = async (e) => {
         e.preventDefault();
 
@@ -102,85 +67,65 @@ export default function ChatPage({ contactUser }) {
                     content: message,
                 });
 
-                const newMessage = response.data;
+                // Add the sent message directly to the chat with 'You' as sender
+                const sentMessage = {
+                    ...response.data,
+                    sender: "You",
+                };
 
-                // Add the new message to the chat history
-                setMessages((prevMessages) => [
-                    ...prevMessages,
-                    { sender: "You", content: message },
-                    { sender: contactUser.firstName, content: newMessage.content }
-                ]);
-
-                setMessage("");  // Reset input field
+                setMessages((prevMessages) => [...prevMessages, sentMessage]);
+                setMessage(""); // Clear the input field
             } catch (error) {
                 console.error("Error sending message:", error);
-<<<<<<< HEAD
-                // You can handle the error differently here (show a simple error message)
->>>>>>> 8c4c85d6463f30a1ded158f2ace42c97d962da9b
-=======
->>>>>>> 799b6669009074df6aabe96d31cabe67caac2ede
             }
         }
     };
 
     return (
-        <div className="flex flex-col h-screen">
+        <div className="flex flex-col h-screen bg-gray-100">
+            {/* Header */}
             <header className="bg-[#231955] text-white py-4 px-6 shadow">
                 <h2 className="font-semibold text-xl">
                     Chat with {contactUser.firstName} {contactUser.lastName}
                 </h2>
             </header>
 
-            <div className="flex flex-col flex-1 p-6 bg-gray-100">
-<<<<<<< HEAD
-                {error && (
-                    <div className="mb-4 text-red-500 bg-red-100 p-2 rounded">
-                        {error}
-                    </div>
-                )}
-                <div className="flex flex-col flex-grow space-y-4 overflow-y-auto p-4 bg-white rounded-lg shadow">
-                    {messages.map((msg, index) => (
+            {/* Messages Container */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-100">
+                {messages.map((msg, index) => (
+                    <div
+                        key={index}
+                        className={`flex ${
+                            msg.sender === "You" ? "justify-end" : "justify-start"
+                        }`}
+                    >
                         <div
-                            key={index}
-                            className={`p-4 rounded-lg ${
+                            className={`p-4 rounded-lg max-w-sm ${
                                 msg.sender === "You"
-                                    ? "bg-blue-500 text-white self-end"
-                                    : "bg-gray-300 text-black self-start"
+                                    ? "bg-blue-500 text-white"
+                                    : "bg-gray-300 text-black"
                             }`}
                         >
-                            <strong>{msg.sender}: </strong> {msg.text}
-                            <div className="text-xs text-gray-500 mt-1">{msg.timestamp}</div>
-                        </div>
-                    ))}
-                    <div ref={messageEndRef}></div> {/* For auto-scrolling */}
-=======
-                <div className="flex flex-col space-y-4 overflow-y-auto p-4 bg-white rounded-lg shadow">
-                    {messages.length > 0 ? (
-                        messages.map((msg, index) => (
-                            <div
-                                key={index}
-                                className={`flex ${msg.sender === "You" ? "justify-end" : "justify-start"} mb-4`}
-                            >
-                                <div
-                                    className={`p-4 rounded-lg max-w-xs ${
-                                        msg.sender === "You"
-                                            ? "bg-blue-500 text-white"
-                                            : "bg-gray-300 text-black"
-                                    }`}
-                                >
-                                    <strong>{msg.sender === "You" ? "me" : msg.sender}: </strong>
-                                    {msg.content}
-                                </div>
+                            {/* Sender Name */}
+                            <div className="font-bold mb-1 text-sm">{msg.sender}</div>
+                            {/* Message Content */}
+                            <div>{msg.content}</div>
+                            {/* Timestamp */}
+                            <div className="text-xs text-gray-500 mt-2">
+                                {moment(msg.timestamp).format("h:mm A, MMM D")}
                             </div>
-                        ))
-                    ) : (
-                        <p>No messages yet.</p>
-                    )}
->>>>>>> 799b6669009074df6aabe96d31cabe67caac2ede
-                </div>
+                        </div>
+                    </div>
+                ))}
+                {/* Auto-scroll reference element */}
+                <div ref={messagesEndRef} />
             </div>
 
-            <form className="flex items-center p-4 bg-white border-t border-gray-300" onSubmit={handleSendMessage}>
+            {/* Input Form */}
+            <form
+                className="flex items-center p-4 bg-white border-t border-gray-300"
+                onSubmit={handleSendMessage}
+            >
                 <input
                     type="text"
                     value={message}
@@ -190,8 +135,7 @@ export default function ChatPage({ contactUser }) {
                 />
                 <button
                     type="submit"
-                    className="bg-blue-600 text-white p-2 rounded-r-lg"
-                    disabled={!message.trim()} // Disable button if input is empty
+                    className="bg-blue-600 text-white px-4 py-2 rounded-r-lg"
                 >
                     Send
                 </button>

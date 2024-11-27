@@ -105,17 +105,7 @@ Route::middleware('auth:sanctum')->get('/messages/{contactId}', [ChatController:
     })->name('My-project');
 
     // Add the chat route here
-<<<<<<< HEAD
-    Route::get('/chat/{id}', [ChatController::class, 'show'])->name('chat.show');
-    Route::get('/messages/{id}', [ChatController::class, 'fetchMessages']);
-    Route::get('/messages', [ChatController::class, 'fetchMessages']);
-    Route::post('/messages', [ChatController::class, 'storeMessage']);
-    
-    Route::get('/messages', [ChatController::class, 'index'])->middleware('auth:sanctum');
-    Route::post('/messages', [ChatController::class, 'store'])->middleware('auth:sanctum');
-=======
 
->>>>>>> 8c4c85d6463f30a1ded158f2ace42c97d962da9b
 
 
     // Route to submit a proposal
