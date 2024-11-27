@@ -89,12 +89,15 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 
 
     Route::middleware('auth:sanctum')->group(function () {
-
         Route::get('/chat/{id}', [ChatController::class, 'show'])->name('chat.show');
-
+        Route::post('/messages', [ChatController::class, 'storeMessage']);
+        Route::get('/messages/{contactId}', [ChatController::class, 'getMessages']);
     });
+    // Fetch messages
+Route::middleware('auth:sanctum')->get('/messages/{contactId}', [ChatController::class, 'getMessages']);
 
-    Route::middleware('auth:sanctum')->post('/messages', [ChatController::class, 'storeMessage']);
+    
+    
 
     // Route to show "My Projects"
     Route::get('/My-project', function () {
