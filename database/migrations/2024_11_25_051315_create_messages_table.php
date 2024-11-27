@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('messages', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('sender_id'); // User who sends the message
-            $table->unsignedBigInteger('recipient_id'); // User who receives the message
-            $table->text('content'); // Message content
-            $table->boolean('is_read')->default(false); // Read status
+            $table->unsignedBigInteger('sender_id'); 
+            $table->unsignedBigInteger('recipient_id'); 
+            $table->text('content'); 
+            $table->boolean('is_read')->default(false); 
             $table->timestamps();
 
             // Foreign keys
