@@ -74,12 +74,35 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     // Route to delete a project
     Route::delete('/post-project/{id}', [PostProjectController::class, 'destroy'])->name('post-project.destroy');
 
+
+    // Route::middleware('auth:sanctum')->group(function () {
+        
+    //         Route::middleware('auth:sanctum')->post('/messages', [ChatController::class, 'storeMessage']);
+    // Route::get('/chat/{id}', [ChatController::class, 'show'])->name('chat.show');
+    // // Route::get('/messages/{id}', [ChatController::class, 'fetchMessages']);
+    // // Route::get('/messages', [ChatController::class, 'fetchMessages']);
+    // // Route::post('/messages', [ChatController::class, 'storeMessage']);
+    
+    // // Route::get('/messages', [ChatController::class, 'index'])->middleware('auth:sanctum');
+    // // Route::post('/messages', [ChatController::class, 'store'])->middleware('auth:sanctum');
+    // });
+
+
+    Route::middleware('auth:sanctum')->group(function () {
+
+        Route::get('/chat/{id}', [ChatController::class, 'show'])->name('chat.show');
+
+    });
+
+    Route::middleware('auth:sanctum')->post('/messages', [ChatController::class, 'storeMessage']);
+
     // Route to show "My Projects"
     Route::get('/My-project', function () {
         return Inertia::render('MyProject');
     })->name('My-project');
 
     // Add the chat route here
+<<<<<<< HEAD
     Route::get('/chat/{id}', [ChatController::class, 'show'])->name('chat.show');
     Route::get('/messages/{id}', [ChatController::class, 'fetchMessages']);
     Route::get('/messages', [ChatController::class, 'fetchMessages']);
@@ -87,6 +110,9 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     
     Route::get('/messages', [ChatController::class, 'index'])->middleware('auth:sanctum');
     Route::post('/messages', [ChatController::class, 'store'])->middleware('auth:sanctum');
+=======
+
+>>>>>>> 8c4c85d6463f30a1ded158f2ace42c97d962da9b
 
 
     // Route to submit a proposal
@@ -101,8 +127,8 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::get('/proposal/{jobOfferId}', [ProposalController::class, 'getProposals']);
     Route::get('/api/users/{userId}', [ProposalController::class, 'getUserProfile']);
     Route::post('/users/{id}/rate', [UserController::class, 'rate'])->name('rate.user');
-    Route::get('/user/{id}/approved-posts', [UserController::class, 'getUserApprovedPosts']);
-Route::get('/user/{id}/done-jobs', [UserController::class, 'getUserDoneJobs']);
+    Route::get('/post/user/{id}/approved-posts', [UserController::class, 'getUsersApprovedPosts']);
+    Route::get('/jobdone/user/{id}/done-jobs', [UserController::class, 'getUsersDoneJobs']);
 
 
     

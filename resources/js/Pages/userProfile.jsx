@@ -22,7 +22,7 @@ export default function UserProfile({ user }) {
     useEffect(() => {
         const fetchApprovedPosts = async (userId) => {
             try {
-                const response = await axios.get(`/admin/user/${userId}/approved-posts`);
+                const response = await axios.get(`/post/user/${userId}/approved-posts`);
                 if (response.data && response.data.approvedPosts) {
                     setApprovedPosts(response.data.approvedPosts);
                 } else {
@@ -35,7 +35,7 @@ export default function UserProfile({ user }) {
 
         const fetchDoneJobs = async (userId) => {
             try {
-                const response = await axios.get(`/admin/user/${userId}/done-jobs`);
+                const response = await axios.get(`/jobdone/user/${userId}/done-jobs`);
                 if (response.data && response.data.doneJobs) {
                     console.log("Done Jobs Data:", response.data.doneJobs);
                     setDoneJobs(response.data.doneJobs);

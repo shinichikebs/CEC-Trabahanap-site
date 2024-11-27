@@ -22,6 +22,7 @@ class ChatController extends Controller
         ]);
     }
 
+<<<<<<< HEAD
     /**
      * Fetch chat messages between the authenticated user and the contact user.
      */
@@ -65,4 +66,27 @@ class ChatController extends Controller
 
         return response()->json($message, 201);
     }
+=======
+    public function storeMessage(Request $request)
+    {
+        // Validate the incoming request
+        $request->validate([
+            'recipient_id' => 'required|integer|exists:users,id',  // Ensure recipient exists
+            'content' => 'required|string|max:1000',  // Validate message content
+        ]);
+    
+        // Store the new message in the database
+        $message = Message::create([
+            'sender_id' => auth()->id(),  // Authenticated user as the sender
+            'recipient_id' => $request->recipient_id,  // Recipient ID
+            'content' => $request->content,  // Message content
+            'is_read' => false,  // New message is unread by default
+        ]);
+    
+        // Return the stored message as a response
+        return response()->json($message, 201);
+    }
+    
+    
+>>>>>>> 8c4c85d6463f30a1ded158f2ace42c97d962da9b
 }

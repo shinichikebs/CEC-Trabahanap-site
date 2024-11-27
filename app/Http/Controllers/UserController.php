@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Proposal;
 use App\Models\Rating;
 use App\Models\User;
+use App\Models\JobOffer;
+use App\Models\JobDone;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Notifications\ProposalApproved;
@@ -112,27 +114,37 @@ class UserController extends Controller
 }
 
     
-public function getUserApprovedPosts($userId)
+public function getUsersApprovedPosts($userId)
 {
-    $approvedPosts = JobOffer::where('user_id', $userId)
-        ->where('is_approved', 1)
-        ->get(['id', 'job_title', 'job_description']);
+    try {
+        $approvedPosts = JobOffer::where('user_id', $userId)
+            ->where('is_approved', 1) // Only fetch approved posts
+            ->get();
 
-    \Log::info('Approved Posts:', $approvedPosts->toArray());
-
-    return response()->json(['approvedPosts' => $approvedPosts]);
+        return response()->json([
+            'approvedPosts' => $approvedPosts,
+        ]);
+    } catch (\Exception $e) {
+        \Log::error('Error fetching approved posts: ' . $e->getMessage());
+        return response()->json(['error' => 'Internal Server Error'], 500);
+    }
 }
 
-public function getUserDoneJobs($userId)
+
+
+public function getUsersDoneJobs($userId)
 {
-    $doneJobs = JobDone::where('user_id', $userId)
-        ->get(['id', 'job_title', 'job_description']);
+    try {
+        $doneJobs = JobDone::where('user_id', $userId)->get();
 
-    \Log::info('Done Jobs:', $doneJobs->toArray());
-
-    return response()->json(['doneJobs' => $doneJobs]);
+        return response()->json([
+            'doneJobs' => $doneJobs
+        ]);
+    } catch (\Exception $e) {
+        \Log::error('Error fetching done jobs: ' . $e->getMessage());
+        return response()->json(['error' => 'Internal Server Error'], 500);
+    }
 }
-
 
 
     // public function getNotifications()

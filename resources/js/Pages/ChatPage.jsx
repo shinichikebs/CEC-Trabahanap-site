@@ -1,12 +1,18 @@
+<<<<<<< HEAD
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 
 // Set axios base URL for all requests
 axios.defaults.baseURL = process.env.REACT_APP_API_BASE_URL || "http://localhost:8000/api";
+=======
+import React, { useState } from "react";
+import axios from "axios";
+>>>>>>> 8c4c85d6463f30a1ded158f2ace42c97d962da9b
 
 export default function ChatPage({ contactUser }) {
     const [message, setMessage] = useState("");
     const [messages, setMessages] = useState([]);
+<<<<<<< HEAD
     const [error, setError] = useState(null); // To capture and display errors
     const messageEndRef = useRef(null); // For auto-scrolling to the latest message
 
@@ -58,6 +64,30 @@ export default function ChatPage({ contactUser }) {
             } catch (err) {
                 setError("Failed to send the message. Please try again.");
                 console.error("Error sending message:", err);
+=======
+
+    const handleSendMessage = async () => {
+        if (message.trim()) {
+            try {
+                // Send message to backend
+                const response = await axios.post("/messages", {
+                    recipient_id: contactUser.id,  // The recipient's ID
+                    content: message,               // The content of the message
+                });
+
+                // Assuming the backend returns the new message
+                const newMessage = response.data;
+                
+                // Add message to chat history
+                setMessages((prevMessages) => [
+                    ...prevMessages,
+                    { sender: "You", text: message },
+                ]);
+                setMessage("");  // Reset the input after sending
+            } catch (error) {
+                console.error("Error sending message:", error);
+                // You can handle the error differently here (show a simple error message)
+>>>>>>> 8c4c85d6463f30a1ded158f2ace42c97d962da9b
             }
         }
     };
