@@ -34,6 +34,25 @@ class UserController extends Controller
         return response()->json(['message' => 'No approved users found'], 404);
     }
 
+    public function getUserProfile($userId)
+    {
+        $user = User::find($userId);
+    
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+    
+        return response()->json([
+            'id' => $user->id,
+            'firstName' => $user->firstName,
+            'lastName' => $user->lastName,
+            'email' => $user->email,
+            'bio' => $user->bio ?? 'No bio available', // Default value for bio
+            'avatar' => $user->avatar,
+        ]);
+    }
+    
+    
 
     public function show($id)
     {

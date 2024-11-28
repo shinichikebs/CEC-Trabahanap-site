@@ -54,8 +54,13 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     // Route to search users
     Route::get('/search-user', [UserController::class, 'searchUser']);
     
+    Route::middleware('auth:sanctum')->get('/notifications', [NotificationController::class, 'getNotification']);
+Route::middleware('auth:sanctum')->get('/user-profile/{userId}', [UserController::class, 'getUserProfile']);
+// web.php
+    Route::get('/user/{id}', [UserController::class, 'show'])->name('user.profile');
 
     // notification
+    Route::post('/notifications/{id}/mark-as-read', [NotificationController::class, 'markAsRead']);
 
     Route::post('/notifications', [NotificationController::class, 'store'])->name('notifications.store');
     Route::get('/notification-data', [NotificationController::class, 'getNotification']);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Notifications\UserApproved;
 use App\Models\Report;
 use App\Models\DeletedUser;
 use App\Models\Admin;
@@ -84,22 +85,40 @@ class AdminDashboardController extends Controller
             return response()->json(['error' => 'Internal Server Error'], 500);
         }
     }
-
-
-    // Method to approve user (set is_approved to 1)
     public function approveUser($id)
     {
         try {
+            // Find the user
             $user = User::findOrFail($id);
+            
+            // Mark the user as approved
             $user->is_approved = 1;
             $user->save();
-
-            return response()->json(['message' => 'User approved successfully']);
+    
+            // Send the approval notification to the user
+            $user->notify(new UserApproved($user));
+    
+            return response()->json(['message' => 'User approved and notified successfully']);
         } catch (\Exception $e) {
             \Log::error('Error approving user: ' . $e->getMessage());
             return response()->json(['error' => 'Internal Server Error'], 500);
         }
     }
+
+    // Method to approve user (set is_approved to 1)
+    // public function approveUser($id)
+    // {
+    //     try {
+    //         $user = User::findOrFail($id);
+    //         $user->is_approved = 1;
+    //         $user->save();
+
+    //         return response()->json(['message' => 'User approved successfully']);
+    //     } catch (\Exception $e) {
+    //         \Log::error('Error approving user: ' . $e->getMessage());
+    //         return response()->json(['error' => 'Internal Server Error'], 500);
+    //     }
+    // }
 
         public function approvePost($id)
         {

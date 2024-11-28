@@ -14,27 +14,23 @@ class NotificationController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getNotification()
-    {
-        $user = Auth::user();
-
-        if (!$user) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
-        // Fetch notifications and mark unread ones as read
-        $data = Notification::where('user_id', $user->id)
-            ->orderBy('created_at', 'desc')
-            ->with('user') // Include user details for notifications
-            ->get();
-
-        // Optionally, mark all notifications as read when fetched
-        Notification::where('user_id', $user->id)
-            ->where('read', false)
-            ->update(['read' => true]);
-
-        return response()->json(['notifs' => $data]);
-    }
+    
+     public function getNotification()
+     {
+         $user = Auth::user();
+ 
+         if (!$user) {
+             return response()->json(['error' => 'Unauthorized'], 401);
+         }
+ 
+         // Fetch notifications and include user details
+         $notifications = Notification::where('user_id', $user->id)
+             ->orderBy('created_at', 'desc')
+             ->with('user') // Ensure user details are included
+             ->get();
+ 
+         return response()->json(['notifs' => $notifications]);
+     }
 
     /**
      * Fetch notifications for the authenticated user.
@@ -73,15 +69,15 @@ class NotificationController extends Controller
     {
         try {
             $notification = Notification::findOrFail($id);
-
+    
             // Ensure the authenticated user owns the notification
             if ($notification->user_id !== auth()->id()) {
                 return response()->json(['error' => 'Unauthorized'], 403);
             }
-
+    
             // Mark the notification as read
             $notification->update(['read' => true]);
-
+    
             return response()->json([
                 'message' => 'Notification marked as read.',
                 'notification' => $notification,
@@ -91,6 +87,7 @@ class NotificationController extends Controller
             return response()->json(['error' => 'Internal Server Error'], 500);
         }
     }
+    
     
     /**
      * Store a new notification.
@@ -122,4 +119,5 @@ class NotificationController extends Controller
             return response()->json(['error' => 'Internal Server Error'], 500);
         }
     }
+    
 }

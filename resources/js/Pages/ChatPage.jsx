@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import moment from "moment";
+import { IoMdArrowBack } from "react-icons/io";
 
 export default function ChatPage({ contactUser, currentUserId }) {
     const [message, setMessage] = useState("");
@@ -81,13 +82,22 @@ export default function ChatPage({ contactUser, currentUserId }) {
         }
     };
 
+    const handleBackClick = () => {
+        window.history.back();
+    };
     return (
         <div className="flex flex-col h-screen bg-gray-100">
             {/* Header */}
-            <header className="bg-[#231955] text-white py-4 px-6 shadow">
+            <header className="bg-[#231955] text-white py-4 px-6 shadow flex items-center justify-between">
                 <h2 className="font-semibold text-xl">
                     Chat with {contactUser.firstName} {contactUser.lastName}
                 </h2>
+                <button
+                    onClick={() => window.history.back()}
+                    className="text-[#E8AA42] bg-transparent border border-[#E8AA42] jutify-end item-end rounded-lg py-2 px-4 hover:bg-[#D18C33] hover:text-white transition duration-200"
+                >
+                    <IoMdArrowBack />
+                </button>
             </header>
 
             {/* Messages Container */}

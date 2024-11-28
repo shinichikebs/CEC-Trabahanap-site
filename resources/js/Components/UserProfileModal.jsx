@@ -1,4 +1,5 @@
 import React from 'react';
+import { Head, Link } from "@inertiajs/react";
 
 function UserProfileModal({ showProfileModal, closeUserProfileModal, user }) {
     if (!showProfileModal || !user) return null;
@@ -19,17 +20,12 @@ function UserProfileModal({ showProfileModal, closeUserProfileModal, user }) {
                         className="rounded-full w-24 h-24 mb-4"
                     />
                     <p className="text-xl font-semibold mb-4">{user.firstName} {user.lastName}</p>
-                    <button
-                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mb-2"
-                    >
-                        Contact
-                    </button>
-                    <button
-                        onClick={() => alert('Report submitted')}
-                        className="text-red-500 text-sm"
-                    >
-                        Report Profile
-                    </button>
+                    <Link
+                            href={route("chat.show", { id: user.id })}
+                            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded"
+                        >
+                            Contact
+                        </Link>
                 </div>
 
                 {/* Right Section - User Info */}
@@ -53,7 +49,7 @@ function UserProfileModal({ showProfileModal, closeUserProfileModal, user }) {
                             onClick={closeUserProfileModal}
                             className="mt-4 px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
                         >
-                            Back to Proposal List
+                            Return
                         </button>
                     </div>
                 </div>
