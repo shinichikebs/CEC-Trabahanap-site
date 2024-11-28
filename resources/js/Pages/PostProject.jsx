@@ -238,7 +238,7 @@ export default function PostProject({ auth, jobOffer }) {
                                     className="block text-gray-700 text-sm font-bold mb-2"
                                     htmlFor="title"
                                 >
-                                    What Do You Need To Get Done
+                                    Post Job Offers
                                 </label>
                                 <input
                                     required
@@ -364,6 +364,7 @@ export default function PostProject({ auth, jobOffer }) {
                             {/* File Upload */}
                             <div className="mb-6">
                                 <h1 className="flex flex-col text-gray-700 text-sm font-bold mb-2">Upload Samples and Other Helpful Material</h1>
+                                <h2 className="font-small text-yellow-400">Warning! Do not submit documents that contains confidential information.</h2>
                                 <div>
                                     <label className="block w-full h-24 flex justify-center items-center border-2 border-dashed border-gray-400 rounded-lg items-center cursor-pointer" htmlFor="uploads">
                                         {uploadStatus.length > 0 ? (
@@ -473,7 +474,7 @@ export default function PostProject({ auth, jobOffer }) {
                                     className="block text-gray-700 text-sm font-bold mb-2"
                                     htmlFor="days-post-end"
                                 >
-                                    Days Post End
+                                    Project Duration
                                 </label>
                                 <input
                                     id="days-post-end"
@@ -506,14 +507,14 @@ export default function PostProject({ auth, jobOffer }) {
                                     >
                                         I have read and agree to the{" "}
                                         <a
-                                            href="#"
+                                            href="https://docs.google.com/document/d/1zZSdQuxgD4Vm4V2m_NXC4ysBd7vzIPiZnP4xlGbZy4Q/edit?usp=sharing"
                                             className="text-blue-600 underline"
                                         >
                                             Terms of Service
                                         </a>{" "}
                                         and{" "}
                                         <a
-                                            href="#"
+                                            href="https://docs.google.com/document/d/1yjudtsYQX_W_MAxhfz7CRSY9Ek8iejUAlk44r5teFro/edit?usp=sharing"
                                             className="text-blue-600 underline"
                                         >
                                             Privacy Policy
