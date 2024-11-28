@@ -18,7 +18,7 @@ export default function Navbar({ className = "", ...props }) {
                 </h1>
                 <div className="hidden md:flex items-center space-x-10 ml-10 text-white text-sm">
                     <li className="list-none">
-                        <a href="/about-us" className="hover:underline">About Us</a>
+                        <a  href="https://sites.google.com/view/risk-coders/home" className="hover:underline">About Us</a>
                     </li>
                 </div>
                 {/* Hamburger menu icon for mobile */}

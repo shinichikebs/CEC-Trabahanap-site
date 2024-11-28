@@ -118,7 +118,7 @@ export default function MyProject({ auth }) {
                                         </p>
                                         <p className="text-sm text-black-600 dark:text-black-400">Category: {project.category}</p>
                                         <p className="text-sm text-black-600 dark:text-black-400">Sub Category: {project.sub_category}</p>
-                                        <p className="text-sm text-black-600 dark:text-black-400">Days Post End: {project.days_post_end}</p>
+                                        <p className="text-sm text-black-600 dark:text-black-400">Project Duration: {project.days_post_end}</p>
                                         <p className="text-sm text-black-600 dark:text-black-400">Budget: ₱{project.budget}</p>
                                         <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">{project.created_at}</p>
                                     </div>

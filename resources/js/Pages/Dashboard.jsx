@@ -144,7 +144,8 @@ export default function Dashboard({ auth }) {
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
-        const allowedTypes = ["application/pdf", "application/msword", "image/jpeg", "image/png"];
+        const allowedTypes = ["application/pdf", "application/msword", "image/jpeg", "image/png", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // For .docx files
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation"];
 
         if (file && allowedTypes.includes(file.type)) {
             if (file.size <= MAX_FILE_SIZE) {
@@ -272,13 +273,13 @@ export default function Dashboard({ auth }) {
             {/* Proposal Details */}
             {click && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                    <div className="bg-white w-full max-w-3xl lg:max-w-5xl h-auto lg:h-5/6 overflow-y-auto p-6 rounded-lg shadow-lg relative">
+                    <div className="bg-white w-full max-w-5xl lg:max-w-5xl h-auto lg:h-5/6 overflow-y-auto p-6 rounded-lg shadow-lg relative">
                         <IoMdArrowBack
-                            className="absolute top-4 left-4 cursor-pointer text-gray-500"
+                            className="absolute top-7 left-4 cursor-pointer text-gray-500"
                             size={24}
                             onClick={() => setClick(false)}
                         />
-                        <h1 className="text-3xl font-semibold mt-5 mb-4">{details.job_title}</h1>
+                        <h1 className="text-3xl font-semibold mt-8 mb-5">{details.job_title}</h1>
                         <div className="mb-4">
                             <h2 className="font-medium text-gray-700">Description:</h2>
                             <p className="text-gray-600">{details.job_description || "No description provided."}</p>
@@ -303,12 +304,13 @@ export default function Dashboard({ auth }) {
 
                         </div>
                         <div className="mb-4">
-                            <h2 className="font-medium text-gray-700">Days Post End:</h2>
+                            <h2 className="font-medium text-gray-700">Project Duration:</h2>
                             <p className="text-gray-600">{details.days_post_end || "N/A"}</p>
                         </div>
                         {/* Attachments */}
                         <div className="mb-4">
                             <h2 className="font-medium text-gray-700">Attachments:</h2>
+
                             {details.attachments && details.attachments.length > 0 ? (
                                 details.attachments.map((attachment) => (
                                     <a
@@ -333,6 +335,9 @@ export default function Dashboard({ auth }) {
                                 value={proposalText}
                                 onChange={(e) => setProposalText(e.target.value)}
                             />
+                           
+                             <h2 className="font-medium text-gray-700  mt-3">Submit Proposal Documents (eg. Portfolio):</h2>
+                             <h2 className="font-small text-yellow-300">Warning! Do not submit documents that contains confidential information.</h2>
                             <input
                                 type="file"
                                 className="mt-2"

@@ -349,7 +349,7 @@ export default function UserProfile({ user }) {
                         <p><strong>Budget:</strong> {selectedPost.budget ? `₱ ${selectedPost.budget}` : "N/A"}</p>
                         <p><strong>Sub Category:</strong> {selectedPost.sub_category}</p>
                         <p><strong>Work Type:</strong> {selectedPost.work_type === 0 ? "Full-time" : "Part-time"}</p>
-                        <p><strong>Days Until End:</strong> {selectedPost.days_post_end} days</p>
+                        <p><strong>Project Duration:</strong> {selectedPost.days_post_end} days</p>
                         <p><strong>Post Created At:</strong> {new Date(selectedPost.created_at).toLocaleString()}</p>
                     </div>
                 </div>
