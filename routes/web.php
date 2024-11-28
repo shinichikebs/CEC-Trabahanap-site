@@ -193,6 +193,7 @@ Route::group(['middleware' => ['auth:admin']], function () {
     Route::get('/admin/user/{id}/approved-posts', [AdminDashboardController::class, 'getUserApprovedPosts']);
     Route::post('/admin/confirm-password', [AdminDashboardController::class, 'confirmPassword']);
     Route::get('/admin/user/{userId}/done-jobs', [AdminDashboardController::class, 'getDoneJobs']);
+    Route::post('/admin/approve-user/{id}', [AdminDashboardController::class, 'approveUser']);
 
 
 });
@@ -206,5 +207,12 @@ Route::post('/admin/logout', function () {
 Route::get('/test', function () {
     return response()->json(['message' => 'Laravel is working!']);
 });
+
+Route::get('/test-email', function () {
+    $name = "Funny Codde"; // The name you want to pass
+    Mail::to('palban.markvincent@cec.edu.ph')->send(new \App\Mail\UserApprovedMail($name));
+});
+
+
 
 require __DIR__.'/auth.php';

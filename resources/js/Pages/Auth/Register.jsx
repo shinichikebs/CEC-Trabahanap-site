@@ -23,6 +23,15 @@ export default function Register() {
         };
     }, []);
 
+    // Handle ID number input validation (only numbers, allow starting with 0)
+    const handleIdNumberChange = (e) => {
+        const value = e.target.value;
+        // Allow only numbers (including leading 0)
+        if (/^\d*$/.test(value)) {
+            setData('id_number', value); // Ensure this is set as a string
+        }
+    };
+
     const submit = (e) => {
         e.preventDefault();
         post(route('register'));
@@ -31,9 +40,7 @@ export default function Register() {
     return (
         <>
             <Head title="Register" />
-            <div
-                    className={`fixed inset-0 w-full h-screen bg-black opacity-50 z-[1]`}
-                ></div>
+            <div className={`fixed inset-0 w-full h-screen bg-black opacity-50 z-[1]`}></div>
             <div
                 className="min-h-screen flex items-center justify-center bg-cover bg-center"
                 style={{
@@ -53,7 +60,7 @@ export default function Register() {
                                 value={data.id_number}
                                 className="w-full bg-white text-black !text-black border-b border-black placeholder-black focus:ring-0 focus:border-black"
                                 placeholder="ID Number"
-                                onChange={(e) => setData('id_number', e.target.value)}
+                                onChange={handleIdNumberChange}  // Use the new validation function
                                 required
                             />
                             <InputError message={errors.id_number} className="mt-2" />
@@ -155,15 +162,14 @@ export default function Register() {
                         </div>
 
                         <div className="flex flex-col items-center mt-6">
-    <PrimaryButton
-        type="submit"
-        className="bg-blue-600 hover:bg-blue-700 text-black font-bold py-2 px-4 rounded-lg focus:outline-none focus:ring"
-        disabled={processing}
-    >
-        SIGN UP
-    </PrimaryButton>
-</div>
-
+                            <PrimaryButton
+                                type="submit"
+                                className="bg-blue-600 hover:bg-blue-700 text-black font-bold py-2 px-4 rounded-lg focus:outline-none focus:ring"
+                                disabled={processing}
+                            >
+                                SIGN UP
+                            </PrimaryButton>
+                        </div>
 
                         <div className="mt-4 text-center">
                             <Link

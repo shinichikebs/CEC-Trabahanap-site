@@ -100,18 +100,24 @@ export default function Dashboard() {
             .then((response) => {
                 Swal.fire({
                     title: "Success!",
-                    text: "Post approved successfully!",
+                    text: "User approved successfully!",
                     icon: "success",
                     confirmButtonText: "Okay",
                 });
+    
                 setPendingUsers((prevUsers) =>
                     prevUsers.filter((user) => user.id !== userId)
-                ); // Remove the approved user from the list
+                );
+    
+                // Log to the browser console (front-end)
+                console.log(`User ${userId} approved and email sent.`);
             })
             .catch((error) => {
-                console.error("Error approving user:", error);
+                console.error('Error approving user:', error.response || error.message);
             });
     };
+    
+    
     const handleLogout = () => {
         Inertia.post("/admin/logout"); // Assuming Inertia.js is being used for logout
     };

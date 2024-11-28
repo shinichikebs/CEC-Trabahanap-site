@@ -32,7 +32,7 @@ class RegisteredUserController extends Controller
 {
 
     $request->validate([
-        'id_number' => 'required|integer|unique:users',
+        'id_number' => 'required|digits_between:1,20|unique:users',
         'firstName' => 'required|string|max:255',
         'lastName' => 'required|string|max:255',
         'middleName' => 'nullable|string|max:255',
@@ -43,7 +43,7 @@ class RegisteredUserController extends Controller
     ]);
 
     $user = User::create([
-        'id_number' => $request->id_number,
+        'id_number' => (string) $request->id_number,  // Store the id_number as a string
         'firstName' => $request->firstName,
         'lastName' => $request->lastName,
         'middleName' => $request->middleName,

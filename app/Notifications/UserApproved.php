@@ -30,10 +30,11 @@ class UserApproved extends Notification
     {
         return (new MailMessage)
                     ->subject('Your Account Has Been Approved')
-                    ->greeting('Hello ' . $this->user->firstName . ' ' . $this->user->lastName)
+                    ->greeting('Hello ' . $this->user->first_name . ' ' . $this->user->last_name)  // Adjusted to use proper user fields
                     ->line('Your account has been approved. You can now access all features.')
-                    ->action('Go to Dashboard', url('/dashboard'))
-                    ->line('Thank you for being a part of our community!');
+                    ->action('Go to Dashboard', url('/')) // Adjust the URL if needed
+                    ->line('Thank you for being a part of our community regards CeC Trabahanap!');
     }
 }
+
 

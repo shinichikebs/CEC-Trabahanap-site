@@ -85,25 +85,33 @@ class AdminDashboardController extends Controller
             return response()->json(['error' => 'Internal Server Error'], 500);
         }
     }
+
+    //---------------------------------------------------------------------------------------------------------------------------------------------------
     public function approveUser($id)
     {
         try {
-            // Find the user
+            // Find user and approve them
             $user = User::findOrFail($id);
-            
-            // Mark the user as approved
             $user->is_approved = 1;
             $user->save();
     
-            // Send the approval notification to the user
+            // Send notification (this will send the email)
             $user->notify(new UserApproved($user));
     
-            return response()->json(['message' => 'User approved and notified successfully']);
+            // Log success to the console (for the server)
+            \Log::info('User approved and email sent to: ' . $user->email);
+    
+            return response()->json(['message' => 'User approved successfully']);
         } catch (\Exception $e) {
+            // Log the exception message and stack trace
             \Log::error('Error approving user: ' . $e->getMessage());
+            \Log::error($e->getTraceAsString()); // Log the stack trace
+    
             return response()->json(['error' => 'Internal Server Error'], 500);
         }
     }
+    
+
 
     // Method to approve user (set is_approved to 1)
     // public function approveUser($id)
