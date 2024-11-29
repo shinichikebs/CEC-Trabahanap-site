@@ -220,6 +220,7 @@ export default function PostProject({ auth, jobOffer }) {
             user={auth.user}
             header={
                 <div className="bg-purple-900 text-white py-4 px-6 shadow-lg">
+                    
                     <h2 className="font-semibold text-xl leading-tight">
                         {jobOffer ? "Edit Project" : "Post Project"}
                     </h2>

@@ -14,12 +14,6 @@ class AdminMiddleware
             return redirect()->route('admin.login'); // Redirect to admin login page
         }
 
-        $response = $next($request);
-
-        return $response->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
-                        ->header('Expires', '0');
-
-
-        // return $next($request);
+        return $next($request);
     }
 }

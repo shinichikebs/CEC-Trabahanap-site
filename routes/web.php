@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Middleware\RedirectIfAuthenticated;
 
 
 Route::get('/', function () {
@@ -27,9 +28,10 @@ Route::get('/', function () {
     ]);
 });
 
-// Group routes that require authentication and email verification
-Route::group(['middleware' => ['auth', 'verified']], function () {
+Route::group(['middleware' => ['auth', 'user.auth']], function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    // Other user-specific routes
+
     
     Route::get('/dashboard-data', [DashboardController::class, 'getData']);
     Route::get('/notification-data', [NotificationController::class, 'getNotification']);
@@ -80,18 +82,6 @@ Route::middleware('auth:sanctum')->get('/user-profile/{userId}', [UserController
     Route::delete('/post-project/{id}', [PostProjectController::class, 'destroy'])->name('post-project.destroy');
 
 
-    // Route::middleware('auth:sanctum')->group(function () {
-        
-    //         Route::middleware('auth:sanctum')->post('/messages', [ChatController::class, 'storeMessage']);
-    // Route::get('/chat/{id}', [ChatController::class, 'show'])->name('chat.show');
-    // // Route::get('/messages/{id}', [ChatController::class, 'fetchMessages']);
-    // // Route::get('/messages', [ChatController::class, 'fetchMessages']);
-    // // Route::post('/messages', [ChatController::class, 'storeMessage']);
-    
-    // // Route::get('/messages', [ChatController::class, 'index'])->middleware('auth:sanctum');
-    // // Route::post('/messages', [ChatController::class, 'store'])->middleware('auth:sanctum');
-    // });
-
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/chat/{id}', [ChatController::class, 'show'])->name('chat.show');
@@ -128,9 +118,18 @@ Route::middleware('auth:sanctum')->get('/messages/{contactId}', [ChatController:
     Route::get('/post/user/{id}/approved-posts', [UserController::class, 'getUsersApprovedPosts']);
     Route::get('/jobdone/user/{id}/done-jobs', [UserController::class, 'getUsersDoneJobs']);
 
+    Route::post('/logout', function (Request $request) {
+        Auth::logout(); // Logs out the user
+        $request->session()->invalidate(); // Invalidate the session
+        $request->session()->regenerateToken(); // Regenerate the CSRF token
+        return redirect()->route('login'); // Redirect to the login page
+    })->name('logout');
 
     
 });
+
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [LoginController::class, 'login'])->name('login.submit');
 
 Route::get('/pending-approval', function () {
     return Inertia::render('Auth/PendingApproval');

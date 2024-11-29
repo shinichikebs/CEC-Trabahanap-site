@@ -63,11 +63,17 @@ class LoginController extends Controller
      */
     public function logout(Request $request)
     {
+        // Log the user out
         Auth::logout();
-
+        
+        // Invalidate the session
         $request->session()->invalidate();
+        
+        // Regenerate the CSRF token to prevent session fixation attacks
         $request->session()->regenerateToken();
-
-        return redirect('/');
+        
+        // Redirect to the login page
+        return redirect()->route('login');
     }
+    
 }
