@@ -431,6 +431,7 @@ export default function PostProject({ auth, jobOffer }) {
                                         </option>
                                         <option value="1">Full Time</option>
                                         <option value="2">Part Time</option>
+                                        <option value="3">Project Based</option>
                                     </select>
                                     {errors.workType && (
                                         <p className="text-red-600 text-sm mt-1">
