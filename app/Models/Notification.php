@@ -15,11 +15,16 @@ class Notification extends Model
 
     protected $fillable = [
         'user_id',
+        'sender_user_id',
         'message',
         'read',
     ];
 
     public function user(){
         return $this->belongsTo(User::class);
+    }
+    public function sender()
+    {
+        return $this->belongsTo(User::class, 'sender_user_id');
     }
 }

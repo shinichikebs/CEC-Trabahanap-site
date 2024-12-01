@@ -27,7 +27,16 @@ export default function NotificationsDropdown() {
     // Fetch the notifications initially
     useEffect(() => {
         fetchNotifData();
+        
+        // Set an interval to refresh notifications every 30 seconds (or adjust as needed)
+        const intervalId = setInterval(() => {
+            fetchNotifData();
+        }, 1000); // 30000ms = 30 seconds
+
+        // Clear interval on component unmount
+        return () => clearInterval(intervalId);
     }, []);
+
 
     // Mark notifications as read when dropdown is opened
     const markNotificationsAsRead = async () => {
@@ -92,29 +101,26 @@ export default function NotificationsDropdown() {
                         <h2 className="font-semibold text-gray-700">Notifications</h2>
                     </div>
                     <ul className="max-h-64 overflow-y-auto">
-                        {notifications.length > 0 ? (
-                            notifications.map((notification) => (
-                                <li
-                                    key={notification.id}
-                                    className={`p-4 border-b hover:bg-gray-100 ${notification.read ? 'bg-gray-200' : ''}`}
-                                >
-                                    <p className="text-gray-700">
-                                        <span
-                                            className="cursor-pointer text-blue-600"
-                                            onClick={() => handleProfileClick(notification.user.id)}
-                                        >
-                                            {notification.user.firstName} {notification.user.lastName}
-                                        </span><br />
-                                        {notification.message}
-                                    </p>
-                                    <span className="text-xs text-gray-500">
-                                        {new Date(notification.created_at).toLocaleDateString()}
-                                    </span>
-                                </li>
-                            ))
-                        ) : (
-                            <li className="p-4 text-gray-700">No new notifications</li>
-                        )}
+                        {notifications.map((notification) => (
+                            <li
+                                key={notification.id}
+                                className={`p-4 border-b hover:bg-gray-100 ${notification.read ? 'bg-gray-200' : ''}`}
+                            >
+                                <p className="text-gray-700">
+                                    {/* Display the post creator's name when it's related to proposal acceptance */}
+                                    <span
+                                        className="cursor-pointer text-blue-600"
+                                        onClick={() => handleProfileClick(notification.sender_user_id || notification.user.id)} // Either sender or user id
+                                    >
+                                        Visit User 
+                                    </span><br />
+                                    {notification.message}
+                                </p>
+                                <span className="text-xs text-gray-500">
+                                    {new Date(notification.created_at).toLocaleDateString()}
+                                </span>
+                            </li>
+                        ))}
                     </ul>
                 </div>
             )}

@@ -13,15 +13,17 @@ return new class extends Migration
     {
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id'); 
-            $table->string('message'); 
-            $table->boolean('read')->default(false); 
+            $table->unsignedBigInteger('user_id');  // Receiver of the notification
+            $table->unsignedBigInteger('sender_user_id');  // Sender of the notification
+            $table->string('message');
+            $table->boolean('read')->default(false);
             $table->timestamps();
+            
+            // Foreign keys
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('sender_user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
-    
-
     
     public function down(): void
     {

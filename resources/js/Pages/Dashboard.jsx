@@ -118,8 +118,20 @@ export default function Dashboard({ auth }) {
     const MAX_FILE_SIZE = 30 * 1024 * 1024;
 
     useEffect(() => {
+        // Fetch data initially when the component mounts
         fetchData();
+    
+        // Set up auto-reload (polling) every 30 seconds (30000ms)
+        const intervalId = setInterval(() => {
+            fetchData();
+        }, 5000); // 5 seconds interval, adjust as needed
+    
+        // Cleanup the interval on component unmount
+        return () => {
+            clearInterval(intervalId);
+        };
     }, []);
+    
 
     useEffect(() => {
         if (selectedCategories.length > 0) {
@@ -242,23 +254,26 @@ export default function Dashboard({ auth }) {
 
                 {/* Main Content */}
                 <div className="flex-grow p-4">
-                    {filteredData.map((item) => (
-                        <div
-                            key={item.id}
-                            className="border-b py-4 px-6 hover:bg-gray-100 cursor-pointer"
-                            onClick={() => {
-                                setDetails(item);
-                                setClick(true);
-                            }}
-                        >
-                            <h1 className="text-2xl font-medium">{item.job_title}</h1>
-                            <p className="text-sm text-gray-500">
-                                Posted by {item.user.firstName} {item.user.lastName}
-                            </p>
-                            <p className="text-sm text-gray-500">Category: {item.category}</p>
-                        </div>
-                    ))}
-                </div>
+    {filteredData
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at)) // Sort in descending order based on created_at
+        .map((item) => (
+            <div
+                key={item.id}
+                className="border-b py-4 px-6 hover:bg-gray-100 cursor-pointer"
+                onClick={() => {
+                    setDetails(item);
+                    setClick(true);
+                }}
+            >
+                <h1 className="text-2xl font-medium">{item.job_title}</h1>
+                <p className="text-sm text-gray-500">
+                    Posted by {item.user.firstName} {item.user.lastName}
+                </p>
+                <p className="text-sm text-gray-500">Category: {item.category}</p>
+            </div>
+        ))}
+</div>
+
             </div>
 
             {/* Category Filter Modal for Mobile */}

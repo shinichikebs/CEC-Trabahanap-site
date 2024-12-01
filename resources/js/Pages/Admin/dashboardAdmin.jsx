@@ -26,9 +26,20 @@ export default function Dashboard() {
     const [selectedUser, setSelectedUser] = useState(null);
 
     useEffect(() => {
+        // Fetch data initially when the component mounts
         fetchData();
+    
+        // Set up auto-reload (polling) every 30 seconds (30000ms)
+        const intervalId = setInterval(() => {
+            fetchData();
+        }, 2000); // 30 seconds interval, adjust as needed
+    
+        // Cleanup the interval on component unmount
+        return () => {
+            clearInterval(intervalId);
+        };
     }, []);
-
+    
     useEffect(() => {
         if (activeTab === "users") {
             fetchPendingUsers();
@@ -356,30 +367,28 @@ export default function Dashboard() {
                             </button>
                             {pendingUsers.length > 0 ? (
                                 <div className="space-y-4">
-                                    {pendingUsers.map((user) => (
-                                        <div
-                                            key={user.id}
-                                            className="flex justify-between items-center bg-gray-100 p-4 rounded-lg shadow"
-                                        >
-                                            <div>
-                                                <p className="font-semibold">
-                                                    {user.firstName}{" "}
-                                                    {user.lastName}
-                                                </p>
-                                                <p className="text-sm text-gray-500">
-                                                    {user.email}
-                                                </p>
-                                            </div>
-                                            <button
-                                                onClick={() =>
-                                                    handleApproveUser(user.id)
-                                                }
-                                                className="ml-4 py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                                            >
-                                                Approve
-                                            </button>
-                                        </div>
-                                    ))}
+                                    {pendingUsers
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at)) // Sort latest first based on created_at
+    .map((user) => (
+        <div
+            key={user.id}
+            className="flex justify-between items-center bg-gray-100 p-4 rounded-lg shadow"
+        >
+            <div>
+                <p className="font-semibold">
+                    {user.firstName} {user.lastName}
+                </p>
+                <p className="text-sm text-gray-500">{user.email}</p>
+            </div>
+            <button
+                onClick={() => handleApproveUser(user.id)}
+                className="ml-4 py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+                Approve
+            </button>
+        </div>
+    ))}
+
                                 </div>
                             ) : (
                                 <p className="text-gray-500">
@@ -401,33 +410,32 @@ export default function Dashboard() {
                             </h3>
                             {pendingPosts.length > 0 ? (
                                 <div className="space-y-4">
-                                    {pendingPosts.map((post) => (
-                                        <div
-                                            key={post.id}
-                                            className="flex justify-between items-center bg-gray-100 p-4 rounded-lg shadow cursor-pointer"
-                                            onClick={() => openModal(post)} // Open modal with selected post
-                                        >
-                                            <div>
-                                                <p className="font-semibold">
-                                                    {post.job_title}
-                                                </p>
-                                                <p className="text-sm text-gray-500">
-                                                    {renderDescription(
-                                                        post.job_description
-                                                    )}
-                                                </p>
-                                            </div>
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation(); // Prevent modal from opening on button click
-                                                    handleApprovePost(post.id);
-                                                }}
-                                                className="ml-4 py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                                            >
-                                                Approve
-                                            </button>
-                                        </div>
-                                    ))}
+                                    {pendingPosts
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at)) // Sort latest first based on created_at
+    .map((post) => (
+        <div
+            key={post.id}
+            className="flex justify-between items-center bg-gray-100 p-4 rounded-lg shadow cursor-pointer"
+            onClick={() => openModal(post)} // Open modal with selected post
+        >
+            <div>
+                <p className="font-semibold">{post.job_title}</p>
+                <p className="text-sm text-gray-500">
+                    {renderDescription(post.job_description)}
+                </p>
+            </div>
+            <button
+                onClick={(e) => {
+                    e.stopPropagation(); // Prevent modal from opening on button click
+                    handleApprovePost(post.id);
+                }}
+                className="ml-4 py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+                Approve
+            </button>
+        </div>
+    ))}
+
                                 </div>
                             ) : (
                                 <p className="text-gray-500">
@@ -442,21 +450,7 @@ export default function Dashboard() {
                     </div>
                 );
 
-            case "messages":
-                return (
-                    <div>
-                        <h2 className="text-xl font-bold mb-4">Messages</h2>
-                        <p>
-                            View and respond to messages. You can manage all
-                            incoming and outgoing communications.
-                        </p>
-                        <div className="bg-white p-4 rounded-lg shadow mt-4">
-                            <h3 className="text-lg font-semibold mb-2">
-                                Inbox
-                            </h3>
-                        </div>
-                    </div>
-                );
+
 
             // report case
             case "Report":
@@ -466,22 +460,7 @@ export default function Dashboard() {
                         <ReportList /> {/* Render the ReportList component */}
                     </div>
                 );
-            case "settings":
-                return (
-                    <div>
-                        <h2 className="text-xl font-bold mb-4">Settings</h2>
-                        <p>
-                            Configure system settings. Update your preferences,
-                            change passwords, and customize the admin panel
-                            here.
-                        </p>
-                        <div className="bg-white p-4 rounded-lg shadow mt-4">
-                            <h3 className="text-lg font-semibold mb-2">
-                                System Preferences
-                            </h3>
-                        </div>
-                    </div>
-                );
+
             default:
                 return (
                     <h2 className="text-xl font-bold mb-4">
@@ -583,16 +562,7 @@ export default function Dashboard() {
                             </li>
 
                             <li>
-                                <button
-                                    className={`block w-full text-left py-2 px-4 hover:bg-gray-700 rounded-lg ${
-                                        activeTab === "messages"
-                                            ? "bg-gray-700"
-                                            : ""
-                                    }`}
-                                    onClick={() => setActiveTab("messages")}
-                                >
-                                    Messages
-                                </button>
+
                             </li>
                             <li>
                                 <button
@@ -607,16 +577,7 @@ export default function Dashboard() {
                                 </button>
                             </li>
                             <li>
-                                <button
-                                    className={`block w-full text-left py-2 px-4 hover:bg-gray-700 rounded-lg ${
-                                        activeTab === "settings"
-                                            ? "bg-gray-700"
-                                            : ""
-                                    }`}
-                                    onClick={() => setActiveTab("settings")}
-                                >
-                                    Settings
-                                </button>
+
                             </li>
                         </ul>
                     </nav>

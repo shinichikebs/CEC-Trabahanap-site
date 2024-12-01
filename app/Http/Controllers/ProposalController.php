@@ -41,6 +41,7 @@ class ProposalController extends Controller
         // Create a notification for the job offer owner
         $notification = new Notification();
         $notification->user_id = $jobOffer->user_id; // Notify the job offer owner
+        $notification->sender_user_id = $sender->id; // Store the sender's ID
         $notification->message = "{$sender->firstName} {$sender->lastName} has submitted a proposal for your job offer '{$jobOffer->job_title}'.";
         $notification->read = 0; // Unread
         $notification->save();
@@ -51,9 +52,8 @@ class ProposalController extends Controller
             'proposal' => $proposal,
             'notification' => $notification,
         ], 200);
+
     }
-    
-    
 
     public function getProposal($projectId)
     {
@@ -89,33 +89,26 @@ class ProposalController extends Controller
         return response()->json(['error' => 'User not found'], 404);
     }
 
-    public function approveProposal($id)
+
+    public function approveProposal($proposalId)
     {
-        $proposal = Proposal::with('user', 'jobOffer.user')->findOrFail($id);
+        $proposal = Proposal::findOrFail($proposalId);
+        $jobOffer = JobOffer::findOrFail($proposal->job_offer_id);
     
-        $jobOffer = $proposal->jobOffer;
-        if ($jobOffer->user_id !== Auth::id()) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
+        // Assuming the creator of the job post is the owner of the job offer
+        $creatorUserId = $jobOffer->user_id; 
     
-        $proposal->approved = true;
-        $proposal->save();
-    
-        // Notify the proposer
+        // Notification when proposal is approved
         Notification::create([
-            'user_id' => $proposal->user_id,
+            'user_id' => $proposal->user_id,  // This is the proposal sender
+            'sender_user_id' => $creatorUserId, // Job offer owner is the sender
             'message' => "Your proposal for the job '{$jobOffer->job_title}' has been approved by {$jobOffer->user->firstName} {$jobOffer->user->lastName}.",
             'read' => false,
         ]);
     
-        // Notify the job offer owner
-        Notification::create([
-            'user_id' => $jobOffer->user_id,
-            'message' => "You have approved a proposal from {$proposal->user->firstName} {$proposal->user->lastName} for the job '{$jobOffer->job_title}'.",
-            'read' => false,
-        ]);
-    
-        return response()->json(['message' => 'Proposal approved successfully.']);
+        // Additional logic to approve the proposal can go here (e.g., updating status)
+        
+        return response()->json(['message' => 'Proposal approved and notification sent.']);
     }
     
     

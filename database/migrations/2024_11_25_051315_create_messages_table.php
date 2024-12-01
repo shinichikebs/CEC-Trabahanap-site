@@ -17,10 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('recipient_id'); // User who receives the message
             $table->text('content'); // Message content
             $table->boolean('is_read')->default(false); // Read status
-            $table->unsignedBigInteger('sender_id'); 
-            $table->unsignedBigInteger('recipient_id'); 
-            $table->text('content'); 
-            $table->boolean('is_read')->default(false); 
+
             $table->timestamps();
 
             // Foreign keys
