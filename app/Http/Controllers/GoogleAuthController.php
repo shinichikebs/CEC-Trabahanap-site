@@ -42,7 +42,8 @@ class GoogleAuthController extends Controller
                     'lastName' => $google_user['family_name'],
                     'email' => $google_user->email,
                     'avatar' => $google_user->getAvatar(),
-                    'google_id' => $google_user['id']
+                    'google_id' => $google_user['id'],
+                    'is_approved' => 1,
                 ]);
 
                 // Set a default is_approved status if needed

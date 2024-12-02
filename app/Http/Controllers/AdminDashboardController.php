@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Notifications\UserApproved;
+use App\Notifications\DeclineUserNotification;
 use App\Models\Report;
 use App\Models\DeletedUser;
 use App\Models\Admin;
@@ -110,7 +111,32 @@ class AdminDashboardController extends Controller
             return response()->json(['error' => 'Internal Server Error'], 500);
         }
     }
+
+
+
+    public function DeclineUser($id)
+    {
+        try {
+            // Find user and approve them
+            $user = User::findOrFail($id);
+            $user->is_approved = 4;
+            $user->save();
     
+            // Send notification (this will send the email)
+            $user->notify(new DeclineUserNotification($user));
+    
+            // Log success to the console (for the server)
+            \Log::info('User approved and email sent to: ' . $user->email);
+    
+            return response()->json(['message' => 'User approved successfully']);
+        } catch (\Exception $e) {
+            // Log the exception message and stack trace
+            \Log::error('Error approving user: ' . $e->getMessage());
+            \Log::error($e->getTraceAsString()); // Log the stack trace
+    
+            return response()->json(['error' => 'Internal Server Error'], 500);
+        }
+    }
 
 
     // Method to approve user (set is_approved to 1)
@@ -332,6 +358,28 @@ class AdminDashboardController extends Controller
                     return response()->json(['error' => 'Internal Server Error'], 500);
                 }
             }
+            public function DeclineconfirmPassword(Request $request)
+                {
+                    $request->validate([
+                        'password' => 'required|string',
+                    ]);
+
+                    // Ensure the admin is logged in and retrieve their information
+                    $admin = Auth::guard('admin')->user();
+
+                    if (!$admin) {
+                        return response()->json(['success' => false, 'message' => 'Admin not authenticated'], 401);
+                    }
+
+                    // Check if the provided password matches the hashed password in the database
+                    if (Hash::check($request->password, $admin->password)) {
+                        return response()->json(['success' => true]);
+                    } else {
+                        return response()->json(['success' => false, 'message' => 'Invalid password'], 401);
+                    }
+                }
+            
+
 
             public function reportUsers()
             {

@@ -187,13 +187,14 @@ Route::group(['middleware' => ['auth:admin']], function () {
     Route::post('/admin/add-staff', [AdminDashboardController::class, 'addStaff'])->name('admin.add-staff');
     Route::delete('/admin/delete-user/{id}', [AdminDashboardController::class, 'deleteUser']);
     Route::post('/admin/restrict-user/{id}', [AdminDashboardController::class, 'restrictUser']);
+    Route::post('/admin/Declineconfirm-password', [AdminDashboardController::class, 'DeclineconfirmPassword']);
     Route::get('/admin/reports', [AdminDashboardController::class, 'reportUsers']);
     Route::get('/admin/user/{id}', [AdminDashboardController::class, 'getUserById']);
     Route::get('/admin/user/{id}/approved-posts', [AdminDashboardController::class, 'getUserApprovedPosts']);
     Route::post('/admin/confirm-password', [AdminDashboardController::class, 'confirmPassword']);
     Route::get('/admin/user/{userId}/done-jobs', [AdminDashboardController::class, 'getDoneJobs']);
     Route::post('/admin/approve-user/{id}', [AdminDashboardController::class, 'approveUser']);
-
+    Route::post('/admin/decline-user/{id}', [AdminDashboardController::class, 'DeclineUser']);
 
 });
 

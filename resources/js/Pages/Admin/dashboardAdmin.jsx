@@ -128,6 +128,32 @@ export default function Dashboard() {
             });
     };
     
+
+    const handleDeclineUser = (userId) => {
+        axios
+            .post(`/admin/decline-user/${userId}`)
+            .then((response) => {
+                Swal.fire({
+                    title: "Success!",
+                    text: "User decline successfully!",
+                    icon: "success",
+                    confirmButtonText: "Okay",
+                });
+    
+                setPendingUsers((prevUsers) =>
+                    prevUsers.filter((user) => user.id !== userId)
+                );
+    
+                // Log to the browser console (front-end)
+                console.log(`User ${userId} approved and email sent.`);
+            })
+            .catch((error) => {
+                console.error('Error approving user:', error.response || error.message);
+            });
+    };
+    
+
+
     
     const handleLogout = () => {
         Inertia.post("/admin/logout"); // Assuming Inertia.js is being used for logout
@@ -386,6 +412,12 @@ export default function Dashboard() {
             >
                 Approve
             </button>
+            <button
+                onClick={() => handleDeclineUser(user.id)}
+                className="ml-4 py-2 px-4 bg-red-600 text-white rounded-lg hover:bg-blue-700"
+            >
+                Decline
+            </button>
         </div>
     ))}
 
@@ -433,6 +465,7 @@ export default function Dashboard() {
             >
                 Approve
             </button>
+
         </div>
     ))}
 
@@ -600,6 +633,7 @@ export default function Dashboard() {
                         onClose={() => setIsSearchModalOpen(false)} // Closes modal
                     />
                 </main>
+
             </div>
         </div>
     );

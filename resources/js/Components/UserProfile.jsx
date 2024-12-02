@@ -89,21 +89,7 @@ const UserProfile = ({ user, onClose }) => {
         }
     };
 
-    const handleRestrict = () => {
-        setActionToConfirm("restrict");
-        setIsPasswordModalOpen(true);
-    };
-
-    const handleRestrictUser = async () => {
-        try {
-            await axios.post(`/admin/restrict-user/${user.id}`);
-            Swal.fire("Success", "User restricted successfully!", "success");
-            onClose();
-        } catch (error) {
-            Swal.fire("Error", "Failed to restrict user", "error");
-            console.error("Error restricting user:", error);
-        }
-    };
+    
 
     const handlePostClick = (post) => {
         setSelectedPost(post);
@@ -139,12 +125,7 @@ const UserProfile = ({ user, onClose }) => {
                     </h2>
 
                     <div className="flex space-x-4 mt-4">
-                        <button
-                            onClick={handleRestrict}
-                            className="bg-red-500 text-white px-4 py-2 rounded-lg"
-                        >
-                            Restrict
-                        </button>
+
                         <button
                             className="bg-red-600 text-white px-4 py-2 rounded-lg flex items-center"
                             onClick={handleDelete}

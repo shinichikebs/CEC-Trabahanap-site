@@ -11,6 +11,8 @@ export default function UserProfile({ user }) {
     const [selectedPost, setSelectedPost] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [rating, setRating] = useState(0);
+    const [selectedViolation, setSelectedViolation] = useState(null);
+
 
     const violations = [
         "Spam or fake profile",
