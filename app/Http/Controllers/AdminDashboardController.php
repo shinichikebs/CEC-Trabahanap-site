@@ -167,6 +167,21 @@ class AdminDashboardController extends Controller
                 return response()->json(['error' => 'Internal Server Error'], 500);
             }
         }
+
+        public function declinePost($id)
+        {
+            try {
+                $post = JobOffer::findOrFail($id);
+                $post->is_approved = 2; // Mark the post as approved
+                $post->save();
+
+                return response()->json(['message' => 'Post approved successfully']);
+            } catch (\Exception $e) {
+                \Log::error('Error approving post: ' . $e->getMessage());
+                return response()->json(['error' => 'Internal Server Error'], 500);
+            }
+        }
+
         public function reportall()
         {
             return Inertia::render('Admin/report');

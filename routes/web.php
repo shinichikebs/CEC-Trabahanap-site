@@ -78,7 +78,7 @@ Route::middleware('auth:sanctum')->get('/user-profile/{userId}', [UserController
     // Route to mark a project as done
     Route::post('/post-project/{id}/done', [PostProjectController::class, 'markAsDone']);
 
-    // Route to delete a project
+    // Route to delete a project    
     Route::delete('/post-project/{id}', [PostProjectController::class, 'destroy'])->name('post-project.destroy');
 
 
@@ -87,6 +87,8 @@ Route::middleware('auth:sanctum')->get('/user-profile/{userId}', [UserController
         Route::get('/chat/{id}', [ChatController::class, 'show'])->name('chat.show');
         Route::post('/messages', [ChatController::class, 'storeMessage']);
         Route::get('/messages/{contactId}', [ChatController::class, 'getMessages']);
+        Route::post('/messages/mark-as-read/{contactId}', [ChatController::class, 'markMessagesAsRead']);
+
     });
     // Fetch messages
 Route::middleware('auth:sanctum')->get('/messages/{contactId}', [ChatController::class, 'getMessages']);
@@ -172,6 +174,7 @@ Route::group(['middleware' => ['auth:admin']], function () {
 
     Route::get('/admin/pending-approval-posts', [AdminDashboardController::class, 'getPendingApprovalPosts']);
     Route::post('/admin/approve-post/{id}', [AdminDashboardController::class, 'approvePost']);
+    Route::post('/admin/decline-post/{id}', [AdminDashboardController::class, 'declinePost']);
 
 
     Route::get('/admin/approved-users', [AdminDashboardController::class, 'getApprovedUsers']);

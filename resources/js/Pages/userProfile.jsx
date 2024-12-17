@@ -242,13 +242,6 @@ export default function UserProfile({ user }) {
                         </Link>
 
                         <button
-                            onClick={handleRateClick}
-                            className="mt-2 text-yellow-500 hover:underline"
-                        >
-                            ★★★★☆/Rate
-                        </button>
-
-                        <button
                             onClick={handleReportClick}
                             className="text-red-500 text-sm mt-2"
                         >

@@ -14,7 +14,8 @@ export default defineConfig({
     resolve: {
         alias: {
             '@': path.resolve(__dirname, 'resources/js'),
-            '@styles': path.resolve(__dirname, 'resources/css'), // Optional alias for styles
+            '@styles': path.resolve(__dirname, 'resources/css'),
+            'react-datepicker': 'node_modules/react-datepicker', // Optional alias for styles
         },
     },
     server: {

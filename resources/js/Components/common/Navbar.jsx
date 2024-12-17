@@ -42,7 +42,7 @@ export default function Navbar({ className = "", ...props }) {
             {isOpen && (
                 <div className="bg-[#231955] text-white p-4 rounded-lg shadow-lg absolute top-16 right-0 w-52 z-20">
                     <a
-                        href="/about-us"
+                        href="https://sites.google.com/view/risk-coders/home"
                         className="block py-2 px-4 text-white rounded-lg mb-2 hover:bg-[#D18C33] flex items-center"
                     >
                         <FaQuestion size={16} className="mr-2" />

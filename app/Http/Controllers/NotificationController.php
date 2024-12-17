@@ -75,7 +75,16 @@ class NotificationController extends Controller
                 return response()->json(['error' => 'Unauthorized'], 403);
             }
     
-            // Mark the notification as read
+            // Check if the notification is related to a message
+            if (strpos($notification->message, 'has sent you a message') !== false) {
+                // This is a message notification, delete it when read
+                $notification->delete();
+                return response()->json([
+                    'message' => 'Message notification deleted.',
+                ]);
+            }
+    
+            // Otherwise, just mark the notification as read
             $notification->update(['read' => true]);
     
             return response()->json([
@@ -87,7 +96,6 @@ class NotificationController extends Controller
             return response()->json(['error' => 'Internal Server Error'], 500);
         }
     }
-    
     
     /**
      * Store a new notification.

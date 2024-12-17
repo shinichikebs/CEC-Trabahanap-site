@@ -6,11 +6,20 @@ import { IoMdArrowBack } from "react-icons/io";
 export default function ChatPage({ contactUser, currentUserId }) {
     const [message, setMessage] = useState("");
     const [messages, setMessages] = useState([]);
-    const [socket, setSocket] = useState(null);
     const messagesEndRef = useRef(null);
 
-    // Fetch messages from the backend on initial page load
+    // Fetch messages from the backend on initial page load and set up auto-reload
     useEffect(() => {
+        // Mark messages as read when the chat is viewed
+        const markAsRead = async () => {
+            try {
+                await axios.post(`/messages/mark-as-read/${contactUser.id}`);
+                console.log("Messages marked as read.");
+            } catch (error) {
+                console.error("Error marking messages as read:", error);
+            }
+        };
+
         const fetchMessages = async () => {
             try {
                 const response = await axios.get(`/messages/${contactUser.id}`);
@@ -23,10 +32,16 @@ export default function ChatPage({ contactUser, currentUserId }) {
                 console.error("Error fetching messages:", error);
             }
         };
-        fetchMessages();
+
+        markAsRead(); // Call to mark messages as read
+        fetchMessages(); // Initial fetch
+
+        // Set up interval to auto reload messages every 5 seconds
+        const interval = setInterval(fetchMessages, 1000); // Fetch every 5 seconds
+
+        // Clear the interval on component unmount
+        return () => clearInterval(interval);
     }, [contactUser.id, contactUser.firstName, currentUserId]);
-
-
 
     // Scroll to the bottom of the messages container
     const scrollToBottom = () => {
@@ -65,6 +80,7 @@ export default function ChatPage({ contactUser, currentUserId }) {
     const handleBackClick = () => {
         window.history.back();
     };
+
     return (
         <div className="flex flex-col h-screen bg-gray-100">
             {/* Header */}
@@ -85,15 +101,11 @@ export default function ChatPage({ contactUser, currentUserId }) {
                 {messages.map((msg, index) => (
                     <div
                         key={index}
-                        className={`flex ${
-                            msg.sender === "You" ? "justify-end" : "justify-start"
-                        }`}
+                        className={`flex ${msg.sender === "You" ? "justify-end" : "justify-start"}`}
                     >
                         <div
                             className={`p-4 rounded-lg max-w-sm ${
-                                msg.sender === "You"
-                                    ? "bg-blue-500 text-white"
-                                    : "bg-gray-300 text-black"
+                                msg.sender === "You" ? "bg-blue-500 text-white" : "bg-gray-300 text-black"
                             }`}
                         >
                             {/* Sender Name */}

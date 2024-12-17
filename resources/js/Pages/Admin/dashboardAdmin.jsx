@@ -28,18 +28,18 @@ export default function Dashboard() {
     useEffect(() => {
         // Fetch data initially when the component mounts
         fetchData();
-    
+
         // Set up auto-reload (polling) every 30 seconds (30000ms)
         const intervalId = setInterval(() => {
             fetchData();
         }, 2000); // 30 seconds interval, adjust as needed
-    
+
         // Cleanup the interval on component unmount
         return () => {
             clearInterval(intervalId);
         };
     }, []);
-    
+
     useEffect(() => {
         if (activeTab === "users") {
             fetchPendingUsers();
@@ -105,6 +105,46 @@ export default function Dashboard() {
             });
     };
 
+    const handleDeclinePost = (postId) => {
+        // Show confirmation prompt before proceeding
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this action!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, decline it!",
+            cancelButtonText: "No, cancel",
+            reverseButtons: true, // Reverses the order of the buttons (Yes, No)
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Proceed with declining the post if "Yes" is clicked
+                axios
+                    .post(`/admin/decline-post/${postId}`)
+                    .then((response) => {
+                        Swal.fire({
+                            title: "Success!",
+                            text: "Post declined successfully!",
+                            icon: "success",
+                            confirmButtonText: "Okay",
+                        });
+
+                        setPendingPosts((prevPosts) =>
+                            prevPosts.filter((post) => post.id !== postId)
+                        ); // Remove declined post from list
+
+                        // Log to the browser console (front-end)
+                        console.log(`Post ${postId} declined.`);
+                    })
+                    .catch((error) => {
+                        console.error("Error declining post:", error);
+                    });
+            } else if (result.isDismissed) {
+                // Optionally handle cancellation (e.g., log to console)
+                console.log(`Post decline operation was cancelled.`);
+            }
+        });
+    };
+
     const handleApproveUser = (userId) => {
         axios
             .post(`/admin/approve-user/${userId}`)
@@ -115,46 +155,65 @@ export default function Dashboard() {
                     icon: "success",
                     confirmButtonText: "Okay",
                 });
-    
+
                 setPendingUsers((prevUsers) =>
                     prevUsers.filter((user) => user.id !== userId)
                 );
-    
+
                 // Log to the browser console (front-end)
                 console.log(`User ${userId} approved and email sent.`);
             })
             .catch((error) => {
-                console.error('Error approving user:', error.response || error.message);
+                console.error(
+                    "Error approving user:",
+                    error.response || error.message
+                );
             });
     };
-    
 
     const handleDeclineUser = (userId) => {
-        axios
-            .post(`/admin/decline-user/${userId}`)
-            .then((response) => {
-                Swal.fire({
-                    title: "Success!",
-                    text: "User decline successfully!",
-                    icon: "success",
-                    confirmButtonText: "Okay",
-                });
-    
-                setPendingUsers((prevUsers) =>
-                    prevUsers.filter((user) => user.id !== userId)
-                );
-    
-                // Log to the browser console (front-end)
-                console.log(`User ${userId} approved and email sent.`);
-            })
-            .catch((error) => {
-                console.error('Error approving user:', error.response || error.message);
-            });
+        // Show confirmation prompt before proceeding
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this action!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, decline it!",
+            cancelButtonText: "No, cancel",
+            reverseButtons: true, // This reverses the order of the buttons (Yes, No)
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Proceed with declining the user if "Yes" is clicked
+                axios
+                    .post(`/admin/decline-user/${userId}`)
+                    .then((response) => {
+                        Swal.fire({
+                            title: "Success!",
+                            text: "User declined successfully!",
+                            icon: "success",
+                            confirmButtonText: "Okay",
+                        });
+
+                        setPendingUsers((prevUsers) =>
+                            prevUsers.filter((user) => user.id !== userId)
+                        );
+
+                        // Log to the browser console (front-end)
+                        console.log(`User ${userId} declined.`);
+                    })
+                    .catch((error) => {
+                        console.error(
+                            "Error declining user:",
+                            error.response || error.message
+                        );
+                    });
+            } else if (result.isDismissed) {
+                // Optionally handle cancellation (e.g., show a cancellation message or log to console)
+                console.log(`User decline operation was cancelled.`);
+            }
+        });
     };
-    
 
-
-    
     const handleLogout = () => {
         Inertia.post("/admin/logout"); // Assuming Inertia.js is being used for logout
     };
@@ -253,7 +312,6 @@ export default function Dashboard() {
         setSearchQuery("");
     };
 
-
     const getNiceMax = (maxValue) => {
         if (maxValue <= 5) return 5;
         const magnitude = Math.pow(10, Math.floor(Math.log10(maxValue)));
@@ -264,11 +322,19 @@ export default function Dashboard() {
     // Function to render the dynamic bar graph
     const renderBarGraph = () => {
         // Find the maximum count
-        const maxCount = Math.max(totalUsers, totalPosts, totalJobsDone, pendingUsers.length, pendingPosts.length);
+        const maxCount = Math.max(
+            totalUsers,
+            totalPosts,
+            totalJobsDone,
+            pendingUsers.length,
+            pendingPosts.length
+        );
         const niceMax = getNiceMax(maxCount); // Adjusted max for better display
 
         // Generate dynamic Y-axis labels
-        const yAxisLabels = Array.from({ length: 8 }, (_, i) => Math.round((niceMax / 2) * i)).reverse();
+        const yAxisLabels = Array.from({ length: 8 }, (_, i) =>
+            Math.round((niceMax / 2) * i)
+        ).reverse();
 
         return (
             <div className="relative flex flex-col items-center left-20 mt-10 w-full max-w-3xl">
@@ -285,17 +351,46 @@ export default function Dashboard() {
                         <div
                             key={i}
                             className="absolute left-0 right-0 border-t border-gray-300"
-                            style={{ bottom: `${(i / (yAxisLabels.length - 1)) * 100}%` }}
+                            style={{
+                                bottom: `${
+                                    (i / (yAxisLabels.length - 1)) * 100
+                                }%`,
+                            }}
                         ></div>
                     ))}
 
                     {/* Bars */}
                     <div className="flex justify-around items-end h-full space-x-4">
-                        <Bar label="Total Users" count={totalUsers} color="bg-blue-300" maxCount={niceMax} />
-                        <Bar label="Total Job Offers" count={totalPosts} color="bg-green-300" maxCount={niceMax} />
-                        <Bar label="Jobs Done" count={totalJobsDone} color="bg-purple-300" maxCount={niceMax} />
-                        <Bar label="Pending Users" count={pendingUsers.length} color="bg-yellow-300" maxCount={niceMax} />
-                        <Bar label="Pending Job Offers" count={pendingPosts.length} color="bg-red-300" maxCount={niceMax} />
+                        <Bar
+                            label="Total Users"
+                            count={totalUsers}
+                            color="bg-blue-300"
+                            maxCount={niceMax}
+                        />
+                        <Bar
+                            label="Total Job Offers"
+                            count={totalPosts}
+                            color="bg-green-300"
+                            maxCount={niceMax}
+                        />
+                        <Bar
+                            label="Jobs Done"
+                            count={totalJobsDone}
+                            color="bg-purple-300"
+                            maxCount={niceMax}
+                        />
+                        <Bar
+                            label="Pending Users"
+                            count={pendingUsers.length}
+                            color="bg-yellow-300"
+                            maxCount={niceMax}
+                        />
+                        <Bar
+                            label="Pending Job Offers"
+                            count={pendingPosts.length}
+                            color="bg-red-300"
+                            maxCount={niceMax}
+                        />
                     </div>
                 </div>
             </div>
@@ -313,12 +408,15 @@ export default function Dashboard() {
                     style={{ height: `${height}px` }}
                     className={`${color} w-12 border border-gray-500 transition-all duration-300 ease-in-out`}
                 ></div>
-                <span className="mt-2 text-center text-gray-700 font-medium text-sm">{label}</span>
-                <span className="text-center font-semibold">{count.toLocaleString()}</span>
+                <span className="mt-2 text-center text-gray-700 font-medium text-sm">
+                    {label}
+                </span>
+                <span className="text-center font-semibold">
+                    {count.toLocaleString()}
+                </span>
             </div>
         );
     };
-    
 
     // Add User modal handlers
     const openAddUserModal = () => setIsAddUserModalOpen(true);
@@ -337,27 +435,34 @@ export default function Dashboard() {
         switch (activeTab) {
             case "dashboard":
                 return (
-                    
                     <div>
-                        <h2 className="text-2xl font-bold mb-4">Dashboard Overview</h2>
+                        <h2 className="text-2xl font-bold mb-4">
+                            Dashboard Overview
+                        </h2>
                         {renderBarGraph()}
-        
+
                         {/* Report Links */}
                         <div className="mt-8 flex space-x-4">
                             <a
-                                onClick={() => Inertia.visit(route("report.all"))}
+                                onClick={() =>
+                                    Inertia.visit(route("report.all"))
+                                }
                                 className="py-3 px-6 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-200 cursor-pointer"
                             >
                                 All Reports
                             </a>
                             <a
-                                onClick={() => Inertia.visit(route("report.user"))}
+                                onClick={() =>
+                                    Inertia.visit(route("report.user"))
+                                }
                                 className="py-3 px-6 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition duration-200 cursor-pointer"
                             >
                                 User Reports
                             </a>
                             <a
-                                onClick={() => Inertia.visit(route("report.post"))}
+                                onClick={() =>
+                                    Inertia.visit(route("report.post"))
+                                }
                                 className="py-3 px-6 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition duration-200 cursor-pointer"
                             >
                                 Post Reports
@@ -365,8 +470,6 @@ export default function Dashboard() {
                         </div>
                     </div>
                 );
-        
-        
 
             case "users":
                 return (
@@ -394,33 +497,49 @@ export default function Dashboard() {
                             {pendingUsers.length > 0 ? (
                                 <div className="space-y-4">
                                     {pendingUsers
-    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at)) // Sort latest first based on created_at
-    .map((user) => (
-        <div
-            key={user.id}
-            className="flex justify-between items-center bg-gray-100 p-4 rounded-lg shadow"
-        >
-            <div>
-                <p className="font-semibold">
-                    {user.firstName} {user.lastName}
-                </p>
-                <p className="text-sm text-gray-500">{user.email}</p>
-            </div>
-            <button
-                onClick={() => handleApproveUser(user.id)}
-                className="ml-4 py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-            >
-                Approve
-            </button>
-            <button
-                onClick={() => handleDeclineUser(user.id)}
-                className="ml-4 py-2 px-4 bg-red-600 text-white rounded-lg hover:bg-blue-700"
-            >
-                Decline
-            </button>
-        </div>
-    ))}
-
+                                        .sort(
+                                            (a, b) =>
+                                                new Date(b.created_at) -
+                                                new Date(a.created_at)
+                                        ) // Sort latest first based on created_at
+                                        .map((user) => (
+                                            <div
+                                                key={user.id}
+                                                className="flex justify-between items-center bg-gray-100 p-4 rounded-lg shadow"
+                                            >
+                                                <div>
+                                                    <p className="font-semibold">
+                                                        {user.firstName}{" "}
+                                                        {user.lastName}
+                                                    </p>
+                                                    <p className="text-sm text-gray-500">
+                                                        {user.email}
+                                                    </p>
+                                                </div>
+                                                <div className="flex space-x-4">
+                                                    <button
+                                                        onClick={() =>
+                                                            handleApproveUser(
+                                                                user.id
+                                                            )
+                                                        }
+                                                        className="py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                                                    >
+                                                        Approve
+                                                    </button>
+                                                    <button
+                                                        onClick={() =>
+                                                            handleDeclineUser(
+                                                                user.id
+                                                            )
+                                                        }
+                                                        className="py-2 px-4 bg-red-600 text-white rounded-lg hover:bg-blue-700"
+                                                    >
+                                                        Decline
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
                                 </div>
                             ) : (
                                 <p className="text-gray-500">
@@ -443,32 +562,53 @@ export default function Dashboard() {
                             {pendingPosts.length > 0 ? (
                                 <div className="space-y-4">
                                     {pendingPosts
-    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at)) // Sort latest first based on created_at
-    .map((post) => (
-        <div
-            key={post.id}
-            className="flex justify-between items-center bg-gray-100 p-4 rounded-lg shadow cursor-pointer"
-            onClick={() => openModal(post)} // Open modal with selected post
-        >
-            <div>
-                <p className="font-semibold">{post.job_title}</p>
-                <p className="text-sm text-gray-500">
-                    {renderDescription(post.job_description)}
-                </p>
-            </div>
-            <button
-                onClick={(e) => {
-                    e.stopPropagation(); // Prevent modal from opening on button click
-                    handleApprovePost(post.id);
-                }}
-                className="ml-4 py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-            >
-                Approve
-            </button>
-
-        </div>
-    ))}
-
+                                        .sort(
+                                            (a, b) =>
+                                                new Date(b.created_at) -
+                                                new Date(a.created_at)
+                                        ) // Sort latest first based on created_at
+                                        .map((post) => (
+                                            <div
+                                                key={post.id}
+                                                className="flex justify-between items-center bg-gray-100 p-4 rounded-lg shadow cursor-pointer"
+                                                onClick={() => openModal(post)} // Open modal with selected post
+                                            >
+                                                <div>
+                                                    <p className="font-semibold">
+                                                        {post.job_title}
+                                                    </p>
+                                                    <p className="text-sm text-gray-500">
+                                                        {renderDescription(
+                                                            post.job_description
+                                                        )}
+                                                    </p>
+                                                </div>
+                                                <div className="flex space-x-4">
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation(); // Prevent modal from opening on button click
+                                                            handleApprovePost(
+                                                                post.id
+                                                            );
+                                                        }}
+                                                        className="py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                                                    >
+                                                        Approve
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation(); // Prevent modal from opening on button click
+                                                            handleDeclinePost(
+                                                                post.id
+                                                            );
+                                                        }}
+                                                        className="py-2 px-4 bg-red-600 text-white rounded-lg hover:bg-blue-700"
+                                                    >
+                                                        Decline
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
                                 </div>
                             ) : (
                                 <p className="text-gray-500">
@@ -482,8 +622,6 @@ export default function Dashboard() {
                         )}
                     </div>
                 );
-
-
 
             // report case
             case "Report":
@@ -594,9 +732,7 @@ export default function Dashboard() {
                                 </button>
                             </li>
 
-                            <li>
-
-                            </li>
+                            <li></li>
                             <li>
                                 <button
                                     className={`block w-full text-left py-2 px-4 hover:bg-gray-700 rounded-lg ${
@@ -609,9 +745,7 @@ export default function Dashboard() {
                                     Report
                                 </button>
                             </li>
-                            <li>
-
-                            </li>
+                            <li></li>
                         </ul>
                     </nav>
                 </aside>
@@ -633,7 +767,6 @@ export default function Dashboard() {
                         onClose={() => setIsSearchModalOpen(false)} // Closes modal
                     />
                 </main>
-
             </div>
         </div>
     );

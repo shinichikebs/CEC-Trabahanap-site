@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Notification;
 use App\Models\User;
 use App\Models\Message;
 use Illuminate\Http\Request;
@@ -47,6 +48,18 @@ class ChatController extends Controller
             'is_read' => false,                   // New message is unread by default
         ]);
 
+        // Now create a notification for the recipient
+    $sender = auth()->user(); // Get the authenticated user (sender)
+    $recipient = User::find($request->recipient_id); // Get the recipient user
+
+    // Create the notification
+    $notification = new Notification();
+    $notification->user_id = $recipient->id; // Notify the recipient (contact user)
+    $notification->sender_user_id = $sender->id; // Store the sender's ID
+    $notification->message = "{$sender->firstName} {$sender->lastName} has sent you a message."; // Customize your message
+    $notification->read = 0; // Unread notification
+    $notification->save();
+
         // Return the stored message as a response
         return response()->json([
             'id' => $message->id,
@@ -57,6 +70,7 @@ class ChatController extends Controller
             'timestamp' => $message->created_at,
             'sender' => 'You', // Always 'You' for messages created by the current user
         ], 201);
+
     }
 
     /**
@@ -100,4 +114,20 @@ class ChatController extends Controller
         // Return the enriched messages as JSON response
         return response()->json($messages);
     }
+
+    // In ChatController.php
+
+    public function markMessagesAsRead($contactId)
+    {
+        $userId = auth()->id();
+
+        // Mark messages as read where the recipient is the authenticated user and the message is not already read
+        Message::where('recipient_id', $userId)
+            ->where('sender_id', $contactId)
+            ->where('is_read', false)
+            ->update(['is_read' => true]);
+
+        return response()->json(['message' => 'Messages marked as read.']);
+    }
+
 }
